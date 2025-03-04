@@ -1,0 +1,18 @@
+{
+    "actuate_seo_filter_indexable": {
+        "column": {
+            "index_id": true,
+            "attribute_id": true,
+            "attribute_code": true,
+            "option": true,
+            "is_indexable": true
+        },
+        "index": {
+            "ACTUATE_SEO_FILTER_INDEXABLE_OPTION": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "ACTUATE_SEO_FILTER_INDEXABLE_ATTRIBUTE_CODE_OPTION": true
+        }
+    }
+}

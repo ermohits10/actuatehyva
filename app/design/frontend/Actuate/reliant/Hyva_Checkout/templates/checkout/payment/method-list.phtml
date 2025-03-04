@@ -1,0 +1,135 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\MethodMetaDataInterface;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Checkout\ViewModel\Checkout\Payment\MethodList as ViewModel;
+use Hyva\Checkout\Magewire\Checkout\Payment\MethodList as Magewire;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Quote\Api\Data\PaymentMethodInterface;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var ViewModel $viewModel */
+/** @var PaymentMethodInterface $method */
+/** @var Magewire $magewire */
+/** @var Escaper $escaper */
+/** @var MethodMetaDataInterface $methodMetaData */
+
+$viewModel = $viewModels->require(ViewModel::class);
+$methods = $viewModel->getList();
+
+$logos = [
+    'braintree' => [
+        $block->getViewFileUrl('Hyva_Checkout::images/visa.png'),
+        $block->getViewFileUrl('Hyva_Checkout::images/mastercard.png')
+    ],
+    'paypal_express' => $block->getViewFileUrl('Hyva_Checkout::images/paypal_checkout.png'),
+    'amazon_payment_v2' => $block->getViewFileUrl('Hyva_Checkout::images/Black-L.png'),
+    'braintree_applepay' => $block->getViewFileUrl('images/apple-pay.png'),
+    'v12finance' => $block->getViewFileUrl('Hyva_Checkout::images/v12logo.png')
+];
+?>
+<div id="payment-methods">
+    <?php if ($methods): ?>
+        <script>
+            window.addEventListener('checkout:step:loaded', () => {
+                if('<?= $escaper->escapeJs($magewire->method) ?>' && document.getElementById('payment-method-list')) {
+                    window.dispatchEvent(new CustomEvent('checkout:payment:method-activate', { detail: { method: '<?= $escaper->escapeJs($magewire->method) ?>'} }))
+                }
+            }, { once: true })
+        </script>
+
+        <ol id="payment-method-list" class="space-y-4">
+            <?php foreach ($methods as $method): ?>
+                <?php $methodCodeAttr = $escaper->escapeHtmlAttr($method->getCode()) ?>
+                <?php $methodMetaData = $viewModel->getMethodMetaData($block, $method) ?>
+
+                <li id="payment-method-option-<?= /* @noEscape */ $methodCodeAttr ?>"
+                    class="<?= $magewire->method === $method->getCode() ? 'active' : 'inactive' ?> method-option border border-[#D9D9D9] py-2.5 px-4 lg:items-center"
+                    wire:key="<?= /* @noEscape */ $methodCodeAttr ?>"
+                >
+                    <div class="flex gap-x-4">
+                        <div class="flex items-center">
+                            <input type="radio"
+                                   class="flex-none disabled:opacity-25 w-5 h-5 lg:w-7 lg:h-7 border-[#D9D9D9]"
+                                   id="payment-method-<?= /* @noEscape */ $methodCodeAttr ?>"
+                                   name="payment-method-option"
+                                   value="<?= /* @noEscape */ $methodCodeAttr ?>"
+                                   wire:model="method"
+                            />
+                        </div>
+
+                        <label class="flex justify-between items-center cursor-pointer w-full relative space-x-4 lg:-mt-[2px] "
+                               for="payment-method-<?= /* @noEscape */ $methodCodeAttr ?>"
+                        >
+                            <div class="text-[#070707] font-semibold text-16 leading-[17px] lg:text-[20px] lg:leading-[24px] flex flex-col">
+                                <?= $escaper->escapeHtml($method->getTitle()) ?>
+
+                                <?php if ($method->getCode() === 'amazon_payment_v2' && $magewire->method !== 'amazon_payment_v2'): ?>
+                                    <span class="text-[#070707] font-semibold text-xs font-medium">
+                                        <?= __('Use your Amazon Account'); ?>
+                                    </span>
+                                <?php endif ?>
+                                <?php if ($method->getCode() === 'paypal_express' && $magewire->method !== 'paypal_express'): ?>
+                                    <span class="text-[#070707] font-semibold text-xs font-medium">
+                                        <?= __('Pay now or in 3 interest-free payments'); ?>
+                                    </span>
+                                <?php endif ?>
+                                <?php if ($methodMetaData->hasSubTitle()): ?>
+                                    <span class="text-[#070707] font-semibold text-xs font-medium">
+                                        <?= $escaper->escapeHtml($methodMetaData->getSubTitle()) ?>
+                                    </span>
+                                <?php endif ?>
+                            </div>
+
+                            <?php if ($methodMetaData->canRenderIcon()): ?>
+                                <div class="-mt-2.5">
+                                    <?= /* @noEscape */ $methodMetaData->renderIcon() ?>
+                                </div>
+                            <?php elseif(isset($logos[$method->getCode()]) && $logos[$method->getCode()]): ?>
+                                <?php if (is_array($logos[$method->getCode()])): ?>
+                                    <?php foreach ($logos[$method->getCode()] as $logo): ?>
+                                        <img alt="<?= $method->getCode() ?>" src="<?= $logo ?>">
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <img alt="<?= $method->getCode() ?>" src="<?= $logos[$method->getCode()] ?>">
+                                <?php endif; ?>
+                            <?php endif ?>
+                        </label>
+                    </div>
+                    <?php if ($viewModel->canShowMethod($block, $method, $magewire->method)): ?>
+                        <?php $html = $viewModel->getMethodBlock($block, $method)->toHtml() ?>
+
+                        <?php if (! empty($html)): ?>
+                            <div id="<?= 'payment-method-view-' . /* @noEscape */ $methodCodeAttr ?>" class="w-full mt-5">
+                                <?php if (in_array($method->getCode(), ['amazon_payment_v2', 'paypal_express'])): ?>
+                                    <div class="payment-method-note mb-2.5">
+                                        <span class="text-lg font-medium">
+                                            <?php if ($method->getCode() === 'amazon_payment_v2'): ?>
+                                                <?= __('You will be redirected to the Amazon Pay Website.'); ?>
+                                            <?php endif;?>
+                                        </span>
+                                    </div>
+                                <?php endif;?>
+                                <?= /* @noEscape */ $html ?>
+                            </div>
+                        <?php endif ?>
+                    <?php endif ?>
+                </li>
+            <?php endforeach ?>
+        </ol>
+    <?php else: ?>
+        <div class="message warning">
+            <?= $escaper->escapeHtml(__('No Payment method available.')) ?>
+        </div>
+    <?php endif ?>
+</div>

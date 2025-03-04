@@ -1,0 +1,246 @@
+<?php
+ /*
+ * This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+ * Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+ * Copyright (c) 2020-2022 Autify digital Ltd.
+ * This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+ * ALL RIGHTS RESERVED.
+ *
+ */
+
+ $financeData = $this->getV12FinanceSuccessView();
+ $autifyDigitalHelper = $this->helper(\AutifyDigital\V12Finance\Helper\Data::class);
+ $orderId = $financeData['order_id'];
+ $applicationId = $financeData['application_id'];
+ $applicationStatus = $financeData['application_status'];
+ $pageText = $financeData['page_text'];
+ $order = $autifyDigitalHelper->getOrder($orderId);
+ $shippingAddress = $autifyDigitalHelper->getFormattedHtmlAddress($order->getShippingAddress());
+ $billingAddress = $autifyDigitalHelper->getFormattedHtmlAddress($order->getBillingAddress());
+?>
+<div class="checkout-success">
+   <div class="success-messages">
+    <?php $_loggedin = $block->getLayout()->createBlock('Magento\Customer\Block\Account\AuthorizationLink')->isLoggedIn() ?>
+    <?php if( $_loggedin ) : ?>
+    <p><?= $block->escapeHtml(__('Your order number is: %1.', sprintf('<a href="%s" class="order-number"><strong>%s</strong></a>', $block->getUrl('sales/order/view', ['order_id'=> $order->getId()]),$order->getIncrementId())), ['a', 'strong']) ?></p>
+    <?php else : ?>
+    <p><?= $this->escapeHtml(__('Your order number is: <span>%1</span>.', $order->getIncrementId()), ['span']) ?></p>
+    <?php endif; ?>
+    <p><?= $this->escapeHtml(__('Your application for V12 is: <span>%1</span>.', $applicationId), ['span']) ?></p>
+    <?php if($applicationStatus == 2): ?>
+    <p><?= $block->escapeHtml(__('Your order has been referred. V12 Finance may need some more information before completing your application. Please keep an eye on your email inbox as you may be contacted by V12 Finance for further details regarding your application before it can be processed.')) ?></p>
+    <?php else: ?>
+    <p><?= $block->escapeHtml(__('We\'ll email you an order confirmation with details and tracking info.')) ?></p>  
+    <?php endif; ?>
+    <strong><?= $block->escapeHtml(__('Order Date:')) ?></strong> <?= $autifyDigitalHelper->formatDate($order->getCreatedAt(), \IntlDateFormatter::LONG) ?>
+</div>
+<div class="block-title">
+   <strong><?= $block->escapeHtml(__('Order Information')) ?></strong>
+</div>
+<div class="block block-order-details-view">
+    
+   <div class="block-content">
+    <div class="p-4 card">
+        <div class="mb-4">
+            <div class="mb-4 pb-4 border-b border-container">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                    <div class="w-full py-4">
+                        <p class="font-semibold mb-2"><?= $block->escapeHtml(__('Billing Address')) ?></p>
+                        <div class="box-content">
+                            <address><?= $billingAddress ?></address>
+                        </div>
+                    </div>
+                    <div class="w-full py-4">
+                        <p class="font-semibold mb-2"><?= $block->escapeHtml(__('Shipping Address')) ?></p>
+                        <div class="box-content">
+                            <address><?= $shippingAddress ?></address>
+                        </div>
+                    </div>
+                    <div class="w-full py-4">
+                        <p class="font-semibold mb-2"><?= $block->escapeHtml(__('Shipping Method')) ?></p>
+                        <div class="box-content">
+                            <?php if ($order->getShippingDescription()) : ?>
+                            <?= $block->escapeHtml($order->getShippingDescription()) ?>
+                            <?php else : ?>
+                            <?= $block->escapeHtml(__('No shipping information available')) ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="w-full py-4">
+                        <p class="font-semibold mb-2"><?= $block->escapeHtml(__('Payment Method')) ?></p>
+                        <div class="box-content">
+                            <dl class="payment-method checkmemo">
+                                <dt class="title"><?= $block->escapeHtml($order->getPayment()->getMethodInstance()->getTitle()) ?></dt>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="order-title">
+            <p class="text-lg mt-8 mb-2"><?= $block->escapeHtml(__('Items Ordered')) ?></p>
+        </div>
+        
+        <div class="order-items">
+            <div class="hidden lg:grid grid-cols-5 text-sm text-secondary mt-2">
+                <div class="p-2 col-span-2"><?= $block->escapeHtml(__('Product Name')) ?></div>
+                <div class="p-2"><?= $block->escapeHtml(__('Price')) ?></div>        
+                <div class="p-2"><?= $block->escapeHtml(__('Qty')) ?></div>
+                <div class="p-2 text-right"><?= $block->escapeHtml(__('Subtotal')) ?></div>    
+            </div>
+            <?php $items = $order->getItems(); ?>
+            <?php $giftMessage = ''?>
+            <?php foreach ($items as $item) :
+                if ($item->getParentItem()) :
+                    continue;
+                endif;
+            ?>
+                <div class="parent-item mb-2">
+                    <div class="lg:grid grid-cols-5 py-2">
+                        <div class="p-2 col-span-2">
+                            <span class="font-semibold"><?= $block->escapeHtml($item->getName()) ?></span>
+                            <div class="item-options mt-2">
+                                <div class="text-sm flex">
+                                    <span><?= $block->escapeHtml(__('Sku')) ?>:</span>
+                                    <span class="text-sm ml-1"><?= /* @noEscape */ $block->prepareSku($item->getSku()) ?></span>
+                                </div>
+                                <?php if ($_options = $block->getItemOptions($item)): ?>
+                                    <div class="text-sm flex mt-1">
+                                    <?php foreach ($_options as $_option): ?>
+                                        <dt><?= $block->escapeHtml($_option['label']) ?></dt>
+                                        <?php if (!$block->getPrintStatus()): ?>
+                                            <?php $_formatedOptionValue = $block->getFormatedOptionValue($_option) ?>
+                                            <dd<?= (isset($_formatedOptionValue['full_view']) ? ' class="tooltip wrapper"' : '') ?>>
+                                                <?= $block->escapeHtml($_formatedOptionValue['value'], ['a']) ?>
+                                                <?php if (isset($_formatedOptionValue['full_view'])): ?>
+                                                    <div class="tooltip content">
+                                                        <dl class="item options">
+                                                            <dt><?= $block->escapeHtml($_option['label']) ?></dt>
+                                                            <dd><?= $block->escapeHtml($_formatedOptionValue['full_view']) ?></dd>
+                                                        </dl>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </dd>
+                                        <?php else: ?>
+                                            <?php $optionValue = isset($_option['print_value']) ? $_option['print_value'] : $_option['value'] ?>
+                                            <dd><?= $block->escapeHtml($optionValue) ?></dd>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                    </dl>
+                                <?php endif; ?>
+                                <?= $block->escapeHtml($item->getDescription()) ?>
+                            </div>
+                        </div>
+                        <div class="p-2 flex justify-between lg:block">
+                            <p class="lg:hidden font-medium"><?= $block->escapeHtml(__('Price')) ?></p>
+                            <span class="price-excluding-tax" data-label="<?= $block->escapeHtml(__('Excl. Tax')) ?>">
+                                <span class="cart-price">
+                                    <span class="price"><?= /* @noEscape */ $this->helper('Magento\Framework\Pricing\Helper\Data')->currency($item->getRowTotal(), true, false); ?></span>        
+                                </span>
+                            </span>
+                        </div>
+                        <div class="p-2 flex justify-between lg:block">
+                            <p class="lg:hidden font-medium"><?= $block->escapeHtml(__('Qty')) ?></p>
+                            <div class="text-right lg:text-left">
+                                <p>
+                                    <span class="title"><?= $block->escapeHtml(__('Ordered')) ?>:</span>
+                                    <span class="content"><?= (float) $item->getQtyOrdered() ?></span>
+                                </p>
+                            </div>
+                            <?php if ($item->getQtyShipped() > 0): ?>
+                            <div class="text-right lg:text-left">
+                                <p>
+                                    <span class="title"><?= $block->escapeHtml(__('Shipped')) ?>:</span>
+                                    <span class="content"><?= (float) $item->getQtyShipped() ?></span>
+                                </p>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ($item->getQtyCanceled() > 0): ?>
+                            <div class="text-right lg:text-left">
+                                <p>
+                                    <span class="title"><?= $block->escapeHtml(__('Canceled')) ?>:</span>
+                                    <span class="content"><?= (float) $item->getQtyCanceled() ?></span>
+                                </p>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ($item->getQtyRefunded() > 0): ?>
+                            <div class="text-right lg:text-left">
+                                <p>
+                                    <span class="title"><?= $block->escapeHtml(__('Refunded')) ?>:</span>
+                                    <span class="content"><?= (float) $item->getQtyRefunded() ?></span>
+                                </p>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="p-2 text-right flex justify-between lg:block">
+                            <p class="lg:hidden font-medium"><?= $block->escapeHtml(__('Subtotal')) ?></p>
+                            <span class="price-excluding-tax" data-label="<?= $block->escapeHtml(__('Excl. Tax')) ?>">
+                                <span class="cart-price">
+                                    <span class="price"><?= /* @noEscape */ $this->helper('Magento\Framework\Pricing\Helper\Data')->currency($item->getPrice(), true, false); ?></span>        
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+                    
+            <div class="flex justify-end border-t border-container mt-2">
+                <div class="lg:w-1/3">
+                    <div class="grid grid-cols-2 text-right p-2 gap-2">
+                        <div>
+                            <?= $block->escapeHtml(__('Subtotal')) ?>
+                        </div>
+                        <div data-th="Subtotal">
+                            <span class="price">
+                                <?= /* @noEscape */ $this->helper('Magento\Framework\Pricing\Helper\Data')->currency($order->getSubtotal(), true, false); ?>
+                            </span>                    
+                        </div>
+                        <div>
+                            <?= $block->escapeHtml(__('Shipping & Handling')) ?>                    
+                        </div>
+                        <div data-th="Shipping &amp; Handling">
+                            <span class="price">
+                                <?= /* @noEscape */ $this->helper('Magento\Framework\Pricing\Helper\Data')->currency($order->getShippingAmount(), true, false); ?>
+                            </span>
+                        </div>
+                        <?php if($order->getTaxAmount() > 0): ?>
+                        <div>
+                            <strong><?= $block->escapeHtml(__('Tax')) ?></strong>
+                        </div>
+                        <div data-th="<?= $block->escapeHtml(__('Tax')) ?>">
+                            <strong><span class="price">
+                                <strong><?= /* @noEscape */ $this->helper('Magento\Framework\Pricing\Helper\Data')->currency($order->getTaxAmount(), true, false); ?></strong>
+                            </span></strong>
+                        </div>
+                        <?php endif; ?>
+                        <div>
+                            <strong><?= $block->escapeHtml(__('Grand Total')) ?></strong>
+                        </div>
+                        <div data-th="Grand Total">
+                            <strong><span class="price">
+                                <strong><?= /* @noEscape */ $this->helper('Magento\Framework\Pricing\Helper\Data')->currency($order->getGrandTotal(), true, false); ?></strong>
+                            </span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php if($autifyDigitalHelper->getConfig('v12finance/checkout_success_configuration/application_status_display') == '1'): ?>
+    <?php if($applicationStatus == 2): ?>
+    <p><?= $pageText ?></p>
+    <?php elseif($applicationStatus == 5): ?>
+    <p><?= $pageText ?></p>
+    <?php else: ?>
+    <p><?= $pageText ?></p>
+    <?php endif;?>
+    <?php endif;?>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <a class="action primary continue" href="<?= /* @noEscape */$this->getUrl() ?>">
+                <span><?= $block->escapeHtml(__('Continue Shopping')) ?></span>
+            </a>
+        </div>
+    </div>
+

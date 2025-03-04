@@ -1,0 +1,45 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\Theme\ViewModel\ProductPage;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+/** @var Product $product */
+$product = $productViewModel->getProduct();
+
+if (!$product->getDescription()) {
+    return;
+}
+?>
+<div class="prose !max-w-none product-features">
+    <div class="!max-w-none" x-data="{ open: false }">
+        <div class="c-block h-[180px] lg:!h-full" :class="{'!h-full': open}">
+            <?php
+                $html = $productViewModel->productAttributeHtml($product, $product->getProductFeatures(), 'product_features');
+                $pattern = "/<p[^>]*><\\/p[^>]*>/"; 
+                //$pattern = "/<[^\/>]*>([\s]?)*<\/[^>]*>/";  use this pattern to remove any empty tag
+                if(!empty($html)):
+                    echo preg_replace($pattern, '', $html);
+                endif;
+            ?>
+        </div>
+        <button x-show="!open" @click="open = true" class="bg-[#FF7E21] text-white px-7 h-9 font-bold text-base -mb-10 md:text-[22px] font-serif block mx-auto mt-4 rounded lg:hidden">View More</button>
+        <button x-show="open" @click="open = false" class="bg-[#FF7E21] text-white px-7 h-9 font-bold text-base -mb-10 md:text-[22px] font-serif block mx-auto mt-4 rounded lg:hidden">View Less</button>
+    </div>
+</div>

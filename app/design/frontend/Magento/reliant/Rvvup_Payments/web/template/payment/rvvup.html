@@ -1,0 +1,28 @@
+<div class="payment-method rvvup-payment" data-bind="css: {'_active': (getCode() == isChecked())},
+attr: {'id': 'payment_method_' + getCode()}">
+    <!-- ko template: getCustomTemplate('rvvupPaymentTitleTemplate') --><!-- /ko -->
+    <div class="payment-method-content rvvup-payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address rvvup-payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <!-- ko template: getCustomTemplate('rvvupIframeSrcTemplate') --><!-- /ko -->
+        <!-- ko template: getCustomTemplate('rvvupIframeModalTemplate') --><!-- /ko -->
+        <!-- ko template: getCustomTemplate('rvvupCardFormTemplate') --><!-- /ko -->
+
+        <div class="checkout-agreements-block rvvup-checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <!-- ko template: getCustomTemplate('rvvupPaypalPayLaterTemplate') --><!-- /ko -->
+        <!-- ko template: getCustomTemplate('rvvupPaypalButtonTemplate') --><!-- /ko -->
+        <!-- ko template: getCustomTemplate('rvvupPlaceOrderTemplate') --><!-- /ko -->
+        <!-- ko template: getCustomTemplate('rvvupCancelExpressPaymentTemplate') --><!-- /ko -->
+    </div>
+</div>

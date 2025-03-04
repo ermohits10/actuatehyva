@@ -1,0 +1,32 @@
+<?php
+declare(strict_types=1);
+
+$sliderBlock = \Magento\Framework\App\ObjectManager::getInstance()->get('\Mirasvit\Brand\Block\Widget\BrandSlider')
+
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Hyva\Theme\Model\ViewModelRegistry $viewModels */
+?>
+<?php
+$isShowBrandLabel = $sliderBlock->isShowBrandLabel();
+
+$containerId = 'mst-brand__slider-' . rand(10000, 100000);
+
+$item = $block->getData('item');
+?>
+
+<a href="<?= $sliderBlock->getBrandUrl($item) ?>" title="View <?= $item->getBrandTitle()[0] ?> products" aria-label="View <?= $item->getBrandTitle()[0] ?> products" class="slide">
+    <div class="m-slider <?php if ($isShowBrandLabel): ?>m-slider-brand-label<?php endif ?>">
+        <?php if ($item['logo']) : ?>
+            <img class="max-h-[32px] md:max-h-[48px]" src="<?= $sliderBlock->getImageUrl($item->getLogo()) ?>" alt="<?= $item->getBrandTitle()[0] ?>" width="83" height="48" loading="lazy"/>
+        <?php else : ?>
+            <p class="m-no-img"><?= $item->getBrandTitle()[0] ?></p>
+        <?php endif; ?>
+    </div>
+</a>
+<?php if ($isShowBrandLabel) : ?>
+    <div class="m-brand-label">
+        <a href="<?= $sliderBlock->getBrandUrl($item) ?>" title="View <?= $escaper->escapeHtml($item->getBrandTitle()) ?> products" aria-label="View <?= $escaper->escapeHtml($item->getBrandTitle()) ?> products" class="slide">
+            <?= $escaper->escapeHtml($item->getBrandTitle()) ?>
+        </a>
+    </div>
+<?php endif ?>

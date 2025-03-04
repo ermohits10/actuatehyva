@@ -1,0 +1,16 @@
+<?php
+/** @var \Mirasvit\LayeredNavigation\Block\Navigation\FilterExpander $block */
+?>
+
+<script>
+    function expandFilters(){
+        const idxs = <?= \Laminas\Json\Json::encode($block->getOpenedFilterIndexes()) ?>;
+        const filters = document.querySelectorAll('.sidebar.sidebar-main div.filter-option');
+
+        filters.forEach(function (filter, idx) {
+            const isOpen = idxs.includes(idx) ? 'true' : 'false';
+            filter.setAttribute('x-data', '{open: ' + isOpen + '}')
+        })
+    }
+    expandFilters();
+</script>

@@ -1,0 +1,59 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Customer\Api\Data\AddressSearchResultsInterface;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var AddressSearchResultsInterface $shippingAddressList */
+/** @var AddressInterface $shippingAddress */
+/** @var HeroiconsOutline $heroiconsViewModel */
+/** @var Escaper $escaper */
+
+$activeEntity = $block->getData('active_entity');
+$addressList = $block->getData('address_list');
+
+$addressListItems = $addressList->getAddressListItems();
+?>
+<?php if ($addressListItems): ?>
+    <div class="address-grid address-select flex mt-5" data-view="select">
+        <label class="sr-only" for="address-list"></label>
+
+        <select id="address-list"
+                name="address-list"
+                class="block w-full h-[48px] form-input text-black rounded-[3px] px-[15px] shadow-none"
+                wire:model="activeAddressEntity"
+        >
+            <?php foreach ($addressListItems as $address): ?>
+                <option value="<?= $escaper->escapeHtmlAttr($address->getId() ?? 0) ?>">
+                    <?= /* @noEscape */ $addressList->renderAddress($address, 'oneline') ?>
+                </option>
+            <?php endforeach ?>
+        </select>
+
+        <?php if (! is_numeric($activeEntity)): ?>
+            <button wire:click="$emitTo('<?= /* @noEscape */ $addressList->getModalAddressFormBlockName() ?>', 'edit')"
+                    class="btn btn-secondary py-0 flex justify-center items-center"
+                    title="<?= $escaper->escapeHtmlAttr(__('Edit Address')) ?>"
+            >
+                <?= $heroiconsViewModel->pencilAltHtml('w-5 h-5') ?>
+            </button>
+        <?php endif ?>
+    </div>
+<?php else: ?>
+    <div class="bg-yellow-100 p-4 border-dashed border-2 border-yellow-400 text-center">
+        <?= $escaper->escapeHtml(__('No addresses available.')) ?>
+    </div>
+<?php endif ?>

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <move element="price-summary.cart-items" destination="checkout.price-summary.section" after="checkout.quote-summary.title"/>
+
+        <referenceContainer name="checkout.guest-details.section">
+            <block name="newsletter.subscribe.component"
+                   template="Hyva_Checkout::checkout/newsletter-subscribe.phtml"
+                   after="-">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">
+                        \ReliantDirect\Checkout\Magewire\NewsletterSubscribe
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!-- Shipping section main-->
+        <container name="checkout.shipping-details.section.main" htmlTag="section" htmlId="shipping-details-main" />
+        <referenceContainer name="checkout.shipping-details.section.main">
+            <block name="rd.checkout.shipping-details.address-list.form"
+                   template="Hyva_Checkout::checkout/address-view/shipping-address-view.phtml"
+                   after="checkout.shipping-details.title">
+                <arguments>
+                    <argument name="magewire" xsi:type="object">
+                        \ReliantDirect\Checkout\Magewire\ShippingAddress
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="checkout.shipping-details.section">
+            <block name="rd.checkout.shipping-details.continue.button"
+                template="Hyva_Checkout::save-and-continue-button.phtml"
+                after="-">
+                <arguments>
+                    <argument name="step" xsi:type="string">checkout.shipping-details.address-form</argument>
+                    <argument name="dovalidation" xsi:type="boolean">true</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!--Delivery Method Section Main-->
+        <container name="checkout.shipping.section.main" htmlTag="section" htmlId="shipping-main"/>
+        <referenceContainer name="checkout.shipping.section">
+            <block name="rd.checkout.shipping-section.continue.button"
+                template="Hyva_Checkout::save-and-continue-button.phtml"
+                after="-">
+                <arguments>
+                    <argument name="step" xsi:type="string">checkout.shipping.methods</argument>
+                    <argument name="dovalidation" xsi:type="boolean">false</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!--Payment Method Section Main-->
+        <container name="checkout.payment.section.main" htmlTag="section" htmlId="payment-main">
+            <block name="rd.checkout.payment-section.logos"
+                   template="Hyva_Checkout::checkout/payment/payment-logos.phtml"
+                    after="checkout.payment.title"/>
+        </container>
+        <referenceBlock name="checkout.payment.methods">
+            <block name="checkout.payment.method.amazon_payment_v2"
+                as="amazon_payment_v2"
+                template="Hyva_Checkout::checkout/payment/method/amazon-payment-v2.phtml"/>
+            <block name="checkout.payment.method.v12finance"
+                as="v12finance"
+                template="Hyva_Checkout::checkout/payment/method/v12finance.phtml"/>
+        </referenceBlock>
+        <referenceBlock name="checkout.payment.method.braintree">
+            <block name="hyva.checkout.navigation.placeorder.button.braintree" template="Hyva_Checkout::custom-place-order.phtml" />
+        </referenceBlock>
+        <referenceBlock name="checkout.payment.method.paypal-express">
+            <block name="hyva.checkout.navigation.placeorder.button.paypal_express" template="Hyva_Checkout::paypal-place-order.phtml" />
+        </referenceBlock>
+    </body>
+</page>

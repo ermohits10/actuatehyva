@@ -1,0 +1,73 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\ViewModel\Breadcrumbs;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var HeroiconsOutline $heroiconsViewModel */
+/** @var Escaper $escaper */
+/** @var Breadcrumbs $viewModel */
+
+$viewModel = $viewModels->require(Breadcrumbs::class);
+$config = $viewModel->getCheckoutConfig();
+$current = $config->getCurrentStep();
+$settingShowWaypoints = $viewModel->getSystemConfig()->showBreadcrumbsWaypoints();
+$settingShowBreadcrumbsCart = $viewModel->getSystemConfig()->showBreadcrumbsCart();
+$heroiconsViewModel = $viewModels->require(HeroiconsOutline::class);
+?>
+<?php $stepCount = count($config->getSteps()) ?>
+<ul class="breadcrumbs items-center space-x-4 hidden md:flex">
+    <?php if ($settingShowBreadcrumbsCart): ?>
+    <li class="space-x-4 inline-flex items-center">
+        <a href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart', ['_secure' => true])) ?>"
+           class="item completed"
+        >
+            <span itemprop="name">
+                <?= $heroiconsViewModel->shoppingCartHtml('w-5 h-5 text-gray-400') ?>
+            </span>
+        </a>
+
+        <span>
+            <?= $heroiconsViewModel->chevronRightHtml('w-4 h-4 text-gray-400') ?>
+        </span>
+    </li>
+    <?php endif ?>
+
+    <?php foreach ($config->getSteps() as $step): ?>
+    <li class="space-x-4 inline-flex items-center">
+        <?php if (($settingShowWaypoints || $step['position'] <= $current['position']) && $step['position'] !== $config->getFirstStep('position')): ?>
+        <span>
+            <?= $heroiconsViewModel->chevronRightHtml('w-4 h-4 text-gray-400') ?>
+        </span>
+        <?php endif ?>
+        <?php if ($config->canStepTo($step['name'])): ?>
+        <button type="button"
+            <?php if ($step['position'] === $current['position']): ?>
+                class="item active"
+            <?php else: ?>
+                class="item completed"
+            <?php endif ?>
+                onclick="hyvaCheckout.navigation.stepTo('<?= $escaper->escapeHtmlAttr($step['route']) ?>', false)"
+        >
+            <?= $escaper->escapeHtml(__($step['label'])) ?>
+        </button>
+        <?php elseif ($settingShowWaypoints): ?>
+        <span class="item locked">
+            <?= $escaper->escapeHtml(__($step['label'])) ?>
+        </span>
+        <?php endif ?>
+    </li>
+    <?php endforeach ?>
+</ul>

@@ -1,0 +1,16 @@
+<?php
+// @codingStandardsIgnoreFile
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+<?php
+$_helper = $this->helper('WeltPixel\GA4\Helper\Data');
+?>
+<?php if ($_helper->isEnabled()) : ?>
+    <?php
+    $pattern = '/<script\b[^>]*>([\s\S]*?)<\/script>/i';
+    preg_match_all($pattern, $_helper->getGtmCodeSnippetForHead(), $matches);
+    foreach ($matches[1] as $scriptContent) {
+        echo /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptContent, false);
+    }
+    ?>
+<?php endif; ?>

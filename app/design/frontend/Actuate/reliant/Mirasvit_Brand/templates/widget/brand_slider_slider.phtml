@@ -1,0 +1,181 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\Store;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Store $viewModelStore */
+$viewModelStore = $viewModels->require(Store::class);
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+$title = (string) $block->getTitle();
+$items = $block->getItems() ?? [];
+if (is_object($items) && $items instanceof Iterator) {
+    $items = iterator_to_array($items);
+}
+if (!$itemCount = count($items)) {
+    return '';
+}
+$sliderItemRenderer = $block->getChildBlock('slider.item.template');
+
+?>
+<script>
+    'use strict';
+
+    function initBrandSliderComponent() {
+        return {
+            active: 0,
+            itemCount: 0,
+            isAutoplay: <?= (int)$block->getData('is_autoplay') ?>,
+            autoplayInterval: <?= (int)$block->getData('autoplay_interval') ?>,
+            isAutoplayLoop: <?= (int)$block->getData('is_autoplay_loop') ?>,
+            pauseOnHover: <?= (int)$block->getData('pause_on_hover') ?>,
+            interval: null,
+            getSlider() {
+                return this.$el.querySelector('.js_slides');
+            },
+            pageSize: 4,
+            pageFillers: 0,
+            calcPageSize() {
+                const slider = this.getSlider();
+                if (slider) {
+                    this.itemCount = slider.querySelectorAll('.js_slide').length;
+                    this.pageSize = Math.round(slider.clientWidth / slider.querySelector('.js_slide').clientWidth);
+                    this.pageFillers = (
+                        this.pageSize * Math.ceil(this.itemCount / this.pageSize)
+                    ) - this.itemCount;
+                }
+
+                // autoplay
+                this.startAutoplay()
+            },
+            calcActive() {
+                const slider = this.getSlider();
+                if (slider) {
+                    const sliderItems = this.itemCount + this.pageFillers;
+                    const calculatedActiveSlide = slider.scrollLeft / (slider.scrollWidth / sliderItems);
+                    this.active = Math.round(calculatedActiveSlide / this.pageSize) * this.pageSize;
+                }
+            },
+            scrollPrevious() {
+                this.scrollTo(this.active - this.pageSize);
+            },
+            scrollNext() {
+                this.scrollTo(this.active + this.pageSize);
+            },
+            scrollTo(idx) {
+                const slider = this.getSlider();
+                if (slider) {
+                    const slideWidth = slider.scrollWidth / (this.itemCount + this.pageFillers);
+                    slider.scrollLeft = Math.floor(slideWidth) * idx;
+                    this.active = idx;
+
+                    this.resetAutoplay();
+                }
+            },
+            startAutoplay() {
+                if (
+                    !this.isAutoplay
+                    || this.interval
+                    || (!this.isAutoplayLoop && this.active === this.pageSize)
+                ) {
+                    return;
+                }
+
+                this.interval = setInterval(function () {
+                    const self = this;
+
+                    if (self.active < self.pageSize) {
+                        self.scrollNext();
+                    } else if (this.isAutoplayLoop) {
+                        self.scrollTo(0);
+                    } else {
+                        clearInterval(self.interval);
+                        self.interval = null;
+                    }
+                }.bind(this), this.autoplayInterval);
+            },
+            stopAutoplay() {
+                if (this.pauseOnHover) {
+                    clearInterval(this.interval);
+                    this.interval = null;
+                }
+            },
+            resetAutoplay() {
+                if (this.interval) {
+                    clearInterval(this.interval);
+                    this.interval = null;
+                }
+
+                this.startAutoplay();
+            }
+        }
+    }
+</script>
+<section class="my-12 text-gray-700 body-font">
+    <?php if ($items): ?>
+        <div x-data="{swiper: null}"
+            x-init="swiper = new Swiper($refs.container, {
+                loop: true,
+                slidesPerView: 2,
+                spaceBetween: 10,
+                breakpoints: {
+                    640: {
+                        spaceBetween: 0,
+                    },
+                    768: {
+                        slidesPerView: 4,
+                        spaceBetween: 20,
+                    },
+                    1024: {
+                        slidesPerView: 6,
+                    },
+                    1920: {
+                        slidesPerView: 8,
+                    },
+                },
+            })"
+        class="relative w-full mx-auto flex flex-row">
+            <div class="absolute inset-y-0 left-0 z-10 flex items-center xl:hidden">
+                <button @click="swiper.slidePrev()" class="bg-white -ml-2 lg:-ml-4 flex justify-center items-center w-10 h-10 rounded-full shadow focus:outline-none" aria-label="Previous slide">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="chevron-left w-6 h-6"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+            <div class="relative w-full overflow-x-hidden bg-F2F6FA rounded-md px-12 py-2 lg:px-4 swiper-container" x-ref="container">
+                <div class="swiper-wrapper">
+                    <?php foreach ($items as $item): ?>
+                        <div class="swiper-slide flex justify-center content-center py-1">
+                            <div class="card-interactive">
+                                <?= $sliderItemRenderer->setItem($item)->toHtml() ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="absolute inset-y-0 right-0 z-10 flex items-center xl:hidden">
+                <button @click="swiper.slideNext()"
+                class="bg-white -mr-2 lg:-mr-4 flex justify-center items-center w-10 h-10 rounded-full shadow focus:outline-none" aria-label="Next slide">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="chevron-right w-6 h-6"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+        </div>
+    <?php endif; ?>
+</section>

@@ -1,0 +1,83 @@
+<?php
+
+/** @var SecureHtmlRenderer $secureRenderer */
+/* @var $block Head */
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Trustpilot\Reviews\Block\Head;
+
+?>
+<?php
+$trustPilotWidgetScript = <<<script
+    var w = document.createElement("script");
+    w.type = "text/javascript";
+    w.src = "{$block->getWidgetScriptUrl()}";
+    w.async = true;
+    document.head.appendChild(w);
+script;
+echo /* @noEscape */ $secureRenderer->renderTag('script', ["type" => "text/javascript", "async" => true], $trustPilotWidgetScript, false);
+
+$trustPilotInstallationScript = <<<script
+    (function(w,d,s,r,n){w.TrustpilotObject=n;w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)};
+    a=d.createElement(s);a.async=1;a.src=r;a.type='text/java'+s;f=d.getElementsByTagName(s)[0];
+    f.parentNode.insertBefore(a,f)})(window,document,'script', '{$block->getScriptUrl()}', 'tp');
+    tp('register','{$block->getInstallationKey()}');
+script;
+echo /* @noEscape */ $secureRenderer->renderTag('script', ["type" => "text/javascript"], $trustPilotInstallationScript, false);
+
+$trustPilotIframeScript = <<<script
+    function inIframe () {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function tryParseJson(str) {
+        if (typeof str === 'string') {
+            try {
+                return JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    if (inIframe()) {
+        window.addEventListener('message', function(e) {
+            var adminOrign = new URL(window.location).hostname;
+            var eventOriginHostname = new URL(e.origin).hostname;
+            if (!e.data || adminOrign !== eventOriginHostname) {
+                return;
+            }
+            if (typeof TrustpilotPreview !== 'undefined') {
+                if (typeof e.data === 'string' && e.data === 'submit') {
+                    TrustpilotPreview.sendTrustboxes();
+                } else {
+                    jsonData = tryParseJson(e.data);
+                    if (jsonData.trustbox) {
+                        TrustpilotPreview.setSettings(jsonData.trustbox);
+                    } else if (jsonData.customised) {
+                        TrustpilotPreview.updateActive(jsonData.customised);
+                    }
+                }
+            } else {
+                var settings = tryParseJson(e.data);
+                if (settings) {
+                    var p = document.createElement("script");
+                    p.type = "text/javascript";
+                    p.onload = function () {
+                        const iFrame = e.source.parent.document.getElementById('configuration_iframe').contentWindow;
+                        TrustpilotPreview.init(['{$block->getPreviewCssUrl()}'], settings, iFrame, e.source);
+                    };
+                    p.src = '{$block->getPreviewCssUrl()}';
+                    document.head.appendChild(p);
+                }
+            }
+        });
+    }
+script;
+
+echo /* @noEscape */ $secureRenderer->renderTag('script', ["type" => "text/javascript"], $trustPilotIframeScript, false);

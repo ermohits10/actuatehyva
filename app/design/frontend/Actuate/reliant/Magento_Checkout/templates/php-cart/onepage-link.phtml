@@ -1,0 +1,28 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Magento\Checkout\Block\Onepage\Link;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Link $block */
+?>
+<?php if ($block->isPossibleOnepageCheckout()): ?>
+    <?php 
+        $buttonName = __('Proceed to Checkout');
+    ?>
+    <a @click.prevent.stop="$dispatch('toggle-authentication',
+        {url: '<?= $escaper->escapeHtmlAttr($escaper->escapeUrl($block->getCheckoutUrl())) ?>'});"
+        href="<?= $escaper->escapeHtmlAttr($escaper->escapeUrl($block->getCheckoutUrl())) ?>"
+        title="<?= $escaper->escapeHtmlAttr(__('Proceed to Checkout')) ?>"
+        class="btn btn-primary rounded text-lg font-medium py-4 px-2 xl:px-10 mt-4 checkout justify-center text-center"
+        id="checkout-link-button"
+    >
+        <svg fill="#ffffff" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" class="!bg-transparent !w-8 h-8 !border-none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill-rule="evenodd" clip-rule="evenodd" d="M666 486v-76.4c0-84.8-69.2-153.6-154-153.6s-154 68.8-154 153.6V486h-51v282h410V486h-51zm-256-76.4c0-56.6 45.4-102.4 102-102.4S614 353 614 409.6V486H410v-76.4z"></path></g></svg> <?= $escaper->escapeHtml($buttonName) ?>
+    </a>
+<?php endif ?>

@@ -1,0 +1,22 @@
+<?php
+/*
+ * This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+ * Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+ * Copyright (c) 2020-2022 Autify digital Ltd.
+ * This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+ * ALL RIGHTS RESERVED.
+ *
+ */
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+
+/** @var SecureHtmlRenderer $secureRenderer */
+
+$v12LogoImage = $this->getViewFileUrl('AutifyDigital_V12Finance::images/v12logo.png');
+$helper = $this->helper(\AutifyDigital\V12Finance\Helper\Data::class);
+
+$financeLogo = <<<script
+    var financeLogo = {$helper->getJsonHelper()->jsonEncode($v12LogoImage)};
+script;
+
+echo /* @noEscape */ $secureRenderer->renderTag('script', ["type" => "text/javascript"], $financeLogo, false);

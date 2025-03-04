@@ -1,0 +1,67 @@
+{
+    "autifydigital_v12finance_application": {
+        "column": {
+            "application_id": true,
+            "order_id": true,
+            "order_increment_id": true,
+            "customer_email": true,
+            "retailer_product_guid": true,
+            "retailer_id": true,
+            "finance_length": true,
+            "order_amount": true,
+            "deposit_amount": true,
+            "interest_amount": true,
+            "finance_amount": true,
+            "total_amount_payable": true,
+            "application_status": true,
+            "pending_email_sent": true,
+            "created_at": true,
+            "updated_at": true,
+            "application_form_url": true,
+            "application_guid": true,
+            "authorization_code": true,
+            "finance_application_id": true,
+            "card_summary": true,
+            "analytics_sent": true,
+            "ads_sent": true,
+            "layer_sent": true,
+            "address_update": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "autifydigital_v12finance_financeoptions": {
+        "column": {
+            "financeoptions_id": true,
+            "finance_id": true,
+            "finance_guid": true,
+            "finance_name": true,
+            "interest_rate": true,
+            "contract_length": true,
+            "calculation_factor": true,
+            "min_loan": true,
+            "max_loan": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "autifydigital_v12finance_priceoptions": {
+        "column": {
+            "priceoptions_id": true,
+            "price_from": true,
+            "price_to": true,
+            "finance_options": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "quote": {
+        "column": {
+            "v12_finance_enable": true,
+            "finance_updated_at": true
+        }
+    }
+}

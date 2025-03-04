@@ -1,0 +1,42 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Magewire\Checkout\Payment\Method\PurchaseOrder;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use ReliantDirect\Checkout\Block\TermAndCondition;
+
+/** @var Template $block */
+/** @var PurchaseOrder $magewire */
+/** @var Escaper $escaper */
+/** @var TermAndCondition $termAndCondition */
+
+$termAndCondition = $block->getLayout()->createBlock(TermAndCondition::class);
+?>
+<div class="col-span-6">
+    <label class="block font-medium text-gray-700">
+        <?= $escaper->escapeHtml(__('Purchase Order Number')) ?>
+
+        <input wire:model.delay.750ms="purchaseOrderNumber"
+               type="text"
+               class="block w-full
+                      shadow-sm
+                      border-gray-300 rounded-md"
+        />
+    </label>
+
+    <?php if ($magewire->hasError('purchaseOrderNumber')): ?>
+    <p class="text-red-500 mt-4 text-sm">
+        <?= $escaper->escapeHtml($magewire->getError('purchaseOrderNumber')) ?>
+    </p>
+    <?php endif ?>
+</div>
+<?= $termAndCondition->toHtml() ?>
+<?= $block->getChildHtml('hyva.checkout.navigation.placeorder.button.purchaseorder') ?>

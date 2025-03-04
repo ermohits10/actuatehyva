@@ -1,0 +1,74 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="actuate_checkout" showInDefault="1" showInWebsite="0" showInStore="1" sortOrder="10" translate="label">
+            <label>Checkout</label>
+            <tab>Actuate_FeaturedCategories</tab>
+            <resource>Magento_Checkout::checkout</resource>
+            <group id="payment" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Payment step</label>
+                <comment>Custom configuration regarding payment step.</comment>
+                <field id="default_method" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Default Payment Method</label>
+                    <source_model>Actuate\ReliantDirectTheme\Model\Config\Source\PaymentOptions</source_model>
+                </field>
+            </group>
+        </section>
+        <section id="actuate_delivery" showInDefault="1" showInWebsite="0" showInStore="1" sortOrder="10" translate="label">
+            <label>Delivery Text</label>
+            <tab>Actuate_FeaturedCategories</tab>
+            <resource>Magento_Checkout::checkout</resource>
+            <group id="delivery" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="delivery_text" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Free Delivery Text</label>
+                </field>
+                <field id="delivery_holidays" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Delivery Holidays</label>
+                    <comment>Please add the comma separated date in DD/MM/YYYY format e.g 20/05/2024</comment>
+                </field>
+            </group>
+        </section>
+        <section id="payment_all_paypal">
+            <group id="express_checkout">
+                <group id="express_checkout_required">
+                    <group id="advertise_paylater">
+                        <field id="merchant_id" translate="label" type="text" showInDefault="1" showInWebsite="1" sortOrder="15">
+                            <label>Merchant ID</label>
+                            <config_path>payment/paypal_paylater/merchant_id</config_path>
+                            <attribute type="shared">1</attribute>
+                            <depends>
+                                <field id="paylater_enabled">1</field>
+                            </depends>
+                        </field>
+                    </group>
+                </group>
+            </group>
+        </section>
+        <section id="actuate_config_product" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+            <label>Configurable Product Settings</label>
+            <tab>Actuate_FeaturedCategories</tab>
+            <resource>Magento_Checkout::checkout</resource>
+            <group id="general" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="attributes" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Swatch Attributes</label>
+                    <comment>Please add the comma separated swatch attribute code</comment>
+                </field>
+            </group>
+        </section>
+        <section id="flix_media" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+            <label>FlixMedia Integration</label>
+            <tab>Actuate_FeaturedCategories</tab>
+            <resource>Actuate_ReliantDirectTheme::config</resource>
+            <group id="general" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="loadbee_api_key" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Loadbee API Key</label>
+                </field>
+                <field id="distributor_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Distributor ID</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

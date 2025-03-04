@@ -1,0 +1,151 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\Theme\ViewModel\SvgIcons;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+$hyvaicons = $viewModels->require(SvgIcons::class);
+
+/** @var Hyva\Theme\ViewModel\StoreConfig $storeConfig */
+$storeConfig = $viewModels->require(Hyva\Theme\ViewModel\StoreConfig::class);
+$showMiniCart = $storeConfig->getStoreConfig(\Magento\Checkout\Block\Cart\Sidebar::XML_PATH_CHECKOUT_SIDEBAR_DISPLAY);
+?>
+<script>
+    function initHeader () {
+        return {
+            searchOpen: false,
+            cart: {},
+            prevScrollPos: window.pageYOffset || document.documentElement.scrollTop,
+            scrollDirection: 'top', // Tracks the scroll direction: 'scrolling' or 'scrollup'
+
+            init() {
+                window.addEventListener('scroll', this.handleScroll.bind(this));
+            },
+
+            handleScroll() {
+                const currentScrollPos = window.pageYOffset || document.documentElement.scrollTop;
+
+                // Check if user has scrolled past 100px
+                this.hasScrolledPast = currentScrollPos > 140;
+
+                if (this.hasScrolledPast) {
+                    if (currentScrollPos > this.prevScrollPos) {
+                        // Scrolling down
+                        this.scrollDirection = 'scrolling';
+                    } else {
+                        // Scrolling up
+                        this.scrollDirection = 'scrollup';
+                    }
+                } else {
+                    // Reset to top if not past 100px
+                    this.scrollDirection = 'top';
+                }
+
+                this.prevScrollPos = currentScrollPos;
+            },
+
+            getHeaderClass() {
+                if (this.scrollDirection === 'scrolling') {
+                    return 'header-scrolling';
+                } else if (this.scrollDirection === 'scrollup') {
+                    return 'header-scrollup';
+                }
+                return 'header-top';
+            },
+
+            getData(data) {
+                if (data.cart) {
+                    this.cart = data.cart;
+                }
+            }
+        };
+    }
+    function initCompareHeader() {
+        return {
+            compareProducts: null,
+            itemCount: 0,
+            receiveCompareData(data) {
+                if (data['compare-products']) {
+                    this.compareProducts = data['compare-products'];
+                    this.itemCount = this.compareProducts.count;
+                }
+            }
+        }
+    }
+</script>
+<div class="header-wrapper">
+    <div x-data="initHeader()" x-init="init()" :class="getHeaderClass()">
+        <div id="header"
+             class="relative z-30 w-full"
+             x-data="initHeader()"
+             @keydown.window.escape="searchOpen = false;"
+             @private-content-loaded.window="getData(event.detail.data)"
+        >
+            <div class="lg:container flex flex-wrap items-center justify-between w-full lg:px-6 py-3 mx-auto mt-0 relative">
+                <!--Logo-->
+                <?= $block->getChildHtml('logo'); ?>
+
+                <!--Search-->
+                <div class="flex items-center order-3 w-full mt-3 lg:mt-0 lg:w-7/12 lg:order-2" id="search-content" x-show="true">
+                    <?= $block->getChildHtml('header-search'); ?>
+                </div>
+
+                <div class="flex items-center order-2 items-end justify-evenly lg:pr-0 lg:order-3 lg:w-3/12">
+                    <div class="contact hidden lg:block">
+                        <a href="#" class="flex">
+                            <?= $heroicons->phoneHtml("inline-block w-6 h-6 text-[#FFFFFF] hover:text-black rotate-12", 25, 25) ?>
+                            <p class="inline-block font-serif font-medium text-white text-[22px] ml-[5px]">0330 057 7143</p>
+                        </a>
+                    </div>
+                    <!--Cart Icon-->
+                    <a id="menu-cart-icon"
+                       <?php if ($showMiniCart): ?>@click.prevent.stop="$dispatch('toggle-cart',{});"<?php endif ?>
+                       class="absolute right-[15px] top-[20px] z-[10] lg:ml-[30px] lg:right-0 lg:top-0 lg:relative inline-block no-underline items-center justify-center"
+                       href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart/index')) ?>"
+                    >
+                        <?= $hyvaicons->renderHtml('cart', 'w-6 h-6 mx-auto mb-0.5 text-white lg:h-[1.8rem] lg:w-[1.8rem]', 38, 38); ?>
+                        <span class="label font-serif font-bold text-sm lg:font-medium lg:text-lg text-white">
+                            <?= $escaper->escapeHtml(__('Basket')) ?>
+                        </span>
+                        <span x-text="cart.summary_count"
+                              class="absolute top-0 right-0 hidden h-5 px-2 py-1 -mt-5 -mr-4 text-xs font-semibold
+                                leading-none text-center text-white uppercase transform -translate-x-1
+                                translate-y-1/2 rounded-full bg-[#FF7E21]"
+                              :class="{
+                                'hidden': !cart.summary_count,
+                                'block': cart.summary_count }"
+                        ></span>
+                    </a>
+                    <!--Customer Icon & Dropdown-->
+                    <?= $block->getChildHtml('customer') ?>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between w-full px-6 mx-auto mt-0 border-t-[white] border-t border-solid">
+                <!--Main Navigation-->
+                <?= $block->getChildHtml('topmenu') ?>
+            </div>
+
+            <!--Cart Drawer-->
+            <?= $block->getChildHtml('cart-drawer'); ?>
+
+            <!--Authentication Pop-Up-->
+            <?= $block->getChildHtml('authentication-popup'); ?>
+        </div>
+    </div>
+</div>

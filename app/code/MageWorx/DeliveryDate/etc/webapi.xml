@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!--
+    Obtain delivery dates available for the specified quote (:quote_id)
+    In case the "advanced" flag is set to "true" will return both available dates and time intervals and unavailable.
+    -->
+    <route url="/V1/delivery_date/:quote_id/:advanced" method="GET">
+        <service class="MageWorx\DeliveryDate\Api\DeliveryManagerInterface" method="getAvailableLimitsForQuoteById"/>
+        <resources>
+            <resource ref="MageWorx_DeliveryDate::manage"/>
+        </resources>
+    </route>
+    <route url="/V1/guest-carts/delivery-date-list/:cartId/:advanced" method="GET">
+        <service class="MageWorx\DeliveryDate\Api\DeliveryManagerInterface" method="getAvailableDeliveryDatesForGuestCart"/>
+        <resources>
+            <resource ref="MageWorx_DeliveryDate::manage"/>
+        </resources>
+    </route>
+    <!-- Get available delivery dates by conditions -->
+    <route url="/V1/delivery-date-limits-by-conditions" method="POST">
+        <service class="MageWorx\DeliveryDate\Api\DeliveryManagerInterface" method="getDeliveryOptionLimitsByConditions"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <!-- Get delivery date for guest cart -->
+    <route url="/V1/guest-carts/:cartId/delivery-date" method="GET">
+        <service class="MageWorx\DeliveryDate\Api\QueueManagerInterface" method="getSelectedDeliveryDateByGuestCartId"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <!-- Get delivery date for specific cart -->
+    <route url="/V1/carts/:cartId/delivery-date" method="GET">
+        <service class="MageWorx\DeliveryDate\Api\QueueManagerInterface" method="getSelectedDeliveryDateByCartId"/>
+        <resources>
+            <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
+    <!-- Get delivery date for my cart -->
+    <route url="/V1/carts/mine/delivery-date" method="GET">
+        <service class="MageWorx\DeliveryDate\Api\QueueManagerInterface" method="getSelectedDeliveryDateByCartId"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Set delivery date for guest cart -->
+    <route url="/V1/guest-carts/:cartId/delivery-date" method="POST">
+        <service class="MageWorx\DeliveryDate\Api\QueueManagerInterface" method="setDeliveryDateForGuestCart"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <!-- Set delivery date for specific cart -->
+    <route url="/V1/carts/:cartId/delivery-date" method="POST">
+        <service class="MageWorx\DeliveryDate\Api\QueueManagerInterface" method="setDeliveryDateForCart"/>
+        <resources>
+            <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
+    <!-- Set delivery date for my cart -->
+    <route url="/V1/carts/mine/delivery-date" method="POST">
+        <service class="MageWorx\DeliveryDate\Api\QueueManagerInterface" method="setDeliveryDateForCart"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+</routes>

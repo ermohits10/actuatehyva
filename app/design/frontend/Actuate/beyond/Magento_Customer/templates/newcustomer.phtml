@@ -1,0 +1,21 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Customer\Block\Form\Login\Info;
+use Magento\Framework\Escaper;
+
+/** @var Info $block */
+/** @var Escaper $escaper */
+?>
+<?php if ($block->getRegistration()->isAllowed()): ?>
+    <div class="block-new-customer w-full">
+        <p><?= $escaper->escapeHtml(__('Need an account?')) ?> <a href="<?= $escaper->escapeUrl($block->getCreateAccountUrl()) ?>" class=""><span><?= $escaper->escapeHtml(__('Sign Up')) ?></span></a></p>
+    </div>
+<?php endif; ?>

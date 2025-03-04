@@ -1,0 +1,33 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/**
+ * @var \Magento\Backend\Block\Template $block
+ */
+?>
+<?php
+/** @var \MageWorx\DeliveryDate\Block\Adminhtml\Queue\Calendar $parentBlock */
+$parentBlock = $block->getParentBlock();
+?>
+<?php if (!$parentBlock->getQueueId()): ?>
+    <div id="lnb">
+        <div id="lnb-calendars" class="lnb-calendars">
+            <div>
+                <div class="lnb-calendars-item">
+                    <label>
+                        <input class="tui-full-calendar-checkbox-square" type="checkbox" value="all" checked>
+                        <span></span>
+                        <strong><?= $block->escapeHtml(__('View all')); ?></strong>
+                    </label>
+                </div>
+            </div>
+            <div id="calendarList" class="lnb-calendars-d1">
+            </div>
+        </div>
+        <div class="lnb-footer">
+
+        </div>
+    </div>
+<?php endif; ?>

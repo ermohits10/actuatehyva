@@ -1,0 +1,10 @@
+/*
+Copyright © MageWorx. All rights reserved.
+See LICENSE.txt for license details.
+*/
+
+#delivery-form .fieldset > .field, #delivery-form .fieldset > .fields > .field {
+    margin: 0 0 20px;
+    clear: both;
+    display: block;
+}

@@ -1,0 +1,57 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+
+/**
+ * @Internal Prefer utilizing the "after" container for injecting additional code.
+ */
+?>
+
+<script>
+    'use strict';
+
+    <?php /* @api */ ?>
+    hyvaCheckout.evaluation.registerProcessor(
+        'message',
+        (component, el, result) => {
+            const dispatchMessage = () => {
+                hyvaCheckout.message.send(
+                    result.arguments.text,
+                    result.arguments.type,
+                    result.arguments.duration || null
+                )
+
+                return result.result || false
+            }
+
+            if (result.dispatch) {
+                return dispatchMessage()
+            }
+
+            <?php /* Validate whether the hash should be retained or removed due to its absence. */ ?>
+            Magewire.hook('message.received', (message, component) => {
+                if (component.id === result.id) {
+                    hyvaCheckout.validation.remove(result.hash)
+                }
+            })
+
+            <?php /* Registers the evaluation result as a validation for the specified component. */ ?>
+            hyvaCheckout.validation.register(result.hash, () => dispatchMessage(), el, result.id, {
+                stackPosition: result.arguments.position || 500
+            })
+        }
+    )
+
+</script>
+
+<?= $this->getChildHtml('after') ?>

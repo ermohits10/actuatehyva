@@ -1,0 +1,44 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\Checkout\ViewModel\Checkout\PriceSummary\TotalSegments as TotalSegmentsViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+
+/** @var TotalSegmentsViewModel $totalSegmentsViewModel */
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$totalSegmentsViewModel = $viewModels->require(TotalSegmentsViewModel::class);
+$totals = $totalSegmentsViewModel->getTotals();
+?>
+<div class="total-segments leading-loose space-y-1">
+    <?php if ($totals): ?>
+        <?php foreach ($totals->getTotalSegments() as $segment): ?>
+            <?php if ($segment->hasCode() && $child = $totalSegmentsViewModel->getTotalBlock($block, $segment->toArray())): ?>
+                <div class="item <?= $escaper->escapeHtmlAttr($segment->getCode()) ?>">
+                    <?= $child->toHtml() ?>
+
+                    <?php foreach ($totalSegmentsViewModel->getTotalSegmentExtensionAttributes($segment) as $code => $extensionAttribute): ?>
+                        <?php if ($extensionAttributes = $totalSegmentsViewModel->getTotalExtensionAttributesBlock($child, $code, $extensionAttribute)): ?>
+                            <?= $extensionAttributes->toHtml() ?>
+                        <?php endif ?>
+                    <?php endforeach ?>
+                </div>
+            <?php endif ?>
+        <?php endforeach ?>
+    <?php else: ?>
+        <p class="border border-red-700 bg-red-500 rounded-md text-white p-4 text-sm">
+            <?= $escaper->escapeHtml(__('Something went wrong while collecting the order price summary.')) ?>
+        </p>
+    <?php endif ?>
+</div>

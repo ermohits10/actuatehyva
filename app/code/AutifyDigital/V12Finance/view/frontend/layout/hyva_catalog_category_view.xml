@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+~ Copyright (c) 2020 Autify digital Ltd.
+~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+~ ALL RIGHTS RESERVED.
+~
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="catalog_list_item" />
+    <body>
+        <referenceBlock name="product_list_item">
+            <action method="setTemplate" ifconfig="v12finance/category_page/enable_v12_finance">
+                <argument name="template" xsi:type="string">AutifyDigital_V12Finance::product/list/item.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

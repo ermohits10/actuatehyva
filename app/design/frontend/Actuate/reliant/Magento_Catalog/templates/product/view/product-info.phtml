@@ -1,0 +1,583 @@
+<?php
+/**
+ * HyvÃ¤ Themes - https://hyva.io
+ * Copyright Â© HyvÃ¤ Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Actuate\ReliantDirectTheme\ViewModel\CommonViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\ProductAttributes;
+use Hyva\Theme\ViewModel\ProductPage;
+use Hyva\Theme\ViewModel\SvgIcons;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Rvvup\Payments\ViewModel\Clearpay;
+use Rvvup\Payments\ViewModel\Price;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+/** @var ProductAttributes $attributesViewModel */
+$attributesViewModel = $viewModels->require(ProductAttributes::class);
+/** @var Product $product */
+$product = $productViewModel->getProduct();
+
+/** @var CommonViewModel $commonViewModel */
+$commonViewModel = $viewModels->require(CommonViewModel::class);
+$clearpay = $viewModels->require(Clearpay::class);
+$thresholds = $clearpay->getThresholds($product);
+$priceViewModel = $viewModels->require(Price::class);
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+$hyvaicons = $viewModels->require(SvgIcons::class);
+$paymentIcons = $viewModels->require(Hyva\PaymentIcons\ViewModel\PaymentIconsLight::class);
+$_manufacturer = $product->getAttributeText('manufacturer');
+$manfgteelabour = $product->getManfgteelabour();
+$_energyrating = $block->getProduct()->getResource()->getAttribute('energyrating_rating')->getFrontend()->getValue($block->getProduct());
+$_energyrating_link = $product->getAttributeText('energyrating_link');
+$_energyrating_datasheet = $product->getAttributeText('energyrating_datasheet');
+
+/** Promo Blocks **/
+$_promo1 = $product->getAttributeText('nc1000000352');
+$_promo2 = $product->getAttributeText('nc1000000466');
+$_promo3 = $product->getAttributeText('nc1000000470');
+$_promo4 = $product->getAttributeText('nc1000001270');
+$_promo5 = $product->getAttributeText('nc1000001276');
+
+if ($_promo1 == 'x' || $_promo1 == 'X'):
+    $_promo1 = '';
+endif;
+if ($_promo2 == 'x' || $_promo2 == 'X'):
+    $_promo2 = '';
+endif;
+if ($_promo3 == 'x' || $_promo3 == 'X'):
+    $_promo3 = '';
+endif;
+if ($_promo4 == 'x' || $_promo4 == 'X'):
+    $_promo4 = '';
+endif;
+if ($_promo5 == 'x' || $_promo5 == 'X'):
+    $_promo5 = '';
+endif;
+$branchesList = [];
+$depotsList = [];
+$depotAvailabilityArr = [];
+$ProductStockAvailabilityScheduleArr = [];
+
+$_outofstockallowbackorder = $product->getAttributeText('outofstockallowbackorder');
+
+$availabilityType = '';
+$isExistingPO = '';
+$psaQuantity = $buyOnline = '';
+$trueStock = '';
+
+$xmlArray = $depotsList = [];
+?>
+<?php if (null !== $product->getStockanalysis()):
+    $stockAnalysis = $commonViewModel->getStockAnalysisData($product->getStockanalysis());
+    $trueStock = $stockAnalysis['localStock'];
+    $buyOnline = $stockAnalysis['buyOnline'];
+    $depotsList = $stockAnalysis['depotList'];
+    $availabilityType = $stockAnalysis['availabilityType'];
+    $isExistingPO = $stockAnalysis['isExistingPO'];
+    $psaQuantity = $stockAnalysis['psaQuantity'];
+endif;
+$checkSKU = $product->getSku();
+if (in_array($checkSKU, ['1000009848', '1000009859', '1000009862', '1000009842', '1000009845', '1000009856', '1000009839', '1000009865'])):
+    $buyOnline = true;
+    $depotsList[] = $checkSKU;
+    $depotsList[] .= 'sku-' . $checkSKU;
+endif;
+?>
+<div class="w-full lg:mb-6 lg:mb-0 relative lg:sticky lg:top-[150px] lg:bg-white main-product-info">
+    <div class="lg:bg-[#f5f5f5] lg:p-3.5 lg:pt-2 lg:border lg:border-[#126366] lg:rounded">
+        <div class="flex flex-col sm:flex-row justify-between">
+            <?= $block->getChildHtml("alert.urls") ?>
+        </div>
+        <h1 class="title-font text-xl leading-7 font-medium font-serif md:text-[26px] md:leading-8">
+            <?= $escaper->escapeHtml($product->getName()) ?>
+        </h1>
+        <div class="flex">
+            <div class="feefo-review-badge-wrapper-product mt-1<?= $_energyrating != '' ? ' inline-flex' : '';?>"></div>
+            <?php if ($_energyrating != ''): ?>
+                <div class="energy-rating inline-flex float-right mt-1 ml-auto">
+                    <p class="text-sm md:text-base"><?php if ($_energyrating_link != ''): echo '<a href="' . $_energyrating_link . '" title="View Energy Rating" target="_blank">'; endif; ?><img src="<?php echo $this->getUrl('media/energy-ratings/') . $_energyrating . '.webp'; ?>" width="63" height="35" alt="View Energy Rating" class="w-8 md:w-10 lg:w-12 inline-block"><?php if ($_energyrating_link != ''): echo '</a>'; endif; ?></p>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div class="price-block">
+            <?= $block->getChildHtml("product.info.price") ?>
+        </div>
+        <?php if ($_promo1 != '' || $_promo2 != '' || $_promo3 != '' || $_promo4 != '' || $_promo5 != ''): ?>
+            <div x-data="{id: 1}">
+                <?php
+                    $deal1content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo1 . '')->toHtml();
+                    if (!str_contains($deal1content, 'pdp-deal-link')):
+                        $deal1content = '<span class="pdp-deal-link">'.$deal1content.'</span>';
+                    endif;
+
+                    $deal2content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo2 . '')->toHtml();
+                    if (!str_contains($deal2content, 'pdp-deal-link')):
+                        $deal2content = '<span class="pdp-deal-link">'.$deal2content.'</span>';
+                    endif;
+
+                    $deal3content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo3 . '')->toHtml();
+                    if (!str_contains($deal3content, 'pdp-deal-link')):
+                        $deal3content = '<span class="pdp-deal-link">'.$deal3content.'</span>';
+                    endif;
+
+                    if ($deal1content != ''):
+                        echo '<div class="pdp-deal-strip deal-1 cursor-pointer" @click="$dispatch(\'open-dropdown\',{id})">' . $deal1content .''. $heroicons->informationCircleHtml('w-4 h-4 lg:w-6 lg:h-6 text-[#126366] absolute right-[6px] top-[9px] lg:top-[7px]') .'</div>';
+                    elseif ($deal2content != ''):
+                        echo '<div class="pdp-deal-strip deal-2 cursor-pointer" @click="$dispatch(\'open-dropdown\',{id})>' . $deal2content .''. $heroicons->informationCircleHtml('w-4 h-4 lg:w-6 lg:h-6 text-[#126366] absolute right-[6px] top-[9px] lg:top-[7px]') .'</div>';
+                    elseif ($deal3content != ''):
+                        echo '<div class="pdp-deal-strip deal-3 cursor-pointer" @click="$dispatch(\'open-dropdown\',{id})>' . $deal3content.''. $heroicons->informationCircleHtml('w-4 h-4 lg:w-6 lg:h-6 text-[#126366] absolute right-[6px] top-[9px] lg:top-[7px]') .'</div>';
+                    endif;
+                ?>
+            </div>
+        <?php endif;?>
+        <?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('pdp-promotion-block')->toHtml(); ?>
+        <?= $block->getChildHtml('relevant-products') ?>
+
+        <?php if ($product->getTypeId() === 'configurable'): ?>
+            <?= $block->getChildHtml('product.info.form') ?>
+
+            <div class="flex flex-col sm:flex-row items-end <?= $product->getTypeId() === 'simple' ? 'mt-1' : 'md:mt-1 mt-2.5';?> mb-2.5">
+                <div class="flex w-full">
+                    <?php if ($product->getTypeId() === 'simple'): ?>
+                        <?php if ($product->isSaleable() && count($depotsList) >= 1 && $buyOnline == true && $trueStock >= 1): ?>
+                            <?= $block->getChildHtml("product.info.quantity") ?>
+                            <?= $block->getChildHtml("product.info.addtocart") ?>
+                        <?php elseif ($availabilityType == 'CurrentPO' && $isExistingPO == true && $psaQuantity >= 1 && $_outofstockallowbackorder != ''): ?>
+                            <?= $block->getChildHtml("product.info.preordercart") ?>
+                        <?php else: ?>
+                            <p class="w-full"><a href="tel:+443300577142" title="<?php $escaper->escapeHtml(__('Call for Availability')); ?>" target="_blank" class="btn btn-primary font-serif text-sm leading-5 font-medium md:text-lg md:leading-7 md:font-bold text-center"><span class="inline-block w-full">Call 0330 057 7142 for Availability</span></a></p>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <?= $block->getChildHtml("product.info.quantity") ?>
+                        <?= $block->getChildHtml("product.info.addtocart") ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif;?>
+
+        <div class="border border-[#126366] bg-[#F5F5F5] shadow-md lg:bg-white rounded-md px-3 py-2">
+            <div class="delivery-block pb-2 mb-1" x-data="initializeTimer()" x-init="init()">
+                <div class="flex relative pr-4">
+                    <div @click="open = !open"
+                         class="ml-auto flex text-sm leading-6 cursor-pointer text-medium font-sans text-black font-medium absolute right-0 inset-y-0 my-auto items-center"
+                         :class="{'items-center': open, 'items-start mt-1': !open}"
+                    >
+                        <svg x-show="open" width="10" height="15" viewBox="0 0 10 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="8.74971" y1="7.68334" x2="1.27997" y2="0.744608" stroke="black" stroke-width="2"/>
+                            <line x1="9.34175" y1="6.93467" x2="1.65724" y2="13.6348" stroke="black" stroke-width="2"/>
+                        </svg>
+                        <span class="ml-1.5 flex" x-show="!open">
+                            <span class="underline -mt-1.5 mr-0">Close</span>
+                            <svg class="ml-0.5 w-2.5 h-3" width="7" height="8" viewBox="0 0 7 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.923 8H5.607C5.49967 8 5.41333 7.972 5.348 7.916C5.28733 7.85533 5.23833 7.79233 5.201 7.727L3.486 5.018C3.46267 5.088 3.43933 5.15567 3.416 5.221C3.39267 5.28633 3.36233 5.347 3.325 5.403L1.75 7.727C1.70333 7.79233 1.64967 7.85533 1.589 7.916C1.52833 7.972 1.449 8 1.351 8H0.133L2.611 4.339L0.231 0.888H1.547C1.65433 0.888 1.73133 0.904333 1.778 0.937C1.82933 0.969666 1.87367 1.01867 1.911 1.084L3.598 3.681C3.62133 3.611 3.647 3.54333 3.675 3.478C3.703 3.408 3.74033 3.33567 3.787 3.261L5.236 1.112C5.32 0.962666 5.432 0.888 5.572 0.888H6.825L4.445 4.276L6.923 8Z" fill="black"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="flex flex-col w-full" >
+                        <div class="font-serif flex flex-row items-center" :class="{'w-[80%]': !open, 'w-full': open}">
+                            <span x-show="!isVisible"><?= $hyvaicons->renderHtml('reliant-truck', 'w-10 min-w-[40px] lg:min-w-[50px] h-8 lg:w-14 lg:h-8 mr-2 flex');?></span>
+                            <span class="flex font-bold text-black w-full text-base leading-5" x-html="getDeliveryMessage();"></span>
+                        </div>
+                        <div x-show="isVisible" class="w-full timer flex flex-col text-xs lg:text-sm leading-5 font-semibold">
+                            <div class="text-[#126366] flex-row">
+                                <p class="mb-0 text-black inline-block"><?= __('Order within:')?></p>
+                                <span x-text="hours" class="text-[#126366]"></span><span class="text-[#126366]">hr</span>
+                                <span x-text="minutes" class="ml-0.5 text-[#126366]"></span><span class="text-[#126366]">min</span>
+                                <span x-text="seconds" class="ml-0.5 text-[#126366]"></span><span class="text-[#126366]">sec</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div x-show="!open" class="py-2">
+                    <?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('delivery-box')->toHtml(); ?>
+                </div>
+            </div>
+            <script>
+                function initializeTimer() {
+                    return {
+                        open: true,
+                        isVisible: false, // Used for visibility
+                        forcefullyHidden: false,
+                        startHour: 6, // Range hours - Start hour
+                        endHour: 13, // Range hours - End hour
+                        endMinute: 0, // Range Minute - End Minute
+                        holidayList: '<?= $commonViewModel->getFreeDeliveryHolidays(); ?>', // List of Holidays
+                        weekend: [0, 6], // 0: Sunday, 6: Saturday
+                        days: 0, // Used to keep days
+                        hours: 0, // User to keep hours
+                        minutes: 0, // User to keep minutes
+                        seconds: 0, // User to keep seconds
+                        remaining: null, // User to keep remaining time
+                        productDeliveryMessage: '<?= $product->getDeliveryMessage() ?>',
+                        commonDeliveryMessage: '<?= $product->getAttributeText('nc1000001586') === 'Yes' ? 'FREE Delivery from %1 &#42;' : 'Delivery from %1 &#42;'; ?>',
+                        init() {
+                            let self = this;
+                            let countDownTimer = setInterval(() => {
+                                self.setVisibility();
+                                if (self.isVisible) { self.setRemaining(); }
+                                if (self.forcefullyHidden) { clearInterval(countDownTimer); }
+                            }, 1000);
+                        },
+
+                        /**
+                         * Get delivery message based on the tomorrow date
+                         * @returns {string}
+                         */
+                        getDeliveryMessage() {
+                            if (this.productDeliveryMessage !== ''
+                                && this.productDeliveryMessage !== null
+                                && this.productDeliveryMessage !== 'null') {
+                                return this.productDeliveryMessage;
+                            }
+
+                            let tomorrowDate = new Date(new Date().getTime() + 86400000);
+                            if (new Date().getHours() >= this.endHour && new Date().getMinutes() >= this.endMinute) {
+                                tomorrowDate = new Date(tomorrowDate.getTime() + 86400000);
+                            }
+                            let holidayList = this.holidayList.split(',');
+                            if (!holidayList.includes(tomorrowDate.toLocaleDateString('en-GB'))
+                                && !this.weekend.includes(tomorrowDate.getDay())
+                                && new Date(new Date().setDate(new Date().getDate() + 1)).getDate() === tomorrowDate.getDate()
+                            ) {
+                                this.productDeliveryMessage = this.commonDeliveryMessage.replace('%1', 'Tomorrow');
+                            } else {
+                                const nth = (d) => {
+                                    if (d > 3 && d < 21) return 'th';
+                                    switch (d % 10) {
+                                        case 1:  return "st";
+                                        case 2:  return "nd";
+                                        case 3:  return "rd";
+                                        default: return "th";
+                                    }
+                                };
+                                const dayName = (d) => {
+                                    return ['Sun', 'Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Sat'][d];
+                                };
+                                const monthName = (m) => {
+                                    return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m];
+                                }
+
+                                let deliveryDate = this.getNextAvailableDeliveryDate(tomorrowDate);
+                                let formattedDate = dayName(deliveryDate.getDay()) + ' ' + deliveryDate.getDate() + nth(deliveryDate.getDate()) + ' ' + monthName(deliveryDate.getMonth());
+                                this.productDeliveryMessage = this.commonDeliveryMessage.replace('%1', formattedDate);
+                                if (deliveryDate.getDay() === 6) {
+                                    this.productDeliveryMessage = this.productDeliveryMessage.replace('FREE ', '');
+                                }
+                            }
+
+                            return this.productDeliveryMessage;
+                        },
+
+                        /**
+                         * Get Next available date for delivery
+                         * @param date
+                         * @returns {*}
+                         */
+                        getNextAvailableDeliveryDate(date) {
+                            let holidayList = this.holidayList.split(',');
+                            if ((this.weekend.includes(date.getDay()) && !holidayList.includes(date.toLocaleDateString('en-GB')) && (new Date().getDay() === 4 && new Date().getHours() >= this.endHour))
+                                || (this.weekend.includes(date.getDay()) && !holidayList.includes(date.toLocaleDateString('en-GB')) && (new Date().getDay() === 5 && new Date().getHours() < this.endHour))) {
+                                return date;
+                            }
+
+                            if (holidayList.includes(date.toLocaleDateString('en-GB'))
+                                || (this.weekend.includes(date.getDay()))
+                                || ((this.weekend.includes(new Date().getDay())) && date.getDay() === 1)
+                                || (new Date().getHours() >= this.endHour && date.getDay() === 1)
+                            ) {
+                                let tomorrowDate = new Date(date.getTime() + 86400000);
+                                return this.getNextAvailableDeliveryDate(tomorrowDate);
+                            }
+
+                            return date;
+                        },
+
+                        /**
+                         * Set Visibility for section
+                         */
+                        setVisibility () {
+                            let tomorrowDate = new Date(new Date().getTime() + 86400000);
+                            let holidayList = this.holidayList.split(',');
+                            if (holidayList.includes(tomorrowDate.toLocaleDateString('en-GB'))
+                                || this.weekend.includes(new Date().getDay())) {
+                                this.isVisible = false;
+                                this.forcefullyHidden = true;
+                            }
+
+                            if (this.forcefullyHidden === false
+                                && new Date(new Date().setHours(this.startHour, 0, 0, 0)).getTime() <= new Date().getTime()
+                                && new Date(new Date().setHours(this.endHour, this.endMinute, 0, 0)).getTime() > new Date().getTime()) {
+                                this.isVisible = true;
+                            }
+
+                            if (this.remaining !== null && this.remaining <= 0 && this.isVisible) {
+                                this.isVisible = false;
+                            }
+                        },
+
+                        /**
+                         * Calculate remaining time for countdown
+                         */
+                        setRemaining() {
+                            const diff = new Date(new Date().setHours(this.endHour, this.endMinute, 0, 0)).getTime() - new Date().getTime();
+                            this.remaining = parseInt(diff/1000);
+                            this.setTime()
+                        },
+
+                        /**
+                         * Get Days based on remaining time
+                         */
+                        getDays() {
+                            return {
+                                value:this.remaining / 86400,
+                                remaining:this.remaining % 86400
+                            };
+                        },
+
+                        /**
+                         * Get Hours based on remaining time
+                         */
+                        getHours() {
+                            return {
+                                value:this.getDays().remaining / 3600,
+                                remaining:this.getDays().remaining % 3600
+                            };
+                        },
+
+                        /**
+                         * Get Minutes based on remaining time
+                         */
+                        getMinutes() {
+                            return {
+                                value:this.getHours().remaining / 60,
+                                remaining:this.getHours().remaining % 60
+                            };
+                        },
+
+                        /**
+                         * Get Seconds based on remaining time
+                         */
+                        getSeconds() {
+                            return {
+                                value:this.getMinutes().remaining,
+                            };
+                        },
+
+                        /**
+                         * Format time to render
+                         */
+                        format(value) {
+                            return ("0" + parseInt(value)).slice(-2)
+                        },
+
+                        /**
+                         * Set each data to variable to render
+                         */
+                        setTime() {
+                            this.days = this.format(this.getDays().value);
+                            this.hours = this.format(this.getHours().value);
+                            this.minutes = this.format(this.getMinutes().value);
+                            this.seconds = this.format(this.getSeconds().value);
+                        }
+                    }
+                }
+            </script>
+            <div class="finance-block pb-1 border-t border-[#126366] pt-1" x-data="{ open: true }">
+                <div class="flex flex-col relative pr-4">
+                    <h3 class="text-black w-full text-base font-semibold leading-5" :class="{'w-[80%]': !open, 'w-full': open}">
+                        <?= $escaper->escapeHtml(__('Spread the Cost')) ?> <small class="text-xs font-semibold">(<?= $escaper->escapeHtml(__('interest-free available')) ?>)</small>
+                        <?php
+                            $product_price = $product->getFinalPrice();
+                        ?>
+                    </h3>
+                    <div class="flex items-center flex-row w-full" x-show="open">
+                        <svg width="57" height="13" viewBox="0 0 57 13" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-1.5 w-[57px] h-[13px]">
+                            <mask id="mask0_454_328" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="11" height="13">
+                            <path d="M0 0H10.7019V12.6042H0V0Z" fill="white"/>
+                            </mask>
+                            <g mask="url(#mask0_454_328)">
+                            <path d="M9.62608 3.20245C9.77969 2.22183 9.62479 1.5549 9.09462 0.950523C8.51065 0.285219 7.45582 0.000366211 6.10642 0.000366211H2.18913C1.91335 0.000366211 1.6784 0.200962 1.63562 0.473176L0.00428335 10.817C-0.0277991 11.0212 0.129696 11.2059 0.33645 11.2059H2.75494L2.58805 12.2643C2.55986 12.4428 2.69758 12.6042 2.87841 12.6042H4.91678C5.15821 12.6042 5.36366 12.4286 5.40125 12.1904L5.42102 12.0867L5.80504 9.65166L5.82999 9.51717C5.86758 9.27866 6.07304 9.10334 6.31414 9.10334H6.61909C8.59394 9.10334 10.1404 8.30095 10.5921 5.98065C10.7807 5.01105 10.6832 4.20186 10.1841 3.63281C10.0331 3.46073 9.84515 3.31846 9.62608 3.20245Z" fill="#159BD7"/>
+                            </g>
+                            <path d="M9.94178 3.14336C10.1004 2.18072 9.94044 1.52603 9.39288 0.932732C8.78975 0.279629 7.70032 0 6.30664 0H2.26082C1.976 0 1.73334 0.196917 1.68916 0.464139L0.00429781 10.6183C-0.0288372 10.8187 0.133825 11 0.347362 11H2.8452L3.47243 7.21849L3.45301 7.33683C3.49753 7.06961 3.73784 6.87238 4.02267 6.87238H5.20984C7.54134 6.87238 9.36677 5.97209 9.90028 3.36859C9.91601 3.2916 9.92973 3.21684 9.94178 3.14336Z" fill="#222C65"/>
+                            <path d="M4.14651 3.15608C4.17328 2.99511 4.28172 2.86341 4.42799 2.79692C4.49459 2.7667 4.56889 2.74984 4.64654 2.74984H7.81813C8.19399 2.74984 8.54409 2.77306 8.86439 2.82205C8.95576 2.83605 9.04513 2.85228 9.13148 2.87073C9.21817 2.88886 9.30184 2.90922 9.38317 2.93181C9.42401 2.94294 9.46383 2.95503 9.50333 2.96744C9.66064 3.01706 9.8069 3.0756 9.94178 3.14336C10.1004 2.18072 9.94044 1.52603 9.39288 0.932732C8.78975 0.279629 7.70032 0 6.30664 0H2.26082C1.976 0 1.73334 0.196917 1.68916 0.464139L0.00429781 10.6183C-0.0288372 10.8187 0.133825 11 0.347362 11H2.8452L3.47243 7.21849L4.14651 3.15608Z" fill="#253B80"/>
+                            <path d="M43.4896 4.37128C43.3091 5.66408 42.401 5.66408 41.5227 5.66408H41.0239L41.3737 3.25153C41.395 3.10531 41.5108 2.99796 41.6469 2.99796H41.8759C42.4734 2.99796 43.0376 2.99796 43.3287 3.36813C43.5032 3.5893 43.5559 3.91782 43.4896 4.37128ZM43.1074 1H39.7967C39.5703 1 39.3779 1.17953 39.3422 1.42291L38.0034 10.653C37.977 10.8353 38.1064 11 38.2758 11H39.9746C40.1329 11 40.2682 10.8751 40.2929 10.7048L40.6724 8.08773C40.7082 7.84435 40.9005 7.66574 41.1269 7.66574H42.1746C44.3551 7.66574 45.6139 6.51823 45.9433 4.24357C46.0913 3.24875 45.9492 2.46678 45.5211 1.91986C45.0496 1.31834 44.2155 1 43.1074 1Z" fill="#159BD7"/>
+                            <path d="M19.4896 4.37128C19.3091 5.66408 18.401 5.66408 17.5235 5.66408H17.0239L17.3737 3.25153C17.395 3.10531 17.5108 2.99796 17.6469 2.99796H17.8759C18.4734 2.99796 19.0376 2.99796 19.3287 3.36813C19.5032 3.5893 19.5559 3.91782 19.4896 4.37128ZM19.1074 1H15.7967C15.5703 1 15.3779 1.17953 15.3422 1.42291L14.0034 10.653C13.977 10.8353 14.1064 11 14.2758 11H15.8571C16.0835 11 16.2758 10.8214 16.3116 10.578L16.6724 8.08773C16.7082 7.84435 16.9005 7.66574 17.1269 7.66574H18.1746C20.3551 7.66574 21.6139 6.51823 21.9433 4.24357C22.0913 3.24875 21.9492 2.46678 21.5211 1.91986C21.0496 1.31834 20.2155 1 19.1074 1Z" fill="#253B80"/>
+                            <path d="M26.4424 7.52131C26.2848 8.50794 25.5447 9.1694 24.6005 9.1694C24.1275 9.1694 23.7482 9.00913 23.5048 8.70341C23.2639 8.4014 23.1728 7.97155 23.2499 7.49166C23.3961 6.51429 24.1485 5.83152 25.0778 5.83152C25.5412 5.83152 25.9178 5.99365 26.1657 6.30122C26.4162 6.61157 26.5143 7.0442 26.4424 7.52131ZM28.7162 4.16305H27.0844C26.9452 4.16305 26.8261 4.27051 26.8042 4.41596L26.7323 4.89862L26.6185 4.72446C26.2646 4.18158 25.4772 4 24.6907 4C22.8881 4 21.3484 5.44521 21.0488 7.47128C20.8929 8.48293 21.1145 9.44825 21.6567 10.1227C22.1542 10.7425 22.8645 11 23.7115 11C25.1645 11 25.9703 10.0124 25.9703 10.0124L25.8968 10.4923C25.8696 10.6748 26.0027 10.8397 26.1779 10.8397H27.6468C27.8797 10.8397 28.0786 10.6609 28.1145 10.4173L28.9965 4.50953C29.0236 4.32795 28.8905 4.16305 28.7162 4.16305Z" fill="#253B80"/>
+                            <path d="M50.4424 7.52131C50.2848 8.50794 49.5447 9.1694 48.6005 9.1694C48.1275 9.1694 47.7482 9.00913 47.5048 8.70341C47.2639 8.4014 47.1728 7.97155 47.2499 7.49166C47.3961 6.51429 48.1485 5.83152 49.0778 5.83152C49.5412 5.83152 49.9178 5.99365 50.1657 6.30122C50.4153 6.61157 50.5143 7.0442 50.4424 7.52131ZM52.7162 4.16305H51.0844C50.9443 4.16305 50.8261 4.27051 50.8042 4.41596L50.7323 4.89862L50.6185 4.72446C50.2646 4.18158 49.4772 4 48.6907 4C46.8881 4 45.3484 5.44521 45.0488 7.47128C44.8929 8.48293 45.1145 9.44825 45.6558 10.1227C46.1542 10.7425 46.8645 11 47.7115 11C49.1645 11 49.9703 10.0124 49.9703 10.0124L49.8968 10.4923C49.8696 10.6748 50.0036 10.8397 50.1779 10.8397H51.6468C51.8797 10.8397 52.0786 10.6609 52.1145 10.4173L52.9965 4.50953C53.0236 4.32795 52.8905 4.16305 52.7162 4.16305Z" fill="#159BD7"/>
+                            <path d="M37.7119 4H36.0479C35.8888 4 35.7405 4.08234 35.6507 4.21926L33.3559 7.73859L32.384 4.35619C32.3227 4.14525 32.1361 4 31.9238 4H30.2881C30.0909 4 29.9523 4.20169 30.0154 4.3969L31.8473 9.99507L30.1247 12.5263C29.9896 12.7252 30.1256 13 30.3592 13H32.0215C32.1787 13 32.3262 12.9195 32.4159 12.7844L37.9482 4.47091C38.0806 4.272 37.9438 4 37.7119 4Z" fill="#253B80"/>
+                            <path d="M54.5844 1.25356L53.004 10.6539C52.9733 10.8362 53.1237 11 53.3207 11H54.9099C55.1732 11 55.3978 10.8214 55.4384 10.578L56.996 1.34703C57.0267 1.16472 56.8763 1 56.6793 1H54.901C54.7427 1 54.6081 1.10735 54.5844 1.25356Z" fill="#159BD7"/>
+                        </svg>
+                        <?php if (is_array($thresholds) && $clearpay->isInThreshold($product, $thresholds)): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" width="106" height="36" viewBox="0 0 106 36" class="w-[80px] mr-1.5">
+                                <path class="afterpay-logo-badge-background" fill="#b2fce4" d="m87.9659,35.9683l-69.9317,0a17.9342,17.9342 0 1 1 0,-35.8683l69.9317,0a17.9342,17.9342 0 1 1 0,35.8683z"></path>
+                                <g class="afterpay-logo-badge-lockup">
+                                    <path d="m75.7442,13.8827l-5.2852,10.9026l-2.1897,0l1.9746,-4.073l-3.102,-6.8296l2.2483,0l1.9942,4.5748l2.1765,-4.5748l2.1832,0l0.0001,0z"></path>
+                                    <path d="m55.6334,17.7537a2.1505,2.1505 0 0 0 -2.105,-2.2157c-1.1599,0 -2.1048,0.932 -2.1048,2.2157c0,1.2708 0.9449,2.2157 2.1049,2.2157a2.1505,2.1505 0 0 0 2.105,-2.2157m-6.1324,7.0316l0,-10.9025l1.903,0l0,1.0035a3.076,3.076 0 0 1 2.4437,-1.147c2.0919,0 3.7341,1.7205 3.7341,3.9949s-1.6748,4.0078 -3.7797,4.0078a2.9977,2.9977 0 0 1 -2.3395,-1.0362l0,4.073l-1.9617,0l0,0.0065l0.0001,0z"></path>
+                                    <path d="m64.4506,17.7537c0,-1.3033 -0.945,-2.2157 -2.105,-2.2157c-1.1599,0 -2.1048,0.932 -2.1048,2.2157c0,1.2708 0.9449,2.2157 2.1049,2.2157c1.16,0 2.105,-0.9188 2.105,-2.2157m0.013,3.871l0,-1.0037a3.102,3.102 0 0 1 -2.4439,1.1274c-2.1244,0 -3.734,-1.7009 -3.734,-3.9948c0,-2.2743 1.6747,-4.0078 3.7797,-4.0078c0.9905,0 1.8247,0.4366 2.3981,1.1144l0,-0.9775l1.903,0l0,7.7419l-1.903,0l0.0001,0.0001z"></path>
+                                    <path d="m46.0668,14.6387s0.4822,-0.8993 1.6748,-0.8993c0.5083,0 0.8341,0.176 0.8341,0.176l0,1.9745s-0.7168,-0.4431 -1.375,-0.3519s-1.0753,0.6908 -1.0753,1.4989l0,4.5878l-1.968,0l0,-7.742l1.9029,0l0,0.756l0.0065,0z"></path>
+                                    <path d="m90.5242,13.4461l-2.2548,-1.2903l-2.2874,-1.3099a2.2744,2.2744 0 0 0 -3.4017,1.9681l0,0.2933c0,0.1629 0.0847,0.3128 0.228,0.391l1.0623,0.606a0.4431,0.4431 0 0 0 0.6582,-0.3845l0,-0.6973c0,-0.3454 0.3714,-0.5604 0.6712,-0.391l2.0854,1.1991l2.0788,1.1926a0.4497,0.4497 0 0 1 0,0.7755l-2.0788,1.1926l-2.0854,1.199a0.4497,0.4497 0 0 1 -0.6712,-0.391l0,-0.3454c0,-1.7464 -1.8899,-2.8413 -3.4018,-1.968l-2.2874,1.3098l-2.2548,1.2904a2.2809,2.2809 0 0 0 0,3.9426l2.2548,1.2903l2.2874,1.31a2.2744,2.2744 0 0 0 3.4018,-1.9682l0,-0.2932c0,-0.163 -0.0847,-0.3128 -0.2281,-0.391l-1.0622,-0.606a0.4431,0.4431 0 0 0 -0.6582,0.3844l0,0.6973c0,0.3454 -0.3715,0.5604 -0.6713,0.391l-2.0853,-1.199l-2.0789,-1.1927a0.4497,0.4497 0 0 1 0,-0.7755l2.0789,-1.1925l2.0853,-1.1991a0.4497,0.4497 0 0 1 0.6713,0.391l0,0.3454c0,1.7465 1.8898,2.8413 3.4017,1.968l2.2874,-1.3098l2.2548,-1.2903a2.2809,2.2809 0 0 0 0,-3.9427z"></path>
+                                    <path d="m22.2806,18.7377a3.8905,3.8905 0 0 1 -3.9296,3.0043a3.91,3.91 0 0 1 -4.0078,-3.9948a3.9492,3.9492 0 0 1 4.0404,-4.0078a3.897,3.897 0 0 1 3.884,2.9716l-2.0137,0a2.105,2.105 0 0 0 -1.8573,-1.16a2.1375,2.1375 0 0 0 -2.105,2.1962a2.1375,2.1375 0 0 0 2.105,2.1961c0.8211,0 1.5314,-0.4627 1.8703,-1.2056l2.0137,0z"></path>
+                                    <path d="m23.1864,21.6181l0,-10.922l1.9485,0l0,10.922l-1.9485,0z"></path>
+                                    <path d="m28.0675,18.262a1.9224,1.9224 0 0 0 1.9941,1.7921c0.8211,0 1.4532,-0.3845 1.8247,-1.0036l1.9941,0c-0.4627,1.6423 -1.9355,2.6915 -3.871,2.6915c-2.3395,0 -3.9752,-1.6423 -3.9752,-3.9753s1.7335,-4.0208 4.0209,-4.0208a3.871,3.871 0 0 1 3.9296,4.5161l-5.9172,0zm3.884,-1.2121c-0.1369,-1.0036 -0.958,-1.6096 -1.916,-1.6096s-1.7464,0.5865 -1.9485,1.6096l3.8645,0z"></path>
+                                    <path d="m40.9902,21.6181l0,-1.0035a3.089,3.089 0 0 1 -2.4438,1.1274c-2.118,0 -3.7276,-1.701 -3.7276,-3.9948c0,-2.2744 1.6683,-4.0078 3.7733,-4.0078c0.9905,0 1.8247,0.43 2.3981,1.1144l0,-0.9776l1.903,0l0,7.7354l-1.903,0l0,0.0066l0,-0.0001zm-0.0195,-3.8709c0,-1.2967 -0.945,-2.2156 -2.105,-2.2156c-1.16,0 -2.1049,0.9254 -2.1049,2.2157c0,1.2708 0.945,2.2157 2.105,2.2157c1.16,0 2.1049,-0.9124 2.1049,-2.2157l0,-0.0001z"></path>
+                                </g>
+                            </svg>
+                        <?php endif; ?>
+                    </div>
+                    <div class="ml-auto flex text-sm leading-6 cursor-pointer text-medium font-sans text-black font-medium absolute right-0 top-4 md:top-5" @click="open = !open">
+                        <svg x-show="open" width="10" height="15" viewBox="0 0 10 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="8.74971" y1="7.68334" x2="1.27997" y2="0.744608" stroke="black" stroke-width="2"/>
+                            <line x1="9.34175" y1="6.93467" x2="1.65724" y2="13.6348" stroke="black" stroke-width="2"/>
+                        </svg>
+                        <span class="flex -mt-3.5" x-show="!open">
+                            <span class="underline -mt-1.5 mr-0">Close</span>
+                            <svg class="ml-0.5 w-2.5 h-3" width="7" height="8" viewBox="0 0 7 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.923 8H5.607C5.49967 8 5.41333 7.972 5.348 7.916C5.28733 7.85533 5.23833 7.79233 5.201 7.727L3.486 5.018C3.46267 5.088 3.43933 5.15567 3.416 5.221C3.39267 5.28633 3.36233 5.347 3.325 5.403L1.75 7.727C1.70333 7.79233 1.64967 7.85533 1.589 7.916C1.52833 7.972 1.449 8 1.351 8H0.133L2.611 4.339L0.231 0.888H1.547C1.65433 0.888 1.73133 0.904333 1.778 0.937C1.82933 0.969666 1.87367 1.01867 1.911 1.084L3.598 3.681C3.62133 3.611 3.647 3.54333 3.675 3.478C3.703 3.408 3.74033 3.33567 3.787 3.261L5.236 1.112C5.32 0.962666 5.432 0.888 5.572 0.888H6.825L4.445 4.276L6.923 8Z" fill="black"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <div x-show="!open" class="pr-4">
+                    <?= $block->getChildHtml("product.info.paylater") ?>
+                    <?= $block->getChildHtml("product.info.addtocart.rvvup-clearpay") ?>
+                </div>
+            </div>
+            <?php if ($product->getTypeId() !== 'configurable'): ?>
+                <?= $block->getChildHtml('product.info.form') ?>
+            <?php endif;?>
+        </div>
+
+        <?= $block->getChildHtml("product.info.stockstatus") ?>
+        <div id="product-details" class="hidden">
+            <?php foreach ($block->getAttributes() as $attributeConfig) {
+            $attribute = $attributesViewModel->getAttributeFromLayoutConfig($attributeConfig); ?>
+                <?php if ($value = $attribute['value'] ?? null) { ?>
+                    <div class="flex border-t border-gray-300 py-2 last:mb-6 last:border-b <?=/* @noEscape */ $attribute['value'] ?: "" ?>">
+                        <span class="w-1/2 text-left text-gray-700 product-detail-label">
+                            <?= $escaper->escapeHtml($attribute['label']) ?>
+                        </span>
+                        <span class="w-1/2 ml-2 text-left text-gray-900 product-detail-value">
+                            <?= $escaper->escapeHtml($value) ?>
+                        </span>
+                    </div>
+                <?php } ?>
+            <?php
+        } ?>
+        </div>
+
+        <?php if ($product->isSaleable() && count($depotsList) >= 1 && $buyOnline == true && $trueStock >= 1): ?>
+            <div class="flex justify-center hidden">
+                <?= $block->getChildHtml('addtocart.shortcut.buttons') ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($product->getTypeId() !== 'configurable'): ?>
+            <div class="flex flex-col sm:flex-row items-end mt-2.5 mb-2.5">
+                <div class="flex w-full">
+                    <?php if ($product->getTypeId() === 'simple'): ?>
+                        <?php if ($product->isSaleable() && count($depotsList) >= 1 && $buyOnline == true && $trueStock >= 1): ?>
+                            <?= $block->getChildHtml("product.info.quantity") ?>
+                            <?= $block->getChildHtml("product.info.addtocart") ?>
+                        <?php elseif ($availabilityType == 'CurrentPO' && $isExistingPO == true && $psaQuantity >= 1 && $_outofstockallowbackorder != ''): ?>
+                            <?= $block->getChildHtml("product.info.preordercart") ?>
+                        <?php elseif ($product->isSaleable() && $isExistingPO === 'false' && $psaQuantity >= 1): ?>
+                            <?= $block->getChildHtml("product.info.quantity") ?>
+                            <?= $block->getChildHtml("product.info.addtocart") ?>
+                        <?php else: ?>
+                            <p class="w-full">
+                                <a href="tel:+443300577142" title="<?php $escaper->escapeHtml(__('Call for Availability')); ?>" target="_blank"
+                                   class="btn btn-primary font-serif text-sm leading-5 font-medium md:text-lg md:leading-7 md:font-bold text-center">
+                                    <span class="inline-block w-full"><?= __('Call 0330 057 7142 for Availability'); ?></span>
+                                </a>
+                            </p>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <?= $block->getChildHtml("product.info.quantity") ?>
+                        <?= $block->getChildHtml("product.info.addtocart") ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif;?>
+
+        <?php echo $this->getLayout()
+            ->createBlock(\Magento\Cms\Block\Block::class)
+            ->setBlockId('trustpilot-pdp')
+            ->toHtml();
+        ?>
+
+        <div class="flex mt-4 justify-end hidden">
+            <?= $block->getChildHtml('product.info.emailtofriend'); ?>
+            <?= $block->getChildHtml('product.info.additional.actions'); ?>
+        </div>
+        <?php if ($tierPriceBlock = trim($block->getChildHtml("product.price.tier"))): ?>
+            <div class="tier-price-container<?= $product->getTypeId() !== 'configurable' ? ' py-4 my-2': ''; ?>">
+                <?= /** @noEscape */ $tierPriceBlock ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <div class="w-full py-3 px-4 mb-1.5">
+        <p class="font-serif text-xl lg:text-2xl text-center font-semibold text-black"><?= $escaper->escapeHtml('Pay securely with:') ?></p>
+        <div class="pt-4">
+            <?php // echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('payment-options')->toHtml(); ?>
+            <ul class="flex flex-row justify-center items-center">
+                <li class="flex mx-1 p-1 border-2 border-[#D9D9D9] rounded-2xl"><?php echo $hyvaicons->renderHtml('visa', 'w-9 h-6 lg:w-10 lg:h-6'); ?></li>
+                <li class="flex mx-1 p-1 border-2 border-[#D9D9D9] rounded-2xl"><?php echo $hyvaicons->renderHtml('Mastercard', 'w-9 h-6 lg:w-10 lg:h-6'); ?></li>
+                <li class="flex mx-1 p-1 border-2 border-[#D9D9D9] rounded-2xl"><?php echo $hyvaicons->renderHtml('ApplePay', 'w-9 h-6 lg:w-10 lg:h-6'); ?></li>
+                <li class="flex mx-1 p-1 border-2 border-[#D9D9D9] rounded-2xl"><?php echo $hyvaicons->renderHtml('PayPal', 'w-9 h-6 lg:w-9 lg:h-6'); ?></li>
+                <li class="flex mx-1 p-1 border-2 border-[#D9D9D9] rounded-2xl"><?php echo $hyvaicons->renderHtml('amazon-pay', 'w-9 h-6 lg:w-10 lg:h-6'); ?></li>
+                <li class="flex mx-1 p-1 border-2 border-[#D9D9D9] rounded-2xl"><?php echo $hyvaicons->renderHtml('rvvup-small', 'w-9 h-6 lg:w-10 lg:h-6'); ?></li>
+            </ul>
+        </div>
+    </div>
+    <div class="w-full border-t border-b border-[#D1D5DB] py-3 px-4 mb-4 delivery-returns-section" x-data="{ expanded: false }">
+        <button @click="expanded = ! expanded" class="w-full text-left font-serif text-xl lg:text-2xl text-center font-semibold text-black relative"><?= $escaper->escapeHtml(__('Delivery &amp; Returns')) ?> <?= $heroicons->chevronDownHtml('inline-block absolute right-2.5 top-[5px] w-10 h-6 text-[#126366] transition-transform transform duration-300 ease-in-out', 32, 16, [":class" => "{ 'rotate-180': expanded }"]); ?></button>
+        <div class="pt-6 transition" x-show="expanded" x-collapse>
+            <?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('delivery-returns')->toHtml(); ?>
+        </div>
+    </div>
+
+    <?= $block->getChildHtml("product.info.additional") ?>
+
+    <div x-data="{ showStickyBar: false }"
+         @scroll.window="showStickyBar = (window.pageYOffset > 800) ? true : false">
+        <div class="add-to-cart-sticky-bar md:hidden z-50 left-0 bottom-0 fixed w-full px-[20px] py-[10px] bg-[#f2f2f2] invisible"
+             :class="{ 'invisible' : !showStickyBar }">
+            <div class="price-block">
+                <?= $block->getChildHtml("product.info.price") ?>
+            </div>
+
+            <div class="add-to-basket flex flex-col sm:flex-row items-end">
+                <div class="flex w-[150px]">
+                    <?php if ($product->getTypeId() === 'simple'): ?>
+                        <?php if ($product->isSaleable() && count($depotsList) >= 1 && $buyOnline == true && $trueStock >= 1): ?>
+                            <?= $block->getChildHtml("product.info.addtocart") ?>
+                        <?php elseif ($availabilityType == 'CurrentPO' && $isExistingPO == true && $psaQuantity >= 1 && $_outofstockallowbackorder != ''): ?>
+                            <?= $block->getChildHtml("product.info.preordercart") ?>
+                        <?php elseif ($product->isSaleable() && $isExistingPO === 'false' && $psaQuantity >= 1): ?>
+                            <?= $block->getChildHtml("product.info.addtocart") ?>
+                        <?php else: ?>
+                            <p class="w-full"><a href="tel:+443300577142" title="<?php $escaper->escapeHtml(__('Call for Availability')); ?>" target="_blank" class="btn btn-primary font-serif text-sm leading-5 font-medium md:text-lg md:leading-7 md:font-bold text-center"><span class="inline-block w-full">Call 0330 057 7142 for Availability</span></a></p>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <?= $block->getChildHtml("product.info.addtocart") ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

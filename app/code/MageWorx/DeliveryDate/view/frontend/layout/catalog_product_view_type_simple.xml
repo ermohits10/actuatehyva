@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx, Inc. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="MageWorx_DeliveryDate::css/product.css"/>
+    </head>
+    <body>
+        <referenceBlock name="product.info.addtocart">
+            <block class="MageWorx\DeliveryDate\Block\Product\View\EstimatedDeliveryTime"
+                   name="product.info.estimated_delivery_time_mageworx"
+                   template="MageWorx_DeliveryDate::product/view/estimated_delivery_time.phtml"
+                   ifconfig="delivery_date/main/enabled"
+                   after="product.info.type">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="delivery-date-info" xsi:type="array">
+                                <item name="sortOrder" xsi:type="string">1</item>
+                                <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/product-info</item>
+                                <item name="children" xsi:type="array">
+
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.additional">
+            <block class="MageWorx\DeliveryDate\Block\Product\View\EstimatedDeliveryTime"
+                   name="product.info.estimated_delivery_time_mageworx.additional"
+                   template="MageWorx_DeliveryDate::product/view/estimated_delivery_time.phtml"
+                   ifconfig="delivery_date/main/enabled"
+                   after="product.info.type">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="delivery-date-info" xsi:type="array">
+                                <item name="sortOrder" xsi:type="string">1</item>
+                                <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/product-info</item>
+                                <item name="children" xsi:type="array">
+
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

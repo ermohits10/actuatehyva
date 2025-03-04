@@ -1,0 +1,183 @@
+<?php
+
+use \AutifyDigital\V12Finance\Helper\Data;
+
+$financeData = $this->getV12FinanceSuccessView();
+$autifyDigitalHelper = $this->helper(\AutifyDigital\V12Finance\Helper\Data::class);
+$googleTagManagerEnable = $autifyDigitalHelper->getConfig('autifydigital/v12finance/tagmanagers_enable');
+$tagsType = $autifyDigitalHelper->getConfig('autifydigital/v12finance/tag_google_analytics_type');
+$tagsStatus = $financeData['layer_sent'] ? $financeData['layer_sent'] : '';
+
+$succcessAnalyticsEnable = $autifyDigitalHelper->getConfig('autifydigital/v12finance/success_analytics_enable');
+$analyticsType = $autifyDigitalHelper->getConfig('autifydigital/v12finance/google_analytics_type');
+$analyticsStatus = $financeData['analytics_sent'] ? $financeData['analytics_sent'] : '';
+
+if($succcessAnalyticsEnable && $analyticsStatus != 1) {
+    if ($financeData['application_status'] == "5") {
+        if(isset($financeData['application_id'])) {
+            $autifyDigitalHelper->changeAnalyticsStatus($financeData['application_id']);
+        }
+
+        $orderId = $financeData['order_id'];
+        $order = $autifyDigitalHelper->getOrder($orderId);
+        $storeName = $autifyDigitalHelper->getConfig('general/store_information/name');
+        $i = 0;
+        $cartProducts = [];
+        $countItems = count($order->getAllVisibleItems());
+        foreach ($order->getAllVisibleItems() as $item) {
+            if ($i+1 < $countItems) {
+                $cartProducts[$i] = "
+                {
+                'sku': '" . $item->getSku() . "',
+                'name': '" . $block->escapeHtml($item->getName()) . "',
+                'price': " . $item->getPrice() . ",
+                'quantity': " . number_format($item->getQtyOrdered()) . "
+                },";
+                } else {
+                    $cartProducts[$i] = "
+                {
+                'sku': '" . $item->getSku() . "',
+                'name': '" . $block->escapeHtml($item->getName()) . "',
+                'price': " . $item->getPrice() . ",
+                'quantity': " . number_format($item->getQtyOrdered()) . "
+                }";
+            }
+            $i++;
+        }
+?>
+        <script type="text/javascript">
+            var i = 0;
+            var items = [];
+            <?php 
+                foreach($order->getAllVisibleItems() as $item): 
+                    if($analyticsType == 'ga4') { ?>
+                        items[i] = {
+                            'item_id': '<?php echo $item->getSku()?>',
+                            'item_name': '<?php echo $this->escapeJsQuote($item->getProduct()->getName()) ?>',
+                            <?php if($order->getCouponCode()) { ?>
+                                'coupon': '<?php echo $order->getCouponCode() ?>',
+                            <?php } ?>
+                            'currency': '<?php echo $order->getOrderCurrencyCode(); ?>',
+                            'discount': "<?php echo number_format($item->getDiscountAmount(), 2, ".", "") ?>",
+                            'index': i,
+                            'price': '<?php echo $item->getPrice()?>',
+                            'quantity': '<?php echo number_format($item->getQtyOrdered()); ?>',
+                        };
+                <?php 
+                    }
+                    if($analyticsType == 'ga') { ?>
+                        items[i] = {
+                            'id': '<?php echo $item->getSku()?>',
+                            'name': '<?php echo $this->escapeJsQuote($item->getProduct()->getName()) ?>',
+                            'affiliation': '<?php echo $this->escapeJsQuote($storeName) ?>',
+                            <?php if($order->getCouponCode()) { ?>
+                                'coupon': '<?php echo $order->getCouponCode() ?>',
+                            <?php } ?>
+                            'currency': '<?php echo $order->getOrderCurrencyCode(); ?>',
+                            'discount': "<?php echo number_format($item->getDiscountAmount(), 2, ".", "") ?>",
+                            'list_position':  i,
+                            'price': '<?php echo $item->getPrice()?>',
+                            'quantity': '<?php echo number_format($item->getQtyOrdered()); ?>',
+                        };
+                    <?php  } ?>
+                    i++;
+            <?php endforeach; ?>
+            gtag('event', 'purchase', {
+                "transaction_id": "<?php echo $order->getIncrementId();?>",
+                "affiliation": "<?php echo $this->escapeJsQuote($storeName) ?>",
+                "value": '<?php echo number_format($order->getBaseGrandTotal(), 2, ".", ""); ?>',
+                "tax": '<?php echo number_format($order->getTaxAmount(), 2, ".", ""); ?>',
+                "shipping": '<?php echo number_format($order->getBaseShippingAmount(), 2, ".", ""); ?>',
+                "currency": "<?php echo $order->getOrderCurrencyCode(); ?>",
+                <?php if($order->getCouponCode()) { ?>
+                    "coupon": "<?php echo $order->getCouponCode(); ?>",
+                <?php } ?>
+                "items": items
+            });
+        </script>
+<?php        
+    }
+}
+?> 
+<!-- Analytics End -->
+<!-- DL Start -->
+<?php
+if($googleTagManagerEnable && $tagsStatus != 1) {
+    if ($financeData['application_status'] == "5") {
+        if(isset($financeData['application_id'])) {
+            $disableStatusAnalytics = $autifyDigitalHelper->changeDatalayerStatus($financeData['application_id']);
+        }
+        
+        $orderId = $financeData['order_id'];
+        $order = $autifyDigitalHelper->getOrder($orderId);
+        $storeName = $autifyDigitalHelper->getConfig('general/store_information/name');
+        $i = 0;
+        $cartProducts = [];
+        $countItems = count($order->getAllVisibleItems());
+        if ($tagsType == 'ga4') {
+            foreach ($order->getAllVisibleItems() as $item) {
+                if ($i+1<$countItems) {
+                    $cartProducts[$i] = "
+                {
+                'item_id': '" . $item->getSku() . "',
+                'item_name': '" . $block->escapeHtml($item->getName()) . "',
+                'price': " . $item->getPrice() . ",
+                'quantity': " . number_format($item->getQtyOrdered()) . "
+                },";
+                } else {
+                    $cartProducts[$i] = "
+                {
+                'item_id': '" . $item->getSku() . "',
+                'item_name': '" . $block->escapeHtml($item->getName()) . "',
+                'price': " . $item->getPrice() . ",
+                'quantity': " . number_format($item->getQtyOrdered()) . "
+                }";
+                }
+                $i++;
+            }
+        } else {
+            foreach ($order->getAllVisibleItems() as $item) {
+                if ($i+1<$countItems) {
+                    $cartProducts[$i] = "
+                {
+                'sku': '" . $item->getSku() . "',
+                'name': '" . $block->escapeHtml($item->getName()) . "',
+                'price': " . $item->getPrice() . ",
+                'quantity': " . number_format($item->getQtyOrdered()) . "
+                },";
+                } else {
+                    $cartProducts[$i] = "
+                {
+                'sku': '" . $item->getSku() . "',
+                'name': '" . $block->escapeHtml($item->getName()) . "',
+                'price': " . $item->getPrice() . ",
+                'quantity': " . number_format($item->getQtyOrdered()) . "
+                }";
+                }
+                $i++;
+            }
+        }
+        ?>
+        <script>
+            dataLayer.push({ ecommerce: null });
+            dataLayer.push({
+                'ecommerce': {
+                    'purchase': {
+                        'actionField': {
+                            'id': '<?= $order->getIncrementId(); ?>',
+                            'affiliation': '<?= $this->escapeJsQuote($storeName) ?>',
+                            'revenue': '<?= number_format($order->getBaseGrandTotal(), 2, ".", ""); ?>',
+                            'tax':'<?= number_format($order->getTaxAmount(), 2, ".", ""); ?>',
+                            <?php if($order->getCouponCode()) { ?>
+                            'coupon': '<?= $order->getCouponCode() ?>',
+                            <?php } ?>
+                            'shipping': '<?= number_format($order->getBaseShippingAmount(), 2, ".", ""); ?>'
+                        },
+                        'products': [<?php foreach ($cartProducts as $row) {echo $row;}?>]
+                    }
+                },
+                'event': "purchase"
+            });
+        </script>
+    <?php }
+} ?>

@@ -1,0 +1,76 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+?>
+<script>
+    if (hyva && hyva.formValidation) {
+        (() => {
+            const magewireFormValidation = []
+
+            <?php /* The next two functions duplicate private code in Hyva_Theme::page/js/advanced-form-validation.phtml */ ?>
+            const isVisible = element => {
+                const el = element.type !== 'hidden' ? element : (element.parentElement || {});
+                return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
+            }
+
+            const willValidate = element => (element.willValidate || element.type === 'hidden')
+                && element.tagName !== 'BUTTON'
+                && element.disabled === false
+                && !(element.tagName === 'INPUT' && element.type === 'submit')
+                && (element.hasAttribute('data-validate-hidden') || isVisible(element))
+
+            hyva.formValidation = new Proxy(hyva.formValidation, {
+                apply(target, thisArg, args) {
+                    const alpineComponent = target.apply(thisArg, args);
+                    magewireFormValidation.push({ formElement: args[0], context: alpineComponent });
+                    return alpineComponent;
+                }
+            })
+
+            hyva.formValidation.addRule('magewire', (value, options, field, context) => {
+                const el = field.element;
+
+                if (willValidate(el) && options && el.dataset.magewireIsValid === '0') {
+                    // Clear magewire validation message on user interaction with input
+                    const event = ['select-one', 'select-multiple', 'checkbox', 'radio'].includes(el.type) ? 'change' : 'input'
+                    el.addEventListener(event, () => {
+                        el.dataset.magewireIsValid = '1'
+                        context.validateField(field)
+                    }, { once: true })
+                    return el.dataset.msgMagewire || false;
+                }
+
+                return true;
+            });
+
+            window.addEventListener('magewire:load', () => {
+                Magewire.hook('element.updated', (el, component) => {
+                    <?php /* Apply form validation after AddressMagewire renders an input */ ?>
+                    if (! el.form) return;
+
+                    magewireFormValidation.forEach(form => {
+                        if (el.form === form.formElement && Array.from(form.formElement.elements).includes(el) && willValidate(el)) {
+                            form.context.onChange.call(form.context, { target: el })
+                        }
+                    })
+                });
+            }, { once: true });
+        })()
+    } else {
+        console.log(`The hyva.formValidation instance is undefined - be sure to include the block "<?= $escaper->escapeJs($block->getNameInLayout()) ?>" after "advanced-form-validation"`);
+    }
+</script>

@@ -1,0 +1,9 @@
+{
+    "name": "mageworx/module-deliverydatemeta",
+    "require": {
+        "mageworx/module-info": ">=1.0.0",
+        "mageworx/module-deliverydate": "1.20.0"
+    },
+    "type": "metapackage",
+    "version": "1.20.0"
+}

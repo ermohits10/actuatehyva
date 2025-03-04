@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright © MageWorx. All rights reserved.
+See LICENSE.txt for license details.
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">mageworx_delivery_date_queue_listing.mageworx_delivery_date_queue_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>mageworx_delivery_date_queue_columns</spinner>
+        <deps>
+            <dep>mageworx_delivery_date_queue_listing.mageworx_delivery_date_queue_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="mageworx_delivery_date_queue_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="dataScope" xsi:type="string">filters.store_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <dataProvider class="MageWorx\DeliveryDate\Ui\DataProvider\Queue\QueueDataProvider" name="mageworx_delivery_date_queue_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters">
+            <filterSelect name="store_id" provider="${ $.parentName }">
+                <settings>
+                    <options class="Magento\Store\Ui\Component\Listing\Column\Store\Options"/>
+                    <caption translate="true">All Store Views</caption>
+                    <label translate="true">Store View</label>
+                    <dataScope>store_id</dataScope>
+                </settings>
+            </filterSelect>
+        </filters>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="mageworx_delivery_date_queue_columns" class="Magento\Ui\Component\Listing\Columns">
+        <column name="entity_id" sortOrder="10">
+            <settings>
+                <addField>true</addField>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+        <column name="quote_address_id" sortOrder="20">
+            <settings>
+                <addField>true</addField>
+                <filter>textRange</filter>
+                <label translate="true">Quote Address Id</label>
+                <sorting>asc</sorting>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <column name="order_address_id" sortOrder="30">
+            <settings>
+                <addField>true</addField>
+                <filter>textRange</filter>
+                <label translate="true">Order Address Id</label>
+                <sorting>asc</sorting>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <column name="delivery_day" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date" sortOrder="40">
+            <settings>
+                <addField>true</addField>
+                <timezone>false</timezone>
+                <dateFormat>MMM d, y</dateFormat>
+                <skipTimeZoneConversion>true</skipTimeZoneConversion>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Delivery Date</label>
+            </settings>
+        </column>
+        <column name="delivery_time_from" sortOrder="50">
+            <settings>
+                <addField>true</addField>
+                <filter>textRange</filter>
+                <label translate="true">From Time</label>
+                <dataType>text</dataType>
+            </settings>
+        </column>
+        <column name="delivery_time_to" sortOrder="55">
+            <settings>
+                <addField>true</addField>
+                <filter>textRange</filter>
+                <label translate="true">To Time</label>
+                <dataType>text</dataType>
+            </settings>
+        </column>
+        <column name="delivery_option" sortOrder="60">
+            <settings>
+                <addField>true</addField>
+                <filter>textRange</filter>
+                <label translate="true">Delivery Option Id</label>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <column name="shipping_method" component="Magento_Ui/js/grid/columns/select" sortOrder="70">
+            <settings>
+                <addField>true</addField>
+                <options class="MageWorx\DeliveryDate\Model\Source\ShippingMethods"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Shipping Method</label>
+            </settings>
+        </column>
+        <column name="carrier" component="Magento_Ui/js/grid/columns/select" sortOrder="80">
+            <settings>
+                <addField>true</addField>
+                <options class="MageWorx\DeliveryDate\Model\Source\Carriers"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Carrier</label>
+            </settings>
+        </column>
+        <column name="store_id" class="Magento\Store\Ui\Component\Listing\Column\Store" sortOrder="90">
+            <settings>
+                <addField>true</addField>
+                <label translate="true">Store View</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="delivery_comment" sortOrder="100">
+            <settings>
+                <addField>true</addField>
+                <filter>text</filter>
+                <sortable>false</sortable>
+                <label translate="true">Comment</label>
+                <visible>true</visible>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="MageWorx\DeliveryDate\Ui\Component\Listing\Columns\QueueActions" sortOrder="2000">
+            <settings>
+                <indexField>entity_id</indexField>
+                <draggable>true</draggable>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

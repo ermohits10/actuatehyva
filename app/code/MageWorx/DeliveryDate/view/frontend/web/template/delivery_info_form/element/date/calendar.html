@@ -1,0 +1,24 @@
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<input class="admin__control-text"
+       type="text"
+       autocomplete="off"
+       data-bind="
+    hasFocus: focused,
+    datepicker: {
+        storage: shiftedValue,
+        options: options
+    },
+    valueUpdate: valueUpdate,
+    attr: {
+        value: shiftedValue,
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': noticeId,
+        disabled: disabled,
+        autocomplete: autocomplete
+    }"/>

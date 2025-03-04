@@ -1,0 +1,113 @@
+<?php
+/** @var \Mirasvit\GdprCookie\Block\CookieBar $block */ 
+$isShowDeclineButton=$block->isShowDeclineButton();
+?>
+<div class="mst-gdpr__cookie-bar-wrapper block relative z-[99999]" id="gdprCookieBar" x-data="initMstGdprCookieBar()" x-init="initDisplay()">
+    <div class="mst-gdpr__cookie-bar bg-white border border-gray-200 bottom-8 fixed flex items-center left-2 max-w-4xl md:max-w-2xl md:rounded-full px-12 py-8 rounded-xl shadow-md z-50"
+         x-bind:class="{'opacity-70': isLoading}"
+         x-show="isBarVisible"
+         style="display: none">
+        <div class="consent-text">
+            Hyva <?= $block->getPolicyText() ?>
+        </div>
+
+        <div class="mst-gdpr__buttons flex flex-col md:flex-row">
+            <button type="button"
+                    class="action btn justify-center md:mr-2 md:px-2 mr-auto px-4 text-sm w-auto xl:px-4"
+                    x-bind:class="{'opacity-0': isLoading}"
+                    @click="openSettings">
+                <span><?= __('Settings') ?></span>
+            </button>
+
+            <button class="action btn btn-primary justify-center md:mt-0 md:px-2 mr-auto mt-4 mx-auto px-4 text-sm w-auto xl:px-4"
+                    data-trigger-settings="agree"
+                    x-bind:class="{'opacity-0': isLoading}"
+                    @click="handleAllow(1)"><span><?= __('Agree') ?></span></button>
+            <?php if ($isShowDeclineButton): ?>
+                <button
+                    class="action btn justify-center md:mt-0 md:px-2 mr-auto mt-4 mx-auto px-4 text-sm w-auto xl:px-4"
+                    data-trigger-settings="agree"
+                    x-bind:class="{'opacity-0': isLoading}"
+                    @click="handleDecline"><span><?= __('Decline') ?></span></button>
+            <?php endif; ?>
+        </div>
+    </div>
+    <div class="mst-gdpr__cookie-bar-overlay bg-white fixed h-full left-0 opacity-60 top-0 w-full z-40"
+         style="display: none"
+         id="gdprCookieBarOverlay" x-show="isScreenLocked"></div>
+</div>
+<script>
+    function initMstGdprCookieBar() {
+        'use strict';
+        const cookieGroupName = '<?= \Mirasvit\GdprCookie\Model\ConfigProvider::MST_COOKIE_GROUPS ?>';
+        const consentCookieName = '<?= \Mirasvit\GdprCookie\Model\ConfigProvider::CONSENT_COOKIE_NAME ?>'
+        <?php $isOverlayEnabled = $block->getJsonConfig()['*']['Mirasvit_GdprCookie/js/cookieBar']['lockScreen'] ?? false ?>
+
+        return {
+            isLoading: false,
+            isBarVisible: false,
+            isScreenLocked: false,
+            initDisplay: function () {
+                !hyva.getCookie(cookieGroupName) || !hyva.getCookie(consentCookieName)
+                    ? this.show()
+                    : this.hide();
+                window.addEventListener('mst-gdpr-cookie-settings-save', () => {
+                    this.handleAllow();
+                })
+            },
+            show: function () {
+                this.isBarVisible = true;
+                this.isScreenLocked = window.location.href.indexOf('cookie') === -1 && <?= (int) $isOverlayEnabled ?>;
+                if (this.isScreenLocked) {
+                    document.querySelector('body').style.overflow = 'hidden';
+                }
+            },
+            hide: function () {
+                this.isBarVisible = false;
+                this.isScreenLocked = false;
+                document.querySelector('body').style.overflow = 'auto';
+            },
+            handleAllow: function (agreeAll) {
+                this.isLoading = true;
+
+                let checkedGroups = [];
+                if (agreeAll) {
+                    checkedGroups = document.querySelectorAll('.cookie-group-container .checkbox');
+                } else {
+                    checkedGroups = document.querySelectorAll('.cookie-group-container .checkbox:checked');
+                }
+
+                const checked = Array.from(checkedGroups || []);
+                const body = checked.reduce((body, item) => {
+                    body.append('group_ids[]', item.dataset.groupId);
+                    return body;
+                }, new URLSearchParams({form_key: hyva.getFormKey()}))
+
+                fetch('<?= $block->getUrl('gdpr_cookie/cookie/allow') ?>', {
+                        method: 'post',
+                        body: body,
+                        headers: {contentType: 'application/x-www-form-urlencoded; charset=UTF-8'}
+                })
+                    .then(() => this.hide())
+                    .finally(() => this.isLoading = false)
+            },
+
+            handleDecline: function () {
+                this.isLoading = true;
+
+                const body = new URLSearchParams({form_key: hyva.getFormKey()});
+                fetch('<?= $block->getUrl('gdpr_cookie/cookie/decline') ?>', {
+                    method: 'post',
+                    body: body,
+                    headers: {contentType: 'application/x-www-form-urlencoded; charset=UTF-8'}
+                })
+                    .then(() => this.hide())
+                    .finally(() => this.isLoading = false)
+            },
+
+            openSettings: function () {
+                window.dispatchEvent(new CustomEvent('mst-gdpr-cookie-settings-open'));
+            }
+        };
+    }
+</script>

@@ -1,0 +1,169 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+/**
+ * @var TopMenu $block
+ */
+$html = $block->getMenuHtml();
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\Navigation;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+use Magezon\NinjaMenus\Block\TopMenu;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Navigation $viewModelNavigation */
+/** @var HeroiconsOutline $heroicons */
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+$viewModelNavigation = $viewModels->require(Navigation::class, $block);
+$uniqueId = '_' . uniqid();
+$menuItems = $viewModelNavigation->getNavigation(4);
+$block->setData('cache_tags', $viewModelNavigation->getIdentities());
+?>
+<div class="z-20 order-2 sm:order-1 lg:order-2 navigation hidden lg:flex md:w-full"
+>
+    <?php if($html) :?>
+        <div class="lg:container lg:px-6 sections nav-sections md:w-full">
+            <nav class="navigation" data-action="navigation">
+                <?= $html ?>
+            </nav>
+        </div>
+    <?php else: ?>
+        <?= $this->getMagentoTopMenuHtml() ?>
+    <?php endif; ?>
+</div>
+<nav
+        x-data="initMenuMobile<?= $escaper->escapeHtml($uniqueId) ?>()"
+        @load.window="setActiveMenu($root)"
+        @keydown.window.escape="closeMenu()"
+        class="z-20 order-2 sm:order-1 lg:order-2 navigation lg:hidden"
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Site navigation')) ?>"
+        role="navigation"
+>
+    <!-- mobile -->
+    <button
+            x-ref="mobileMenuTrigger"
+            class="absolute mr-6 left-[20px] top-[20px]"
+            @click="openMenu()"
+            :class="{'overflow-x-hidden overflow-y-auto fixed top-0 left-0 w-full' : open}"
+            type="button"
+            aria-label="<?= $escaper->escapeHtmlAttr(__('Open menu')) ?>"
+            aria-haspopup="menu"
+            :aria-expanded="open"
+            :hidden="open"
+    >
+        <?= $heroicons->menuHtml("w-6 h-6 mx-auto mb-0.5 text-white md:h-6 md:w-6 hover:text-black", 25, 25) ?>
+        <span class="label font-serif font-bold text-sm lg:font-medium lg:text-lg text-white"><?= $escaper->escapeHtml(__('Menu')) ?></span>
+    </button>
+    <div
+            x-ref="mobileMenuNavLinks"
+            class="
+            fixed top-0 right-0 w-full h-full p-1 flex
+            flex-col border-t border-container bg-container-lighter
+            overflow-y-auto overflow-x-hidden
+        "
+            :class="{ 'hidden' : !open }"
+            :aria-hidden="open ? 'false' : 'true'"
+            role="dialog"
+            aria-modal="true"
+    >
+        <div class="sections nav-sections border-t flex flex-col gap-y-1 mt-16">
+            <nav class="navigation" data-action="navigation">
+                <?= $html ?>
+            </nav>
+        </div>
+        <button
+                @click="closeMenu()"
+                class="absolute flex justify-end w-16 self-end mb-1 text-black"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Close menu')) ?>"
+                type="button"
+        >
+            <?= $heroicons->xHtml('hidden p-4', 64, 64, [":class" => "{ 'hidden' : !open, 'block': open }", "aria-hidden" => "true"]) ?>
+        </button>
+    </div>
+</nav>
+<script>
+    'use strict';
+
+    const initMenuMobile<?= $escaper->escapeHtml($uniqueId) ?> = () => {
+        return {
+            mobilePanelActiveId: null,
+            open: false,
+            setActiveMenu(menuNode) {
+                Array.from(menuNode.querySelectorAll('a')).filter(link => {
+                    return link.href === window.location.href.split('?')[0];
+                }).map(item => {
+                    item.classList.add('underline');
+                    item.closest('li.level-0') &&
+                    item.closest('li.level-0').querySelector('a.level-0').classList.add('underline');
+                });
+            },
+            openMenu() {
+                this.open = true
+                this.$nextTick(() => hyva.trapFocus(this.$refs['mobileMenuNavLinks']));
+                // Prevent from body scrolling while mobile menu opened
+                document.body.style.position = 'fixed';
+            },
+            closeMenu() {
+                document.body.style.position = '';
+
+                if (this.open) {
+                    this.$nextTick(() => this.$refs['mobileMenuTrigger'].focus() || hyva.releaseFocus());
+                }
+
+                this.open = false
+                this.mobilePanelActiveId = null
+            },
+            openSubcategory(index) {
+                const menuNodeRef = document.querySelector('[data-child-id=' + index + ']')
+                this.mobilePanelActiveId = this.mobilePanelActiveId === index ? 0 : index
+                this.$nextTick(() => hyva.trapFocus(menuNodeRef))
+            },
+            backToMainCategories(index) {
+                const menuNodeRef = document.querySelector('[data-child-id=' + index + ']')
+                this.mobilePanelActiveId = 0
+                this.$nextTick(() => {
+                    hyva.trapFocus(this.$refs['mobileMenuNavLinks'])
+                    menuNodeRef.querySelector('a').focus()
+                })
+            }
+        }
+    }
+</script>
+
+<script>
+    loadScript('<?= $block->getViewFileUrl('Hyva_MagezonBuilder::js/jquery.min.js') ?>', 'jquery')
+        .then(() => {
+            return loadScript('<?= $block->getViewFileUrl('Magezon_NinjaMenus::js/jquery.drilldown.min.js') ?>', 'drilldown');
+        })
+        .then(() => {
+            return loadScript('<?= $block->getViewFileUrl('Magezon_NinjaMenus::js/jquery.hoverIntent.min.js') ?>', 'hoverIntent');
+        })
+        .then(() => {
+            return loadScript('<?= $block->getViewFileUrl('Magezon_Core::js/jquery-scrolltofixed-min.js') ?>', 'scrolltofixed');
+        })
+        .then(() => {
+            return loadScript('<?= $block->getViewFileUrl('Hyva_MagezonNinjaMenus::js/menu.js') ?>', 'menu');
+        })
+        .then(() => {
+            return loadScript('<?= $block->getViewFileUrl('Hyva_MagezonNinjaMenus::js/jquery.drilldown.min.js') ?>', 'drilldown');
+        })
+        .then(() => {
+            const menuElement = $(".ninjamenus");
+            const options = {
+                "mobileBreakpoint": 1024,
+                // "stick": true,
+            };
+            let ninjaMenus = new NinjaMenus(menuElement, options);
+        })
+</script>

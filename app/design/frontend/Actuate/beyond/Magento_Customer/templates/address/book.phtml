@@ -1,0 +1,92 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Customer\Block\Address\Book;
+use Magento\Framework\Escaper;
+
+/** @var Book $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<div class="block block-addresses-default my-6">
+    <div class="block-title font-serif text-xl leading-7 font-normal pb-2 border-b border-gray-200 mb-6 lg:text-2xl lg:leading-10 block-title">
+            <?= $escaper->escapeHtml(__('Default Addresses')) ?>
+    </div>
+    <div class="grid-cols-2 block-content md:grid gap-x-4 gap-y-0 my-6">
+        <?php if ($customerDefaultBillingAddress = $block->getDefaultBilling()): ?>
+            <div class="box box-address-billing card">
+                <div class="font-sans text-base leading-6 font-bold text-[#126366] lg:text-xl lg:leading-10 lg:font-extrabold mb-2">
+                    <span><?= $escaper->escapeHtml(__('Default Billing Address')) ?></span>
+                </div>
+                <div class="box-content">
+                    <address class="font-sans text-sm leading-5 font-normal lg:text-lg lg:mb-4 not-italic">
+                        <?= $block->getAddressHtml($block->getAddressById($customerDefaultBillingAddress)) ?>
+                    </address>
+                </div>
+                <div class="box-actions">
+                    <a href="<?= $escaper->escapeUrl($block->getAddressEditUrl($customerDefaultBillingAddress)) ?>"
+                       class="inline-flex items-center w-full font-sans text-sm leading-5 font-bold text-[#126366] lg:text-base"
+                       >
+                        <span>
+                            <?= $escaper->escapeHtml(__('Change Billing Address')) ?>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="box box-billing-address card">
+                <div class="font-sans text-base leading-6 font-bold text-[#126366] lg:text-xl lg:leading-10 lg:font-extrabold mb-2">
+                    <span>
+                        <?= $escaper->escapeHtml(__('Default Billing Address')) ?>
+                    </span>
+                </div>
+                <div class="box-content">
+                    <p class="font-sans text-sm leading-5 font-normal lg:text-lg lg:mb-4"><?= $escaper->escapeHtml(__('You have no default billing address in your address book.')) ?></p>
+                </div>
+            </div>
+        <?php endif ?>
+
+        <?php if ($customerDefaultBillingAddress = $block->getDefaultShipping()): ?>
+            <div class="box box-address-shipping card">
+                <div class="font-sans text-base leading-6 font-bold text-[#126366] lg:text-xl lg:leading-10 lg:font-extrabold mb-2">
+                    <span><?= $escaper->escapeHtml(__('Default Shipping Address')) ?></span>
+                </div>
+                <div class="box-content">
+                    <address class="font-sans text-sm leading-5 font-normal lg:text-lg lg:mb-4 not-italic">
+                        <?= $block->getAddressHtml($block->getAddressById($customerDefaultBillingAddress)) ?>
+                    </address>
+                </div>
+                <div class="box-actions">
+                    <a href="<?= $escaper->escapeUrl($block->getAddressEditUrl($customerDefaultBillingAddress)) ?>"
+                       class="inline-flex items-center w-full font-sans text-sm leading-5 font-bold text-[#126366] lg:text-base"
+                    >
+                        <span><?= $escaper->escapeHtml(__('Change Shipping Address')) ?></span>
+                    </a>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="box box-shipping-address card">
+                <div class="font-sans text-base leading-6 font-bold text-[#126366] lg:text-xl lg:leading-10 lg:font-extrabold mb-2">
+                    <span>
+                        <?= $escaper->escapeHtml(__('Default Shipping Address')) ?>
+                    </span>
+                </div>
+                <div class="box-content">
+                    <p class="font-sans text-sm leading-5 font-normal lg:text-lg lg:mb-4">
+                        <?= $escaper->escapeHtml(__('You have no default shipping address in your address book.')) ?>
+                    </p>
+                </div>
+            </div>
+        <?php endif ?>
+    </div>
+</div>

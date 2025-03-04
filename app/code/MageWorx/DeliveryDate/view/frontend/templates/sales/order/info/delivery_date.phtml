@@ -1,0 +1,46 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+?>
+<?php
+/** @var \MageWorx\DeliveryDate\Block\DeliveryInfo $block */
+if ($block->isDeliveryDateEnabled()):
+    ?>
+    <?php
+    try {
+        ?>
+        <div class="box box-order-delivery-info">
+            <strong class="box-title">
+                <span><?= $block->escapeHtml(__('Delivery Information')) ?></span>
+            </strong>
+            <div class="box-content">
+                <br/>
+                <?php if ($block->isDeliveryDateAvailable()): ?>
+                    <div>
+                        <p class="delivery_date_message"><?= $block->escapeHtml(__('Date: ')); ?><?= $block->escapeHtml($block->getDeliveryDateMessage()); ?></p>
+                        <?php if ($deliveryTime = $block->getDeliveryTimeMessage()): ?>
+                            <p class="delivery_date_message"><?= $block->escapeHtml(__('Time: ')); ?><?= $block->escapeHtml($deliveryTime); ?></p>
+                        <?php endif; ?>
+                        <?php if ($block->getDeliveryCommentMessage()): ?>
+                            <p class="delivery_comment"><?= $block->escapeHtml($block->getDeliveryCommentMessage()); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="delivery_date_message"><?= $block->escapeHtml(__('No delivery information available')); ?></p>
+                <?php endif; ?>
+                <?php if ($block->isEditable()): ?>
+                    <?= $block->getChildHtml('form_key'); ?>
+                    <?= $block->getChildHtml('delivery_date_js'); ?>
+                    <?= $block->getChildHtml('change_delivery_date_customer_form'); ?>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php
+    } catch (\Magento\Framework\Exception\LocalizedException $exception) {
+        echo $block->escapeHtml($exception->getMessage());
+    }
+    ?>
+    <?php
+endif;

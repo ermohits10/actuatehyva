@@ -1,0 +1,12 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+?>
+<?php
+/** @var \MageWorx\DeliveryDate\Block\JsConfig $block */
+?>
+<script>
+    let mwDeliveryDateConfig = <?= /* @noEscape */ json_encode($block->getConfig()); ?>;
+</script>

@@ -1,0 +1,38 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Magewire\Checkout\TermsConditions;
+use Magento\CheckoutAgreements\Api\Data\AgreementInterface;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var TermsConditions $magewire */
+/** @var Escaper $escaper */
+
+$availableTerms = $block->getData('terms');
+?>
+<?php if (is_array($availableTerms) && count($availableTerms) !== 0): ?>
+    <?php /** @var AgreementInterface $agreement */ ?>
+    <?php foreach ($availableTerms as $agreement): ?>
+        <p class="bg-gray-100 p-6 rounded-lg space-y-6 mb-6">
+            <?= $escaper->escapeHtml(__($agreement->getContent())) ?>
+        </p>
+
+        <?php if ($agreement->getData('includes_page') && $url = $agreement->getData('page_url')): ?>
+            <a href="<?= $escaper->escapeUrl($url) ?>"
+               class="text-sm hover:underline"
+               target="_blank"
+            >
+                <?= $escaper->escapeHtml(__('Read Terms &amp; Conditions')) ?>
+            </a>
+        <?php endif ?>
+    <?php endforeach ?>
+<?php endif ?>

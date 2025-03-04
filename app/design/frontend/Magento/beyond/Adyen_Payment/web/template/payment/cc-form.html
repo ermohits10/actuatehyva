@@ -1,0 +1,150 @@
+<!--
+/**
+ *
+ * Adyen Payment module (https://www.adyen.com/)
+ *
+ * Copyright (c) 2015 Adyen BV (https://www.adyen.com/)
+ * See LICENSE.txt for license details.
+ *
+ * Author: Adyen <magento@adyen.com>
+ */
+-->
+
+<!-- ko if: adyenCCMethod -->
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label data-bind="attr: {'for': getCode()}" class="label">
+            <span data-bind="text: getTitle()"></span>
+            <!-- ko if: adyenCCMethod().icon -->
+            <!--<img data-bind="attr: {
+                'src': adyenCCMethod().icon.url,
+                'alt': getTitle() + ' logo'
+                }">-->
+            <div class="payment-icon card-payment-icon card-payment-method-logo">
+                <div class="card visa"></div>
+                <div class="card master"></div>
+            </div>
+            <!--/ko-->
+        </label>
+    </div>
+
+    <div class="payment-method-content">
+
+        <!-- ko ifnot: (getClientKey()) -->
+        <span class="message message-error error"><!-- ko text: $t('Please configure an API Key, a Client Key and a live endpoint prefix(if in Production Mode) in your Adyen Required Settings')-->
+            <!-- /ko --></span>
+        <!--/ko-->
+
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+
+        <form class="form" id="adyen-cc-form" data-role="adyen-cc-form" action="#" method="post" data-bind="mageInit: {
+            'transparent':{
+                'context': context(),
+                'controller': getControllerName(),
+                'orderSaveUrl':getPlaceOrderUrl(),
+            }, 'validation':[]}">
+
+
+            <!-- ko foreach: getRegion('messages') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+
+
+            <fieldset
+                    data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+                <!-- ko if: (isShowLegend())-->
+                <legend class="legend">
+                    <span><!-- ko text: $t('Credit Card Information')--><!-- /ko --></span>
+                </legend>
+                <br/>
+                <!-- /ko -->
+
+                <!-- ko if: (areComboCardsEnabled())-->
+                <div class="field required">
+                    <label for="adyen-combo-card-select">
+                        <!--ko text: $t('Select debit or credit card')--><!-- /ko -->
+                    </label>
+                    <div class="control">
+                        <select id="adyen-combo-card-select"
+                                class="select"
+                                name="payment[combo_card_method]"
+                                data-bind="value: comboCardOption"
+                        >
+                            <option value="credit"><!--ko text: $t('Credit Card')--><!-- /ko --></option>
+                            <option value="debit"><!--ko text: $t('Debit Card')--><!-- /ko --></option>
+                        </select>
+                    </div>
+                </div>
+                <!-- /ko -->
+
+                <div class="field number cardContainerField">
+                    <div class="checkout-component-dock" afterRender="renderCCPaymentMethod()" data-bind="attr: { id: 'cardContainer'}"></div>
+                </div>
+
+                <div id="cc_actionModalWrapper">
+                    <div id="cc_actionModal">
+                        <div id="cc_actionModalContent"></div>
+                    </div>
+                </div>
+
+
+                <!-- ko if: (hasInstallments())-->
+
+                <div class="field required"
+                     data-bind="attr: {id: getCode() + '_installments_div'}, visible: installments().length > 0">
+                    <label data-bind="attr: {for: getCode() + '_installments'}" class="label">
+                        <span><!-- ko text: $t('Installments')--><!-- /ko --></span>
+                    </label>
+                    <div class="control">
+
+                        <select class="select"
+                                name="payment[number_of_installments]"
+                                data-bind="attr: {id: getCode() + '_installments', 'data-container': getCode() + '-installments', 'data-validate': JSON.stringify({required:false})},
+
+                                        enable: isActive($parents),
+                                        options: installments,
+                                        optionsValue: 'value',
+                                        optionsText: 'key',
+                                        optionsCaption: $t('Do not use Installments'),
+                                        value: installment"
+                                data-validate="{required:true}">
+                        </select>
+                    </div>
+                </div>
+
+
+                <!-- /ko -->
+            </fieldset>
+
+            <div class="checkout-agreements-block">
+                <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+            </div>
+
+            <div class="actions-toolbar">
+                <div class="primary">
+                    <button class="action primary checkout"
+                            type="submit"
+                            data-bind="click: placeOrder,
+                            attr: {title: $t('Place Order')},
+                            enable: isButtonActive()"
+                            disabled>
+                        <span data-bind="text: $t('Place Order')"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--/ko-->
+

@@ -1,0 +1,135 @@
+<script>
+    const headerSection = document.querySelectorAll('.checkout-left section header');
+    for (i = 0; i < headerSection.length; i++) {
+        if (i != 0) {
+            const firstSection = headerSection[i].parentElement.querySelector('section');
+            if (firstSection) {
+                firstSection.style.display = 'none';
+            }
+        }
+        headerSection[i].addEventListener("click", function () {
+            const parentElem = this.parentElement;
+            const eventData = {element: parentElem, openNextSection: false};
+            const event = new CustomEvent('contintueButtonTrigger', {detail: eventData});
+            document.dispatchEvent(event);
+
+        });
+    }
+
+    // Listen for the event.
+    document.addEventListener(
+        "contintueButtonTrigger",
+        (event) => {
+            var eventData = event.detail;
+            const parentElem = eventData.element;
+            const logoDiv = parentElem.querySelector('.payment-group-logos');
+            const shippingDetails = parentElem.querySelector('.shipping-address-view');
+            parentElem.classList.toggle("active");
+            var content = parentElem.querySelector('section');
+            if (content.style.display == "" || content.style.display === "block") {
+                content.style.display = "none";
+                if (logoDiv) {
+                    logoDiv.style.display = "block";
+                }
+                if (parentElem.id == "shipping-details-main") {
+                    Magewire.find('rd.checkout.shipping-details.address-list.form').callShippingAddressRender();
+                }
+                if (shippingDetails) {
+                    shippingDetails.style.display = "block";
+                }
+            } else {
+                content.style.display = "block";
+                if (logoDiv) {
+                    logoDiv.style.display = "none";
+                }
+                if (shippingDetails) {
+                    shippingDetails.style.display = "none";
+                }
+            }
+
+            if (eventData.openNextSection) {
+                const nextElementSelector = eventData.nextElement
+                const nectElement = document.querySelector(nextElementSelector).querySelector('section');
+                nectElement.style.display = "block";
+
+                const logoDiv = document.querySelector(nextElementSelector).querySelector('.payment-group-logos');
+                if (logoDiv) {
+                    logoDiv.style.display = "none";
+                }
+            }
+        },
+        false,
+    );
+
+
+    window.continueButton = function () {
+        return {
+            async onClick(el) {
+                let hasValid = true;
+                try {
+                    await hyvaCheckout.order.place()
+                } catch (e) {
+                    hasValid = false
+                }
+                if (hasValid) {
+                    this.processButton(el);
+                }
+            },
+            stepValidate: function (el) {
+                const step = el.querySelector('button').dataset.step;
+                const doValidation = el.querySelector('button').dataset.dovalidation;
+                if (doValidation && step) {
+                    if (this.checkedValidationByGroup(step)) {
+                        this.onClick(el)
+                    } else {
+                        this.processButton(el);
+                    }
+                } else {
+                    this.processButton(el);
+                }
+            },
+            processButton: function (el) {
+                const step = el.querySelector('button').dataset.step;
+                const parentElem = el.parentElement.parentElement;
+                var openNextSec = true;
+                var nextElementSelector = "";
+                if (step == "checkout.shipping-details.address-form") {
+                    nextElementSelector = "#shipping-main";
+                } else if (step == "checkout.shipping.methods") {
+                    nextElementSelector = "#payment-main";
+                } else {
+                    openNextSec = false;
+                }
+                const eventData = {element: parentElem, openNextSection: openNextSec, nextElement: nextElementSelector};
+                const event = new CustomEvent('contintueButtonTrigger', {detail: eventData});
+                document.dispatchEvent(event);
+            },
+            checkedValidationByGroup: function (group) {
+                const objectGroup = hyvaCheckout.validation.getValidations();
+                if (objectGroup.hasOwnProperty('onepage')) {
+                    const onepage = objectGroup.onepage;
+                    for (var key in onepage) {
+                        if (onepage.hasOwnProperty(key) && onepage[key].group === group) {
+                            return true; // Group exists
+                        }
+                    }
+                    return false; // Group doesn't exist
+                }
+            }
+        }
+    }
+
+    window.grandTotalSection = function () {
+        return {
+            setGrandTotal: function () {
+                const summaryGrandTotal = document.querySelector('.summary-grand-total');
+                const summaryPriceHolder = document.querySelector('.summary-price-holder')
+                if (summaryGrandTotal && summaryPriceHolder) {
+                    summaryPriceHolder.innerHTML = summaryGrandTotal.innerHTML;
+                }
+
+                return false;
+            }
+        }
+    }
+</script>

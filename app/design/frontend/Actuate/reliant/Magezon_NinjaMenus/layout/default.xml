@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="topmenu_generic">
+            <referenceBlock name="topmenu_mobile" remove="true"/>
+            <referenceBlock name="topmenu_desktop" remove="true"/>
+            <block class="Hyva\MagezonNinjaMenus\Block\TopMenu" as="ninja.menu" name="ninja-menu"
+                   template="Hyva_MagezonNinjaMenus::topmenu.phtml" ifconfig="ninjamenus/general/enabled">
+                <arguments>
+                    <argument name="identifier" translate="true" xsi:type="string">top-menu</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

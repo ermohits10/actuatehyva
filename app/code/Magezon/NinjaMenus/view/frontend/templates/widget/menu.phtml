@@ -1,0 +1,13 @@
+<?php
+/**
+ * @var \Magezon\NinjaMenus\Block\Widget\Menu $block
+ */
+
+$title = $block->getData('title');
+?>
+<div class="block ninjamenus-widget">
+	<?php if ($title) { ?>
+		<div class="block-title"><strong> <span><?= $title ?></span> </strong> </div>
+	<?php } ?>
+	<?= $block->getMenuHtml() ?>
+</div>

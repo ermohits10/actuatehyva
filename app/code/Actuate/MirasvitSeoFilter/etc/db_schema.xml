@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="actuate_seo_filter_indexable" resource="default" engine="innodb" comment="SeoFilter Indexable">
+        <column xsi:type="int" name="index_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Indexable Id"/>
+        <column xsi:type="varchar" name="attribute_id" nullable="false" length="120" comment="Attribute ID"/>
+        <column xsi:type="varchar" name="attribute_code" nullable="false" length="120" comment="Attribute Code"/>
+        <column xsi:type="varchar" name="option" nullable="true" length="120" comment="Option"/>
+        <column xsi:type="int" name="is_indexable" nullable="false" padding="10" default="0" comment="Is Indexable?"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="index_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ACT_SEO_FILTER_INDEXABLE_ATTRIBUTE_CODE_OPTION">
+            <column name="attribute_code"/>
+            <column name="option"/>
+        </constraint>
+        <index referenceId="ACT_SEO_FILTER_INDEXABLE_OPTION" indexType="btree">
+            <column name="option"/>
+        </index>
+    </table>
+</schema>

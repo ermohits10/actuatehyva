@@ -1,0 +1,70 @@
+<?php
+/*
+ * This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+ * Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+ * Copyright (c) 2020-2022 Autify digital Ltd.
+ * This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+ * ALL RIGHTS RESERVED.
+ *
+ */
+
+$v12FinancePayment = $this->getPayment()->getMethod();
+$v12FinanceApplication = $this->getFinanceBlock();
+
+use AutifyDigital\V12Finance\Helper\Data;
+
+if($v12FinancePayment === 'v12finance'):
+    $orderGetInfo = $this->getPayment()->getAdditionalInformation();
+?>
+    <div class="admin__page-section-item-title" style="margin-top: 20px;">
+        <span class="title"><?= $this->escapeHtml(__('V12 Finance Application')); ?></span>
+        <a href="<?= $this->getUrl("autifydigital_v12finance/application/fetchstatus", ['_query' => ['application_id' => $v12FinanceApplication->getFinanceApplicationId()]]) ?>" style="float: right;">Fetch Application Update</a>
+    </div>
+    <div class="admin__page-section-item-content">
+        <div class="order-payment-additional order-payment-method-title">
+            <div class="order-payment-method-title">
+                <table class="data-table admin__table-secondary">
+                    <tbody>
+                        <tr>
+                            <th><?= $this->escapeHtml(__('Application ID ')); ?>:</th>
+                            <td><?= $this->escapeHtml($v12FinanceApplication->getFinanceApplicationId()); ?></td>
+                        </tr>
+                        <tr>
+                            <th><?= $this->escapeHtml(__('Application Status ')); ?>:</th>
+                            <td><?= strtoupper($this->escapeHtml(Data::V12_STATUS_ARRAY[$v12FinanceApplication->getApplicationStatus()])); ?></td>
+                        </tr>
+                        <tr>
+                            <th><?= $this->escapeHtml(__('Contract Length ')); ?>:</th>
+                            <td><?= __($v12FinanceApplication->getFinanceLength()) . ' Months' ?></td>
+                        </tr>
+                        <?php if(isset($orderGetInfo['finance_name'])): ?>
+                        <tr>
+                            <th><?= $this->escapeHtml(__('Finance Name ')); ?>:</th>
+                            <td><?= $orderGetInfo['finance_name'] ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if(isset($orderGetInfo['finance_apr'])): ?>
+                        <tr>
+                            <th><?= $this->escapeHtml(__('Interest Rate ')); ?>:</th>
+                            <td><?= $orderGetInfo['finance_apr'] . "%" ?></td>
+                        </tr>    
+                        <?php endif; ?>
+                        <?php if($v12FinanceApplication->getCardSummary()) : ?>
+                        <tr>
+                            <th><?= $this->escapeHtml(__('Card Summary ')); ?>:</th>
+                            <td><?= __($v12FinanceApplication->getCardSummary()) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+                <div class="v12-finance-link" style="margin-top:10px;">
+                    <?php if($v12FinanceApplication->getApplicationStatus() == '5'): ?>
+                        <a href="<?= $this->getUrl("autifydigital_v12finance/application/requestpayment", ['_query' => ['application_id' => $v12FinanceApplication->getFinanceApplicationId()]]) ?>">
+                            Request Payment
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>

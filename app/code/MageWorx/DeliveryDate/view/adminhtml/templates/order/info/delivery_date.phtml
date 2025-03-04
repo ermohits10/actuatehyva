@@ -1,0 +1,113 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+
+/** @var \MageWorx\DeliveryDate\Block\Adminhtml\DeliveryInfoAbstract $block */
+?>
+<?php
+if ($block->isDeliveryDateAvailable()):
+    try {
+        ?>
+        <div class="admin__page-section-item order-delivery" style="width:50%; margin-top: 25px;">
+            <div class="admin__page-section-item-title">
+                <span class="title"><?= $block->escapeHtml(__('Delivery Information')) ?></span>
+                <?php if ($block->isEditable()): ?>
+                    <div id="delivery-date-edit-link" class="actions block-edit-link">
+                        <a href="#"
+                           id="edit-delivery-info">
+                            <?= $block->escapeHtml(__('Edit')); ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <div class="admin__page-section-item-content">
+                <?php if ($block->isDeliveryDateAvailable()): ?>
+                    <div>
+                        <p class="delivery_date_message"><?= $block->escapeHtml(__('Date: ')); ?><?= $block->escapeHtml(
+                                $block->getDeliveryDateMessage()
+                            ); ?></p>
+                        <?php if ($deliveryTime = $block->getDeliveryTimeMessage()): ?>
+                            <p class="delivery_date_message"><?= $block->escapeHtml(
+                                    __('Time: ')
+                                ); ?><?= $block->escapeHtml($deliveryTime); ?></p>
+                        <?php endif; ?>
+                        <?php if ($block->getDeliveryCommentMessage()): ?>
+                            <p class="delivery_comment"><?= $block->escapeHtml(
+                                    $block->getDeliveryCommentMessage()
+                                ); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="delivery_date_message"><?= $block->escapeHtml(
+                            __('No delivery information available')
+                        ); ?></p>
+                <?php endif; ?>
+            </div>
+            <?php if ($block->isEditable()): ?>
+                <div class="admin__page-section-item-content edit-delivery-date" id="edit-delivery-info-form"
+                     style="display: none;">
+                    <form method="post"
+                          action="<?= $block->escapeUrl($block->getSubmitFormUrl()); ?>"
+                          id="delivery-info-update-form"
+                          data-mage-init='{"validation": {"rules": {"delivery_day": {"validate-date":{"dateFormat":"MM/dd/YY"}}}}}'>
+                        <fieldset class="admin__fieldset">
+                            <input type="hidden" name="form_key" value="<?= /* @noEscape */
+                            $block->getFormKey(); ?>"/>
+                            <input type="hidden" name="source_id"
+                                   value="<?= $block->escapeHtmlAttr($block->getSource()->getId()); ?>"/>
+                            <input type="hidden" name="source_type"
+                                   value="<?= $block->escapeHtmlAttr($block->getSourceType()); ?>"/>
+                            <?= $block->getFormHtml($block->getSource(), $block->getSourceType()) ?>
+                            <?= $block->getSubmitButtonHtml(); ?>
+                        </fieldset>
+                    </form>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php if ($block->isEditable()): ?>
+            <script type="text/javascript">
+                require([
+                    'jquery',
+                    'mage/validation',
+                    'mage/translate',
+                    'jquery/ui'
+                ], function ($) {
+                    $.validator.addMethod('validate-delivery-day', function (value) {
+                        return /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}$/.test(value);
+                    }, $.mage.__('Incorrect date format. Please use MM/dd/YY format. Example: 12/24/2024'));
+
+                    $.validator.addMethod('validate-delivery-time', function (value) {
+                        if (!value) {
+                            return true;
+                        }
+
+                        return /^\d{1,2}[\/\-:]{0,1}\d{0,2}$/.test(value);
+                    }, $.mage.__('Incorrect time format. Please use hh:mm format. Example: 12:30'));
+
+                    document.getElementById('edit-delivery-info').addEventListener('click', function (e, t) {
+                        e.preventDefault();
+                        $('#edit-delivery-info-form').toggle();
+                    });
+
+                    document.getElementById('delivery-date-submit').addEventListener('click', function (e, t) {
+                        e.preventDefault();
+                        var $form = $('#delivery-info-update-form'),
+                            validator = $form.validate(),
+                            valid = validator.form();
+
+                        if (valid) {
+                            $form.submit();
+                        }
+                    });
+                });
+            </script>
+        <?php endif; ?>
+        <?php
+    } catch (\Magento\Framework\Exception\LocalizedException $exception) {
+        echo $block->escapeHtml($exception->getMessage());
+    }
+endif;
+?>
+

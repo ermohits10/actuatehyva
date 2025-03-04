@@ -1,0 +1,43 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Checkout\ViewModel\Breadcrumbs\SigninRegister;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/*
+ * This header template is a simplified version of Magento_Theme/templates/html/header.phtml from the hyva-default theme, optimized for the checkout.
+ */
+
+$viewModel = $viewModels->require(SigninRegister::class);
+?>
+<div id="header" class="relative z-30 w-full">
+    <div class="container flex flex-wrap justify-between items-center w-full px-6 py-[15px] lg:px-[5px] lg:py-5 mx-auto mt-0">
+        <!--Logo-->
+        <?= $block->getChildHtml('logo'); ?>
+
+        <?php if ($viewModel->getCustomerSession()->isLoggedIn() === false): ?>
+            <div class="order-1 text-base leading-8 flex items-center max767:justify-between">
+                <a class="btn btn-primary text-xl !rounded-none max767:px-6 max767:py-1.5" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login', ['referer' => base64_encode($block->getUrl('checkout'))])) ?>">
+                    <?= $escaper->escapeHtml(__('Sign In')) ?>
+                </a>
+            </div>
+        <?php endif ?>
+    </div>
+
+    <!--Authentication Pop-Up-->
+    <?= $block->getChildHtml('authentication-popup'); ?>
+</div>
+

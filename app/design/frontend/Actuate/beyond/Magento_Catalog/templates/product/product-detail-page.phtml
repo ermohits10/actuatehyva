@@ -1,0 +1,230 @@
+<?php
+/**
+ *
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ *  @category  BSS
+ *  @package   Hyva_BssProductLabel
+ *  @author    Extension Team
+ *  @copyright Copyright (c) 2022 BSS Commerce Co. ( http://bsscommerce.com )
+ *  @license   http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+
+declare(strict_types=1);
+
+use Actuate\ReliantDirectTheme\ViewModel\CommonViewModel;
+use Bss\ProductLabel\Helper\Data;
+use Bss\ProductLabel\Block\Label;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Catalog\Block\Product\View;
+
+/** @var View $block */
+/** @var Data $helper */
+/** @var ViewModelRegistry $viewModels */
+
+$helper = $this->helper(Data::class);
+$product = $block->getProduct();
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var CommonViewModel $commonViewModel */
+$commonViewModel = $viewModels->require(CommonViewModel::class);
+
+/** Promo Blocks **/
+$_promo1 = $product->getAttributeText('nc1000000352');
+$_promo2 = $product->getAttributeText('nc1000000466');
+$_promo3 = $product->getAttributeText('nc1000000470');
+$_promo4 = $product->getAttributeText('nc1000001270');
+$_promo5 = $product->getAttributeText('nc1000001276');
+
+if ($_promo1 == 'x' || $_promo1 == 'X'):
+    $_promo1 = '';
+endif;
+if ($_promo2 == 'x' || $_promo2 == 'X'):
+    $_promo2 = '';
+endif;
+if ($_promo3 == 'x' || $_promo3 == 'X'):
+    $_promo3 = '';
+endif;
+if ($_promo4 == 'x' || $_promo4 == 'X'):
+    $_promo4 = '';
+endif;
+if ($_promo5 == 'x' || $_promo5 == 'X'):
+    $_promo5 = '';
+endif;
+?>
+<section class="text-gray-700 body-font -mt-7">
+    <div class="flex pt-0 pb-0 lg:pb-6 lg:flex-row flex-col items-center">
+        <div class="flex flex-wrap relative order-first w-full">
+            <div class="w-full lg:w-8/12 md:h-auto">
+                <div class="product-image-container-<?= $escaper->escapeUrl($product->getId()) ?> mb-4 md:mb-6 lg:mb-10">
+                    <?= $block->getChildHtml('product.media') ?>
+                    <?php if ($helper->isEnable()):
+                        echo $this->getLayout()->createBlock(Label::class)->setTemplate('Hyva_BssProductLabel::label_productlist.phtml')->setProduct($product)->toHtml();
+                    endif; ?>
+                </div>
+                <div class="w-full lg:mb-6 lg:absolute lg:pl-10 lg:pb-6 lg:w-4/12 lg:mb-0 lg:right-0 lg:top-0 lg:bottom-0">
+                    <?= $block->getChildHtml('product.info') ?>
+                </div>
+
+                <?= $block->getChildHtml('actuate.product.info.fbt'); ?>
+
+                <?php $_manufacturer = $product->getAttributeText('manufacturer'); ?>
+                <?php $brandList = $this->helper('Actuate\FeaturedCategories\Helper\Data')->getConfig('manufacturer/general/excludeManufacturer'); ?>
+                <?php $excludeBrandList = $brandList ? array_map('trim', explode(',', $brandList)) : []; ?>
+
+                <div class="product-pill w-full border border-gray-200 px-2 lg:px-8 mb-10 rounded-md hidden lg:flex lg:block">
+                    <ul class="flex w-full justify-between font-sans text-base leading-6 font-normal">
+                        <li class="box-border py-3 hover:font-bold hover:border-b-2 hover:pb-2 hover:border-[#000d40]"><a href="#description"><?= $escaper->escapeHtml(__('Description')) ?></a></li>
+                        <li class="box-border py-3 hover:font-bold hover:border-b-2 hover:pb-2 hover:border-[#000d40]"><a href="#features"><?= $escaper->escapeHtml(__('Features')) ?></a></li>
+                        <li class="box-border py-3 hover:font-bold hover:border-b-2 hover:pb-2 hover:border-[#000d40]"><a href="#product.attributes"><?= $escaper->escapeHtml(__('Specifications')) ?></a></li>
+                        <?php if( !in_array($_manufacturer, $excludeBrandList)): ?>
+                            <li class="box-border py-3 hover:font-bold hover:border-b-2 hover:pb-2 hover:border-[#000d40]"><a href="#manufacturer-content"><?= $escaper->escapeHtml(__('From the Manufacturer')) ?></a></li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+
+                <?= $block->getChildHtml('amasty.mostviewed.bundle.custom'); ?>
+
+                <div id="product-info lg:mt-0">
+                    <section>
+                        <?= $block->getChildHtml('product_options_wrapper_bottom') ?>
+                    </section>
+                    <?= $block->getChildHtml('product.info.details'); ?>
+                </div>
+                <?php if( !in_array($_manufacturer, $excludeBrandList)): ?>
+                    <?php $_model = $product->getModelno(); ?>
+                    <section id="manufacturer-content" class="float-left overflow-hidden prod-detail-wrapper px-0 w-full">
+                        <div class="w-full container box-border border-b border-gray-200 py-3 px-4 mb-1 lg:mb-4 lg:px-4 lg:py-3 lg:rounded-md lg:border lg:border-[#D1D5DB]" x-data="initializeManufacturer()">
+                            <button class="w-full text-left font-sans text-base leading-6 font-semibold text-[#000d40] lg:font-bold" data-role="init-extra-info" @click="toggleManufactureTab()">From the Manufacturer <?= $heroicons->chevronDownHtml('inline-block float-right w-10 h-6 text-[#000d40] transition-transform transform duration-300 ease-in-out', 32,16,[":class" => "{ 'rotate-180': expanded }"]); ?></button>
+                            <div class="pt-6" x-show="expanded" x-collapse>
+                                <div id="flix-inpage"></div>
+                                <div class="loadbeeTabContent" data-loadbee-apikey="<?= $commonViewModel->getLoadBeeApiKey(); ?>" data-loadbee-gtin="<?php echo $product['gtin']; ?>" data-loadbee-locale="en_GB"></div>
+                            </div>
+                        </div>
+                        <script>
+                            function initializeManufacturer() {
+                                return {
+                                    expanded: false,
+                                    manufacturer: '<?= $_manufacturer; ?>',
+                                    mpn: '<?= $_model; ?>',
+                                    ean: '<?= $product['gtin']; ?>',
+                                    distributorId: '<?= $commonViewModel->getFlixMediaDistributorId(); ?>',
+                                    toggleManufactureTab() {
+                                        this.expanded = !this.expanded;
+                                        if (this.expanded === true) {
+
+                                            const flixScript = document.querySelectorAll('[src="//media.flixfacts.com/js/loader.js"]');
+                                            if (flixScript.length === 0) {
+                                                const script = document.createElement('script');
+                                                script.type = 'text/javascript';
+                                                script.src = '//media.flixfacts.com/js/loader.js';
+                                                script.async = true;
+                                                script.setAttribute("data-flix-distributor", this.distributorId);
+                                                script.setAttribute("data-flix-language", "en");
+                                                script.setAttribute("data-flix-brand", this.manufacturer);
+                                                script.setAttribute("data-flix-mpn", this.mpn);
+                                                script.setAttribute("data-flix-ean", this.ean);
+                                                script.setAttribute("data-flix-sku", '');
+                                                script.setAttribute("data-flix-button", "flix-minisite");
+                                                script.setAttribute("data-flix-inpage", "flix-inpage");
+                                                script.setAttribute("data-flix-button-image", "");
+                                                script.setAttribute("data-flix-price", "");
+                                                script.setAttribute("data-flix-fallback-language", "");
+                                                document.head.appendChild(script);
+
+                                            }
+
+                                            const loadBeeScript = document.querySelectorAll('[src="https://cdn.loadbee.com/js/loadbee_integration.js"]');
+                                            if (loadBeeScript.length === 0) {
+                                                const script1 = document.createElement('script');
+                                                script1.src = 'https://cdn.loadbee.com/js/loadbee_integration.js';
+                                                script1.async = true;
+                                                document.head.appendChild(script1);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </script>
+                    </section>
+                <?php endif; ?>
+                <div class="feefo-review clear-both overflow-hidden">
+                    <div id="feefo-product-review-widgetId" class="feefo-review-widget-product" data-product-sku="<?= $product->getSku(); ?>"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div id="product-bottom">
+    <section class="float-left w-full">
+        <?= $block->getChildHtml('related') ?>
+        <?= $block->getChildHtml('upsell') ?>
+    </section>
+</div>
+<?php if ($_promo1 != '' || $_promo2 != '' || $_promo3 != '' || $_promo4 != '' || $_promo5 != ''): ?>
+<!-- PDP Promo Drawer -->
+<section id="promo-drawer">
+    <div role="dialog" aria-labelledby="promo-drawer-title" aria-modal="true" @click.outside="open=false" class="fixed inset-y-0 right-0 z-[999] flex max-w-full">
+            <div class="backdrop" x-show="open" x-transition:enter="ease-in-out duration-500" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="open=false" aria-label="Close panel"></div>
+            <div class="relative w-screen max-w-md shadow-2xl pt-14 px-2.5 pb-5 bg-white overflow-y-auto" x-show="open" x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
+                <div x-show="open" x-transition:enter="ease-in-out duration-500" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in-out duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute -top-2.5 right-0 flex p-2 mt-2">
+                    <button @click="open=false" aria-label="Close panel" class="p-2 text-gray-300 transition duration-150 ease-in-out hover:text-black">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 20 20" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="minicart flex flex-col space-y-6 shadow-xl rounded" style="border: 2px solid #156366;">
+                    <div style="border-bottom: 1px solid #156366;">
+                        <p class="delivery-text justify-center text-sm md:text-base"><span class="font-bold mr-2" style="color: #156366">FREE </span> Next Day Delivery (order by 1pm)*</p>
+                    </div>
+                    <header class="px-3 sm:px-6">
+                        <h2 id="cart-drawer-title" class="text-lg font-medium leading-7 text-gray-900">
+                            My Basket                        </h2>
+                    </header>
+                    <div class="item-list relative grid gap-6 px-4 py-6 overflow-y-auto bg-white border-b sm:gap-8 sm:px-6 border-container">
+                        <?php if ($_promo1 != ''):
+                            $promo1content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('promo-' . $_promo1 . '')->toHtml();
+                            if ($promo1content != ''):
+                                echo $promo1content;
+                            endif;
+                        endif; ?>
+                        <?php if ($_promo2 != ''):
+                            $promo2content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('promo-' . $_promo2 . '')->toHtml();
+                            if ($promo2content != ''):
+                                echo $promo2content;
+                            endif;
+                        endif; ?>
+                        <?php if ($_promo3 != ''):
+                            $promo3content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('promo-' . $_promo3 . '')->toHtml();
+                            if ($promo3content != ''):
+                                echo $promo3content;
+                            endif;
+                        endif; ?>
+                        <?php if ($_promo4 != ''):
+                            $promo4content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('promo-' . $_promo4 . '')->toHtml();
+                            if ($promo4content != ''):
+                                echo $promo4content;
+                            endif;
+                        endif; ?>
+                        <?php if ($_promo5 != ''):
+                            $promo5content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('promo-' . $_promo5 . '')->toHtml();
+                            if ($promo5content != ''):
+                                echo $promo5content;
+                            endif;
+                        endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+<?php endif;?>

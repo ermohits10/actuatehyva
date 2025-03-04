@@ -1,0 +1,64 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\Checkout\ViewModel\Checkout\ShippingSummary;
+use Hyva\Checkout\ViewModel\Checkout\AddressRenderer;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var ShippingSummary $viewModel */
+
+$viewModel = $viewModels->require(ShippingSummary::class);
+$addressRenderer = $viewModels->require(AddressRenderer::class);
+
+$address = $viewModel->getShippingAddress();
+$carrier = $viewModel->getShippingCarrier();
+?>
+<div class="p-6">
+    <?php if ($address->getFirstname() || $address->getLastname()): ?>
+        <div class="pb-6">
+            <header class="section-title border-b border-gray-400 pb-1 mb-6">
+                <h2 class="text-gray-800 text-xl font-medium">
+                    <?= $escaper->escapeHtml((__('Ship To'))) ?>
+                </h2>
+            </header>
+
+            <address class="address">
+                <?= /* @noEscape */ $addressRenderer->renderCustomerAddress($address) ?>
+            </address>
+        </div>
+    <?php else: ?>
+        <p>
+            <?= $escaper->escapeHtml(__('No shipping address set.')) ?>
+        </p>
+    <?php endif ?>
+
+    <?php if ($carrier): ?>
+    <div>
+        <header class="section-title border-b border-gray-400 pb-1 mb-6">
+            <h2 class="text-gray-800 text-xl font-medium">
+                <?= $escaper->escapeHtml((__('Shipping Method'))) ?>
+            </h2>
+        </header>
+
+        <p class="break-all">
+            <?= $escaper->escapeHtml($carrier) ?>
+        </p>
+    </div>
+    <?php else: ?>
+        <p>
+            <?= $escaper->escapeHtml(__('No shipping method selected.')) ?>
+        </p>
+    <?php endif ?>
+</div>

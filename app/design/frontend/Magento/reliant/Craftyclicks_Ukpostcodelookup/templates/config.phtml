@@ -1,0 +1,13 @@
+<?php
+
+/** @var Magento\Framework\View\TemplateEngine\Php $this */
+$craftyConfig = $this->helper('Craftyclicks\Ukpostcodelookup\Helper\Data');
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+/** @var SecureHtmlRenderer $secureRenderer */
+
+$craftyConfig = <<<script
+    var crafty_cfg = {$craftyConfig->getFrontendCfg()};
+script;
+
+echo /* @noEscape */ $secureRenderer->renderTag('script', [], $craftyConfig, false);

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="empty" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <head>
+        <remove src="mage/calendar.css" />
+        <remove src="css/styles-l.css" />
+        <remove src="css/styles-m.css" />
+        <remove src="css/print.css" />
+        <remove src="requirejs/require.js" />
+        <remove src="AutifyDigital_V12Finance::css/default.css" />
+        <remove src="Magento_Theme::favicon.ico" />
+        <remove src="light/opensans-300.woff2" />
+        <remove src="regular/opensans-400.woff2" />
+        <remove src="semibold/opensans-600.woff2" />
+        <remove src="bold/opensans-700.woff2" />
+        <remove src="fonts/Luma-Icons.woff2" />
+        <referenceBlock name="head.additional" remove="true" />
+    </head>
+    <container name="root" label="Root">
+        <referenceBlock name="google_analytics" remove="true" />
+        <!--<block template="AutifyDigital_V12Finance::financeanalytics.phtml" name="finance.analytics" as="finance_analytics"/>-->
+        <block class="AutifyDigital\V12Finance\Block\Index\GetAnalyticsBlock" name="v12finance.analyticsframe.data" template="AutifyDigital_V12Finance::analytics.phtml"/>
+        <!--<block template="AutifyDigital_V12Finance::analytics.phtml" name="v12finance_analytics"/>-->
+        <!--<block class="Magento\GoogleAnalytics\Block\Ga" name="v12finance_analyticsframe" as="v12finance_analyticsframe" template="Magento_GoogleAnalytics::ga.phtml"/>-->
+    </container>
+</layout>

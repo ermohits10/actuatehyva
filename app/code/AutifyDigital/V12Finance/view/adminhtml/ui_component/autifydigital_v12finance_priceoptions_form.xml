@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">autifydigital_v12finance_priceoptions_form.priceoptions_form_data_source</item>
+		</item>
+		<item name="label" translate="true" xsi:type="string">General Information</item>
+		<item name="template" xsi:type="string">templates/form/collapsible</item>
+	</argument>
+	<settings>
+		<buttons>
+			<button class="AutifyDigital\V12Finance\Block\Adminhtml\PriceOptions\Edit\BackButton" name="back"/>
+			<button class="AutifyDigital\V12Finance\Block\Adminhtml\PriceOptions\Edit\DeleteButton" name="delete" />
+			<button class="AutifyDigital\V12Finance\Block\Adminhtml\PriceOptions\Edit\SaveButton" name="save" />
+			<button class="AutifyDigital\V12Finance\Block\Adminhtml\PriceOptions\Edit\SaveAndContinueButton" name="save_and_continue" />
+		</buttons>
+		<namespace>autifydigital_v12finance_priceoptions_form</namespace>
+		<dataScope>data</dataScope>
+		<deps>
+			<dep>autifydigital_v12finance_priceoptions_form.priceoptions_form_data_source</dep>
+		</deps>
+	</settings>
+	<dataSource name="priceoptions_form_data_source">
+		<argument name="data" xsi:type="array">
+			<item name="js_config" xsi:type="array">
+				<item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+			</item>
+		</argument>
+		<settings>
+			<submitUrl path="*/*/save"/>
+		</settings>
+		<dataProvider class="AutifyDigital\V12Finance\Model\PriceOptions\DataProvider" name="priceoptions_form_data_source">
+			<settings>
+				<requestFieldName>priceoptions_id</requestFieldName>
+				<primaryFieldName>priceoptions_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<fieldset name="general">
+		<settings>
+			<label>General</label>
+		</settings>
+		<field name="price_from">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="additionalClasses" xsi:type="array">
+						<item name="admin__field-price-from-range-input" xsi:type="boolean">true</item>
+					</item>
+					<item name="resizeEnabled" xsi:type="boolean">true</item>
+					<item name="resizeDefaultWidth" xsi:type="string">40</item>
+					<item name="label" xsi:type="string">Price Range From:</item>
+					<item name="visible" xsi:type="boolean">true</item>
+					<item name="dataType" xsi:type="string">price</item>
+					<item name="formElement" xsi:type="string">input</item>
+					<item name="validation" xsi:type="array">
+						<item name="required-entry" xsi:type="boolean">true</item>
+						<item name="validate-digits" xsi:type="boolean">true</item>
+					</item>
+				</item>
+			</argument>
+		</field>
+		<field name="price_to">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="additionalClasses" xsi:type="array">
+						<item name="admin__field-price-to-range-input" xsi:type="boolean">true</item>
+					</item>
+					<item name="resizeEnabled" xsi:type="boolean">true</item>
+					<item name="resizeDefaultWidth" xsi:type="string">40</item>
+					<item name="label" xsi:type="string">To:</item>
+					<item name="visible" xsi:type="boolean">true</item>
+					<item name="dataType" xsi:type="string">price</item>
+					<item name="formElement" xsi:type="string">input</item>
+					<item name="validation" xsi:type="array">
+						<item name="required-entry" xsi:type="boolean">true</item>
+						<item name="validate-digits" xsi:type="boolean">true</item>
+					</item>
+				</item>
+			</argument>
+		</field>
+		<field name="finance_options">
+			<argument name="data" xsi:type="array">
+				<item name="options" xsi:type="object">AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOption</item>
+				<item name="config" xsi:type="array">
+					<item name="dataType" xsi:type="string">text</item>
+					<item name="label" translate="true" xsi:type="string">Finance Options</item>
+					<item name="formElement" xsi:type="string">multiselect</item>
+					<item name="validation" xsi:type="array">
+						<item name="required-entry" xsi:type="boolean">true</item>
+					</item>
+				</item>
+			</argument>
+		</field>
+	</fieldset>
+</form>

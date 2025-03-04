@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="MageWorx_DeliveryDate::main"
+             title="MageWorx Delivery Date"
+             module="MageWorx_DeliveryDate"
+             parent="Magento_Backend::stores"
+             sortOrder="90"
+             resource="MageWorx_DeliveryDate::main"/>
+        <add id="MageWorx_DeliveryDate::deliveryoption"
+             title="Delivery Configuration"
+             module="MageWorx_DeliveryDate"
+             parent="MageWorx_DeliveryDate::main"
+             sortOrder="50"
+             action="mageworx_deliverydate/deliveryoption/"
+             resource="MageWorx_DeliveryDate::main"
+        />
+    </menu>
+</config>

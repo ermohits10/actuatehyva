@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Actuate_AwinAdvertiserTracking">
+        <sequence>
+            <module name="Awin_AdvertiserTracking"/>
+            <module name="Scommerce_GoogleTagManagerPro"/>
+        </sequence>
+    </module>
+</config>

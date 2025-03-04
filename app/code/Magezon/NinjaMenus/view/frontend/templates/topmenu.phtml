@@ -1,0 +1,14 @@
+<?php
+/**
+ * @var \Magezon\NinjaMenus\Block\TopMenu $block
+ */
+
+$html = $block->getMenuHtml();
+?>
+<?php if($html) { ?>
+    <nav class="navigation" data-action="navigation">
+        <?= str_replace('data-mage-init=\'{"ninjamenus"', 'data-mage-init=\'{"ninjamenustop"', $html) ?>
+    </nav>
+<?php } else { ?>
+    <?= $this->getMagentoTopMenuHtml() ?>
+<?php } ?>

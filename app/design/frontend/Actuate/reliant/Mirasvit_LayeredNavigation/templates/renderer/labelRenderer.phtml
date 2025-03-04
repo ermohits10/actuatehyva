@@ -1,0 +1,83 @@
+<?php
+/**
+ * @var $block \Mirasvit\LayeredNavigation\Block\Renderer\LabelRenderer
+ * @var $escaper \Magento\Framework\Escaper
+ */
+
+use Actuate\MirasvitSeoFilter\ViewModel\FilterOptionViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+
+/** @var ViewModelRegistry $viewModels */
+
+/** @var FilterOptionViewModel $heroicons */
+$filterOptionViewModel = $viewModels->require(FilterOptionViewModel::class);
+
+$attributeCode  = $block->getAttributeCode();
+$cacheKey       = rand(100000, 1000000);
+$filterAccessor = $attributeCode . 'A' . $cacheKey . 'A';
+$filterOptionIndexFlag = $filterOptionViewModel->getExistsOptions($attributeCode);
+?>
+<div data-mst-nav-filter="<?= $filterAccessor ?>" data-mst-nav-cache-key="<?= $cacheKey ?>" class="mst-nav__label" x-data="initLabelRenderer()">
+    <?= $block->getSearchBoxElement($filterAccessor) ?>
+
+    <ol class="items">
+        <?php foreach ($block->getFilterItems() as $key => $filterItem):
+            $label = $filterItem->getData('label');
+            $numberOfResults = $filterItem->getData('count');
+
+            $isItemChecked = $block->isFilterItemChecked($filterItem, true);
+
+            $imageUrl         = $block->getImageUrl($filterItem);
+            $isFullWidthImage = $block->isFullWidthImage($filterItem);
+
+            $cssClass = [
+                'item',
+                'mst-nav__label-item',
+                '_mode-' . $block->getFilterItemDisplayMode($attributeCode),
+                $isItemChecked ? '_checked' : '',
+                $isItemChecked && $block->isHighlightEnabled() ? '_highlight' : '',
+                $imageUrl ? '_image' : '',
+                $imageUrl && $isFullWidthImage ? '_full-width' : '',
+            ];
+            ?>
+
+            <li data-element="filter"
+                class="<?= implode(' ', $cssClass) ?>"
+                data-value="<?= $filterItem->getValueString() ?>"
+                @click="handleClick"
+            >
+                <?php if ($numberOfResults >= 0): ?>
+                    <?php
+                    $url = $isItemChecked ? $filterItem->getRemoveUrl() : $filterItem->getUrl();
+                    $id  = $block->getItemId($filterItem);
+                    $relAttributeValue = $block->getRelAttributeValue();
+                    if (isset($filterOptionIndexFlag[$filterItem->getValueString()])
+                        && $filterOptionIndexFlag[$filterItem->getValueString()] === '1') {
+                        $relAttributeValue = 'follow';
+                    }
+                    ?>
+                    <a href="<?= $escaper->escapeUrl($url) ?>"
+                       rel="<?= $relAttributeValue; ?>"
+                       aria-label="<?= $escaper->escapeHtmlAttr($label) ?>"
+                    >
+                        <?php if ($imageUrl): ?>
+                            <div class="swatch-option image" style="background: url(<?= $imageUrl ?>) no-repeat center;  background-size: auto 100%;"></div>
+                        <?php endif ?>
+
+                        <input id="<?= $id ?>" type="checkbox" <?= $isItemChecked ? 'checked' : '' ?> />
+
+                        <label for="<?= $id ?>">
+                            <span class="mst-nav__label-item__label"><?= $label ?></span>
+                            <span class="count text-primary">(<?= $filterItem->getData('count') ?>)</span>
+                        </label>
+                    </a>
+                <?php else: ?>
+                    <span class="mst-nav__label-item__label"><?= $label ?></span>
+                    <span class="count text-primary">(<?= $filterItem->getData('count') ?>)</span>
+                <?php endif ?>
+            </li>
+        <?php endforeach ?>
+
+        <?= $block->getSizeLimiterElement($filterAccessor) ?>
+    </ol>
+</div>

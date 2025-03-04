@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <referenceBlock name="cart-drawer">
+        <block class="Amazon\Pay\Block\Minicart\Button" name="amazon.pay.button.custom.mini.cart" template="Amazon_Pay::minicart-custom-button.phtml">
+            <action method="setIsInCatalogProduct">
+                <argument name="is_catalog" xsi:type="boolean">false</argument>
+            </action>
+            <arguments>
+                <argument name="amazon_id" xsi:type="string">AmazonPayButtonMiniCart</argument>
+            </arguments>
+        </block>
+    </referenceBlock>
+</page>

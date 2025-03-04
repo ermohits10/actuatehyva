@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="checkout.cart.wrapper">
+            <block class="Magento\Checkout\Block\Cart" name="checkout.cart.methods.v12finance.before.summary"  template="AutifyDigital_V12Finance::checkout/cart/v12finance-summary.phtml" cacheable="false" />
+            <block class="Magento\Checkout\Block\Cart" name="checkout.cart.methods.v12finance.after.methods"  template="AutifyDigital_V12Finance::checkout/cart/v12finance.phtml" cacheable="false" />
+        </referenceContainer>
+        
+        <referenceBlock name="crosssell">
+            <action method="setTemplate" ifconfig="v12finance/cart_page/enable_v12_finance">
+                <argument name="template" xsi:type="string">AutifyDigital_V12Finance::product/slider/product-slider.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="type" xsi:type="string">crosssell</argument>
+                <argument name="title" xsi:type="string" translate="true">You might also like:</argument>
+                <argument name="hide_rating_summary" xsi:type="boolean">true</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

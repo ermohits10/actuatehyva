@@ -1,0 +1,91 @@
+{
+    "extensions": [
+        {
+            "src": "vendor\/bsscommerce\/hyva-compat-base\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-theme-module\/src"
+        },
+        {
+            "src": "vendor\/amasty\/module-checkout-thank-you-page-hyva-compatibility"
+        },
+        {
+            "src": "vendor\/amasty\/module-mostviewed-hyva"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-amazon-pay\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-bsscommerce-mega-menu\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-bsscommerce-product-label\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-bsscommerce-sociallogin\/src"
+        },
+        {
+            "src": "vendor\/amasty\/module-checkout-delivery-date-hyva-compatibility"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-mirasvit-seo\/src"
+        },
+        {
+            "src": "vendor\/amasty\/module-checkout-gift-wrap-hyva-compatibility"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-jajuma-webp-images\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-mageworx-htmlsitemap\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-mageworx-seomarkup\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-hyva-checkout-braintree"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-magezon-builder\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-magezon-ninja-menus\/src"
+        },
+        {
+            "src": "vendor\/mirasvit\/module-navigation-hyva\/src\/MirasvitAllProducts"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-mirasvit-gdpr\/src"
+        },
+        {
+            "src": "vendor\/mirasvit\/module-navigation-hyva\/src\/MirasvitBrand"
+        },
+        {
+            "src": "vendor\/mirasvit\/module-navigation-hyva\/src\/MirasvitQuickNavigation"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-mirasvit-related\/src"
+        },
+        {
+            "src": "vendor\/mirasvit\/module-navigation-hyva\/src\/MirasvitScroll"
+        },
+        {
+            "src": "vendor\/mirasvit\/module-navigation-hyva\/src\/MirasvitLayeredNavigation"
+        },
+        {
+            "src": "vendor\/rvvup\/module-magento-payments-hyva-checkout\/src"
+        },
+        {
+            "src": "vendor\/magewirephp\/magewire\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-hyva-checkout\/src"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-hyva-checkout-paypal\/src"
+        },
+        {
+            "src": "vendor\/jajuma\/hyva-faq"
+        }
+    ]
+}

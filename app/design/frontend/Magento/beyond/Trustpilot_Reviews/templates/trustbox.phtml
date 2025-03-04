@@ -1,0 +1,18 @@
+<?php
+
+/** @var SecureHtmlRenderer $secureRenderer */
+/* @var $block Trustbox */
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Trustpilot\Reviews\Block\Trustbox;
+
+$trustPilotScript = <<<script
+    const trustpilot_trustbox_settings = {$block->loadTrustboxes()};
+    if (trustpilot_trustbox_settings) {
+        document.addEventListener('DOMContentLoaded', function() {
+            tp('trustBox', trustpilot_trustbox_settings);
+        });
+    }
+script;
+
+echo /* @noEscape */ $secureRenderer->renderTag('script', ["type" => "text/javascript"], $trustPilotScript, false);

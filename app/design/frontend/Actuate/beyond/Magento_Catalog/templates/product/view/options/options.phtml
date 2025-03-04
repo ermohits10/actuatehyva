@@ -1,0 +1,205 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Magento\Catalog\Block\Product\View\Options;
+use Magento\Catalog\Model\Product\Option;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Options $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Option $option */
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+$product = $block->getProduct();
+
+/** @var ProductPrice $productPriceViewModel */
+$productPriceViewModel = $viewModels->require(ProductPrice::class);
+
+$displayTax = $productPriceViewModel->displayPriceIncludingTax();
+
+$options = $block->decorateArray($block->getOptions());
+
+/** @var \Magento\Framework\Pricing\Helper\Data $priceHelper */
+$priceHelper = $this->helper(\Magento\Framework\Pricing\Helper\Data::class);
+
+$subTitles = [];
+foreach ($options as $option) {
+    foreach ($option->getValuesCollection() as $value) {
+        $subTitles[] = $value->getDescription() . " (" . $priceHelper->currencyByStore($value->getPrice()) . ")";
+    }
+}
+
+?>
+<?php if (count($options)): ?>
+    <script>
+        function initOptions() {
+            return {
+                optionConfig: <?= /* @noEscape */ $block->getJsonConfig() ?>,
+                regularPriceKey: '<?= /* @noEscape */ $displayTax ? 'oldPrice' : 'baseOldPrice' ?>',
+                finalPriceKey: '<?= /* @noEscape */ $displayTax ? 'finalPrice' : 'basePrice' ?>',
+                productFinalPrice: false,
+                customOptionPrices: {},
+                refs: [],
+                getFormattedOptionPrice(optionId) {
+                    if (this.customOptionPrices[optionId]) {
+                        const showSign = true;
+                        return hyva.formatPrice(this.customOptionPrices[optionId], showSign);
+                    }
+                    return false;
+                },
+                calculateOptionPrices() {
+                    for (const [customOptionId, customOption] of Object.entries(this.optionConfig)) {
+                        if (customOption.prices) {
+                            this.customOptionPrices[customOptionId] =
+                                this.calculateOptionPrice(customOption,customOptionId);
+                        } else {
+                            for (const [childCustomOptionId, childCustomOption] of Object.entries(customOption)) {
+                                this.customOptionPrices[customOptionId + '_' + childCustomOptionId] =
+                                    this.calculateOptionPrice(childCustomOption,customOptionId,childCustomOptionId);
+                            }
+                        }
+                    }
+
+                    window.dispatchEvent(
+                        new CustomEvent(
+                            "update-custom-option-prices",
+                            {detail: this.customOptionPrices}
+                        )
+                    );
+                },
+                calculateOptionPrice(customOption, customOptionId, childCustomOptionId) {
+                    const customOptionCode = customOptionId + (childCustomOptionId ? '-' + childCustomOptionId : '') ;
+
+                    const optionElement = this.refs && this.refs['option-'+customOptionCode];
+
+                    let price = customOption.prices[this.finalPriceKey].amount;
+
+                    if (this.productFinalPrice &&
+                        optionElement &&
+                        optionElement.dataset.priceAmount &&
+                        optionElement.dataset.priceType
+                    ) {
+                        price = optionElement.dataset.priceType !== 'percent' ?
+                            optionElement.dataset.priceAmount :
+                            this.productFinalPrice * (optionElement.dataset.priceAmount / 100)
+                    }
+
+                    return price;
+                },
+                updateCustomOptionValue($dispatch, customOptionId, target) {
+                    let active;
+                    switch (target.type) {
+                        case 'text':
+                        case 'textarea':
+                        case 'file':
+                            active = !!target.value;
+                        break;
+                        case 'hidden':
+                            // when we're configuring an item in the cart that already has an attachment
+                            // this is only needed on page-initialization
+                            active = (target.value === 'save_old')
+                        break;
+                        case 'select-one':
+                        case 'select-multiple':
+                            Array.from(target.options).forEach(option => {
+                                customOptionId = option.dataset.optionId;
+                                active = option.selected;
+                                $dispatch('update-custom-option-active', { customOptionId, active });
+                            });
+                            return;
+                        break;
+                        case 'radio':
+                            target.checked && document.querySelectorAll('input[name="'+target.name+'"]')
+                                .forEach(input => {
+                                    // unset sibling radio buttons
+                                    input.dataset &&
+                                    input.dataset.optionId &&
+                                    input !== target && $dispatch('update-custom-option-active',
+                                        {
+                                            customOptionId: input.dataset.optionId,
+                                            active: false
+                                        }
+                                    );
+                                });
+                        // DO NOT BREAK
+                        // Checkbox case should also run for Radio
+                        case 'checkbox':
+                            const requiredOptions = document
+                                .querySelectorAll('input[name="'+target.name+'"][data-required]');
+                            const checkedOptionsQty = Array.from(requiredOptions)
+                                .filter(option => option.checked).length;
+
+                            requiredOptions.forEach(input => {
+                                if (checkedOptionsQty) {
+                                    input.required = false;
+                                    input.setCustomValidity('');
+                                } else {
+                                    input.required = false;
+                                    input.setCustomValidity(input.dataset.validationMessage);
+                                }
+                            });
+                            active = target.checked;
+                        break;
+                    }
+                    $dispatch('update-custom-option-active', { customOptionId, active });
+                },
+                initSelectedOptions($dispatch) {
+                    Array.from(document.querySelectorAll('.product-custom-option')).forEach(customOption => {
+                        this.updateCustomOptionValue($dispatch, customOption.dataset.optionId, customOption);
+                    })
+                },
+                eventListeners: {
+                    ['@update-product-final-price.window'](event) {
+                        this.productFinalPrice = event.detail;
+                        this.calculateOptionPrices();
+                    }
+                }
+            }
+        }
+    </script>
+    <div class="install-block border-t border-[#000d40] relative pt-1 pb-1 pr-4" x-data="{ open: true }">
+        <div class="flex">
+            <h3 class="font-semibold text-black text-base leading-5" :class="{'w-[80%]': !open, 'w-full': open}">
+                <?= $escaper->escapeHtml(__('Installation & Recycling Services')) ?>
+            </h3>
+            <div class="ml-auto flex text-sm leading-6 cursor-pointer text-medium font-sans text-black font-medium absolute top-4 right-0" @click="open = !open">
+                <svg x-show="open" width="10" height="15" viewBox="0 0 10 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="8.74971" y1="7.68334" x2="1.27997" y2="0.744608" stroke="black" stroke-width="2"/>
+                    <line x1="9.34175" y1="6.93467" x2="1.65724" y2="13.6348" stroke="black" stroke-width="2"/>
+                </svg>
+                <span class="flex -mt-3.5" x-show="!open">
+                    <span class="underline -mt-1.5 mr-0">Close</span>
+                    <svg class="ml-0.5 w-2.5 h-3" width="7" height="8" viewBox="0 0 7 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.923 8H5.607C5.49967 8 5.41333 7.972 5.348 7.916C5.28733 7.85533 5.23833 7.79233 5.201 7.727L3.486 5.018C3.46267 5.088 3.43933 5.15567 3.416 5.221C3.39267 5.28633 3.36233 5.347 3.325 5.403L1.75 7.727C1.70333 7.79233 1.64967 7.85533 1.589 7.916C1.52833 7.972 1.449 8 1.351 8H0.133L2.611 4.339L0.231 0.888H1.547C1.65433 0.888 1.73133 0.904333 1.778 0.937C1.82933 0.969666 1.87367 1.01867 1.911 1.084L3.598 3.681C3.62133 3.611 3.647 3.54333 3.675 3.478C3.703 3.408 3.74033 3.33567 3.787 3.261L5.236 1.112C5.32 0.962666 5.432 0.888 5.572 0.888H6.825L4.445 4.276L6.923 8Z" fill="black"/>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <?php if (!empty($subTitles)): ?>
+            <p x-show="open" class="text-black text-xs lg:text-sm leading-5 font-medium"><?= implode(', ', $subTitles); ?></p>
+        <?php endif;?>
+        <div x-show="!open">
+        <div x-data="initOptions()"
+            x-init="
+                refs = $refs;
+                $nextTick(() => { calculateOptionPrices(); initSelectedOptions($dispatch); })
+            "
+            x-spread="eventListeners">
+        <?php foreach ($options as $option):?>
+            <?= $block->getOptionHtml($option) ?>
+        <?php endforeach; ?>
+        </div>
+        </div>
+    </div>
+<?php endif; ?>

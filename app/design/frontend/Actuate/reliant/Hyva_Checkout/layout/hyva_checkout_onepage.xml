@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!-- Column Main-->
+        <!-- <move element="checkout.shipping.section" destination="column.main"/> -->
+        <!-- <move element="checkout.payment.section" destination="column.main"/> -->
+        <move element="hyva.checkout.navigation" destination="checkout.price-summary.section" after="-"/>
+        <move element="checkout.guest-details.section" destination="checkout.shipping-details.section" after="checkout.shipping-details.title"/>
+        <move element="checkout.billing-details.section" destination="checkout.shipping-details.section" after="-"/>
+        <referenceBlock name="checkout.billing-details.title" remove="true" />
+
+        <!-- Shipping Section Main-->
+        <move element="checkout.shipping-details.section" destination="checkout.shipping-details.section.main" />
+        <move element="checkout.shipping-details.section.main" destination="hyva.checkout.components" />
+        <move element="checkout.shipping-details.section.main" destination="column.main" before="-"/>
+        <move element="checkout.shipping-details.title" destination="checkout.shipping-details.section.main" before="-"/>
+        <move element="rd.checkout.shipping-details.continue.button" destination="checkout.shipping-details.section" after="-"/>
+
+        <!--Delivery Method Section Main-->
+        <move element="checkout.shipping.section" destination="checkout.shipping.section.main" />
+        <move element="checkout.shipping.section.main" destination="column.main" after="checkout.shipping-details.section.main"/>
+        <move element="checkout.shipping.title" destination="checkout.shipping.section.main" before="-"/>
+        <move element="rd.checkout.shipping-section.continue.button" destination="checkout.shipping.section" after="-"/>
+
+
+        <!--Payment Method Section Main-->
+        <move element="checkout.payment.section" destination="checkout.payment.section.main" />
+        <move element="checkout.payment.section.main" destination="column.main" after="checkout.payment.section.main"/>
+        <move element="checkout.payment.title" destination="checkout.payment.section.main" before="-"/>
+
+        <!-- Checkout js -->
+        <referenceContainer name="column.main">
+            <block name="checkout.js.custom"
+                template="Hyva_Checkout::checkout-js.phtml"
+                after="-" />
+        </referenceContainer>
+
+        <move element="checkout.js.custom" destination="column.main" after="-"/>
+        <move element="checkout.section.quote-actions" destination="checkout.payment.methods" />
+
+        <referenceContainer name="before.body.end">
+            <block name="checkout.ukpcl.js"
+                   template="Hyva_Checkout::checkout/crafty-clicks-js.phtml"
+                   ifconfig="fetchify_main/main_options/enable_extension" />
+        </referenceContainer>
+    </body>
+</page>

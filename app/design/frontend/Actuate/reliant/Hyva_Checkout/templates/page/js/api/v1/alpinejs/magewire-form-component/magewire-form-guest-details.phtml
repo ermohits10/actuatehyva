@@ -1,0 +1,40 @@
+<script>
+    'use strict';
+
+    function initMagewireFormForGuestDetails(form, wire) {
+        function resetPasswordFieldValidationRules() {
+            if (this.fields && this.fields.password) {
+                delete this.fields.password;
+                this.setupField(form.elements.password)
+            }
+        }
+
+        function setPasswordFieldRequired(form) {
+            form.elements.password.setAttribute('required', '');
+            resetPasswordFieldValidationRules.call(this);
+        }
+
+        function setPasswordFieldOptional(form) {
+            form.elements.password.removeAttribute('required')
+            resetPasswordFieldValidationRules.call(this)
+        }
+
+        return Object.assign(
+            initMagewireForm(form, wire),
+
+            {
+                login() {
+                    setPasswordFieldRequired.call(this, form)
+
+                    this.validate()
+                    <?php /* Try to submit the form when the validation succeeds. */ ?>
+                        .then(() => wire.submit())
+                        <?php /* Prevent uncaught form validation exceptions. */ ?>
+                        .catch(() => {})
+                        <?php /* Always reset the password back to optional. */ ?>
+                        .finally(() => setPasswordFieldOptional.call(this, form))
+                }
+            }
+        )
+    }
+</script>

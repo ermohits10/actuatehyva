@@ -1,0 +1,42 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+/**
+ * @Internal Prefer utilizing the "after" container for injecting additional code.
+ */
+?>
+<script>
+    'use strict';
+
+    (() => {
+        <?php /* Ensuring timely availability of a crucial data piece in session storage. This data, sourced from the
+               * backend, plays a vital role and can be extended by developers. It provides them with the opportunity
+               * to include additional storage data. Ultimately, this enriched session storage is transmitted to a
+               * Place Order Service promptly upon the customer placing an order. */ ?>
+        window.addEventListener('checkout:init:storage', () => {
+            <?php /* @see \Hyva\Checkout\Model\Magewire\ServerMemoConfig\SessionStorage */ ?>
+            if (hyvaCheckout.config.hasValue('session_storage')) {
+                <?php /* Workaround to make sure this is a unique object where hyvaCheckout.config won't be effected. */ ?>
+                const storage = JSON.stringify(
+                    Object.assign(hyvaCheckout.storage.data, hyvaCheckout.config.getValue('session_storage')),
+                    <?php /* Making sure empty root arrays coming from the backend, are replaced by objects. */ ?>
+                    (key, value) => Array.isArray(value) && value.length === 0 ? Object.assign({}, value) : value
+                )
+
+                <?php /* Making sure we always have a hyva_checkout session storage object. */ ?>
+                sessionStorage.setItem('hyva_checkout', storage)
+                <?php /* Reset the storage data, now having data from the configuration. */ ?>
+                hyvaCheckout.storage.data = JSON.parse(storage)
+            }
+        })
+    })()
+</script>
+
+<?= $this->getChildHtml('after') ?>

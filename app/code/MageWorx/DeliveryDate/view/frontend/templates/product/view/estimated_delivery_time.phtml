@@ -1,0 +1,27 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/**
+ * @var \MageWorx\DeliveryDate\Block\Product\View\EstimatedDeliveryTime $block
+ */
+?>
+<?php if ($block->isVisibleOnProduct()): ?>
+    <div data-bind="scope:'delivery-date-info'">
+        <div class="mw-deliverydate-info"
+             id="delivery-date-info"
+             data-bind="visible: visible">
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        </div>
+
+        <script type="text/x-magento-init">
+        {
+            "#delivery-date-info": {
+                "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout() ?>
+            }
+        }
+
+        </script>
+    </div>
+<?php endif; ?>

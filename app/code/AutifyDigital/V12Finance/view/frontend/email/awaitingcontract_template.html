@@ -1,0 +1,38 @@
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<!--@subject {{trans "Your Application notification"}} @-->
+<!--@vars {} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans 'Hello ' }} {{var customer_name}},</p>
+        </td>
+    </tr>
+    <tr class="email-summary">
+        <td>
+            <h1>{{trans 'Your V12 Application #' }}{{var application_id}}{{trans ' for order #'}}{{var order_id}}</h1>
+        </td>
+    </tr>
+    <tr class="email-information">
+        <td>
+            <p>
+                {{trans 'The last step is to sign the application, and we will process your order.'}}
+            </p>
+            <p>
+                {{trans 'If you have questions about your order, you can email us at '}}<a href="mailto:{{config path='trans_email/ident_general/email'}}">{{config path="trans_email/ident_general/email"}}</a> {{trans ' or call us at'}} <a href="tel:{{config path='general/store_information/phone'}}">{{config path="general/store_information/phone"}}</a>
+            </p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

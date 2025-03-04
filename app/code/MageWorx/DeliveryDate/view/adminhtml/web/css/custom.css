@@ -1,0 +1,42 @@
+#calendar {
+    height: 1000px;
+    position: relative;
+    margin-bottom: 20px;
+    padding-top: 20px;
+}
+#lnb {
+    float: left;
+    width: 20%;
+    position: relative;
+    padding: 10px;
+}
+#right {
+    width: 80%;
+    float: left;
+    position: relative;
+    padding: 10px;
+}
+#lnb-calendars {
+    padding-top: 20px;
+}
+
+/** Fix error, when grid overlays on the calendar */
+.admin__data-grid-outer-wrap {
+    position: relative;
+    float: left;
+    width: 100%;
+}
+
+.green_button {
+    background-color: #30af32 !important;
+    border-color: #009620 !important;
+    color: #ffffff !important;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25) !important;
+}
+
+.back_button_main {
+    background-color: rgba(164, 169, 175, 0.84) !important;
+    border-color: #8f9696 !important;
+    color: #ffffff !important;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25) !important;
+}

@@ -1,0 +1,16 @@
+/*
+ * This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+ * Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+ * Copyright (c) 2020-2022 Autify digital Ltd.
+ * This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+ * ALL RIGHTS RESERVED.
+ *
+ */
+
+/* Overrides for right-to-left sliders. */
+
+.ui-slider-horizontal.ui-slider-rtl .ui-slider-range-min { left: auto; right: 0; }
+.ui-slider-horizontal.ui-slider-rtl .ui-slider-range-max { left: 0; right: auto; }
+
+.ui-slider-vertical.ui-slider-rtl .ui-slider-range-min { top: 0; bottom: auto; }
+.ui-slider-vertical.ui-slider-rtl .ui-slider-range-max { top: auto; bottom: 0; }

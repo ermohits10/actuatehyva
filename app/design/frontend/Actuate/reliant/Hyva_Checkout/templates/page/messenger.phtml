@@ -1,0 +1,84 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\ViewModel\Page\Messenger;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var HeroiconsOutline $iconsViewModel */
+/** @var Escaper $escaper */
+/** @var Messenger $messengerViewModel */
+
+$iconsViewModel = $viewModels->require(HeroiconsOutline::class);
+$messengerViewModel = $viewModels->require(Messenger::class);
+
+$errorEventHtml = $messengerViewModel->renderErrorEvent($block);
+$successEventHtml = $messengerViewModel->renderSuccessEvent($block);
+$defaultMessageText = $messengerViewModel->getDefaultMessageText();
+?>
+<template x-data="initComponentMessenger(
+              '<?= $escaper->escapeJs($errorEventHtml) ?>',
+              {
+                  onEmptyMessageText: '<?= $escaper->escapeJs($defaultMessageText) ?>',
+                  messagesSuccessListener: '<?= $escaper->escapeJs($successEventHtml) ?>'
+              },
+              '<?= $escaper->escapeJs($successEventHtml) ?>'
+          )"
+          x-init="initialize()"
+          x-for="message in getMessages()" x-bind:key="message.id"
+          aria-live="assertive"
+          role="alert"
+>
+    <div
+        class="component-messenger message mb-4 relative"
+        x-show="message.show"
+        x-bind:class="message.type"
+        x-bind:data-testid="message.component ? `${ message.component.id }-message` : ''"
+    >
+        <span x-text="message.text">
+            <!-- Message Placeholder -->
+        </span>
+
+        <div class="absolute -left-2 -top-2"
+             x-show="message.dispatched >= 2"
+             x-bind:data-message-dispatched="message.dispatched"
+             x-bind:data-message-type="message.type"
+             x-bind:data-message-alias="message.alias || 'none'"
+             x-bind:class="{ 'animate-bounce': message.dispatched >= 3 }"
+        >
+            <span class="flex h-4 w-4">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                      x-bind:class="{
+                          'bg-red-500': message.type === 'error',
+                          'bg-blue-500': message.type === 'info',
+                          'bg-yellow-500': message.type === 'warning'
+                      }"></span>
+                <span class="relative inline-flex rounded-full h-4 w-4 border-2 border-white shadow-xl"
+                      x-bind:class="{
+                          'bg-red-500': message.type === 'error',
+                          'bg-blue-500': message.type === 'info',
+                          'bg-yellow-500': message.type === 'warning'
+                      }"></span>
+            </span>
+        </div>
+
+        <button class="close cursor-pointer"
+                title="<?= $escaper->escapeHtmlAttr(__('Close')) ?>"
+                x-on:click.prevent="resetMessage(message.id)"
+        >
+            <?= /* @noEscape */ $iconsViewModel->xHtml('fill-current', 18, 18) ?>
+        </button>
+    </div>
+</template>
+

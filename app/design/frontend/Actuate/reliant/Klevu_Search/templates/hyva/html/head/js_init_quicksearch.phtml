@@ -1,0 +1,90 @@
+<?php /** @var Klevu\FrontendJs\Block\Template $block */ ?>
+
+klevu.beforeActivation("quick", function (data, scope) {
+    scope.kScope.template.setTemplate(klevuQuickProductBlockCustom, 'klevuQuickProductBlock', true);
+});
+
+var klevuQuickProductBlockCustom = `<%
+    var updatedProductName = dataLocal.name;
+    if(klevu.search.modules.kmcInputs.base.getSkuOnPageEnableValue()) {
+        if(klevu.dom.helpers.cleanUpSku(dataLocal.sku)) {
+            updatedProductName += klevu.dom.helpers.cleanUpSku(dataLocal.sku);
+        }
+    }
+%>
+<li ku-product-block class="klevuProduct" data-id="<%=dataLocal.id%>">
+    <a title="<%= updatedProductName %>" target="_self" href="<%=dataLocal.url%>" data-id="<%=dataLocal.id%>"  class="klevuQuickProductInnerBlock trackProductClick kuTrackRecentView">
+        <div class="klevuProductItemTop">
+            <div class="klevuQuickImgWrap">
+                <div class="klevuQuickDiscountBadge"><strong><%=dataLocal.stickyLabelHead%></strong></div>
+                <img src="<%=dataLocal.image%>" origin="<%=dataLocal.image%>" onerror="klevu.dom.helpers.cleanUpProductImage(this)" alt="<%=updatedProductName%>" />
+            </div>
+        </div>
+        <div class="klevuProductItemBottom">
+            <div class="klevuQuickProductDescBlock">
+                <div title="<%= updatedProductName %>" class="klevuQuickProductName kuClippedOne"> <%= updatedProductName %> </div>
+                <div class="klevu-desc-l2 kuClippedOne"> <%=dataLocal.shortDesc%> </div>
+                <div class="klevuQuickProductDesc kuClippedOne">
+                    <div class="klevuSpectxt"><%=dataLocal.summaryAttribute%><span><%=dataLocal.stickyLabelText%></span></div>
+                </div>
+                <% if(dataLocal.inStock && dataLocal.inStock != "yes") { %>
+                    <%=helper.render('quickProductStock', scope, data, dataLocal) %>
+                <% } else { %>
+                    <% if(klevu.search.modules.kmcInputs.base.getShowPrices()) { %>
+                        <div class="klevuQuickProductPrice kuClippedOne">
+                            <%
+                            var kuTotalVariants = klevu.dom.helpers.cleanUpPriceValue(dataLocal.totalVariants);
+                            var kuStartPrice = klevu.dom.helpers.cleanUpPriceValue(dataLocal.startPrice,dataLocal.currency);
+                            var kuSalePrice = klevu.dom.helpers.cleanUpPriceValue(dataLocal.salePrice,dataLocal.currency);
+                            var kuPrice = klevu.dom.helpers.cleanUpPriceValue(dataLocal.price,dataLocal.currency);
+                            %>
+                            <% if(!Number.isNaN(kuTotalVariants) && !Number.isNaN(kuStartPrice)) { %>
+                                <% if(!Number.isNaN(kuStartPrice) && !Number.isNaN(kuPrice) && (kuPrice > kuStartPrice)) { %>
+                                    <span class="klevuQuickOrigPrice">
+                                        RRP <%= helper.processCurrency(dataLocal.currency,parseFloat(dataLocal.price)).replace(' ', '') %>
+                                    </span>
+                                <% } %>
+                                <span class="klevuQuickSalePrice klevuQuickSpecialPrice"><%=helper.processCurrency(dataLocal.currency,parseFloat(dataLocal.startPrice)).replace(' ', '') %></span>
+                            <% } else if(!Number.isNaN(kuSalePrice) && !Number.isNaN(kuPrice) && (kuPrice > kuSalePrice)){ %>
+                            <span class="klevuQuickOrigPrice">
+                                        RRP <%= helper.processCurrency(dataLocal.currency,parseFloat(dataLocal.price)).replace(' ', '') %>
+                                    </span>
+                            <span class="klevuQuickSalePrice klevuQuickSpecialPrice">
+                                        <%=helper.processCurrency(dataLocal.currency,parseFloat(dataLocal.salePrice)).replace(' ', '') %>
+                                    </span>
+                            <% } else if(!Number.isNaN(kuSalePrice)) { %>
+                            <span class="klevuQuickSalePrice">
+                                        <%= helper.processCurrency(dataLocal.currency,parseFloat(dataLocal.salePrice)).replace(' ', '') %>
+                                    </span>
+                            <% } else if(!Number.isNaN(kuPrice)) { %>
+                            <span class="klevuQuickSalePrice">
+                                        <%= helper.processCurrency(dataLocal.currency,parseFloat(dataLocal.price)).replace(' ', '') %>
+                                    </span>
+                            <% } %>
+                        </div>
+                        <%=helper.render('searchResultProductVATLabelQuick', scope, data, dataLocal) %>
+                    <% } %>
+                <% } %>
+                <%=helper.render('klevuQuickProductRating',scope,data,dataLocal) %>
+            </div>
+        </div>
+        <div class="kuClearLeft"></div>
+    </a>
+    <%=helper.render('quickSearchProductAddToCart',scope,data,dataLocal) %>
+</li>`;
+
+let searchContentElement = document.getElementById("search-content");
+if (searchContentElement) {
+    let klevuSearchResults_wrapper = document.createElement("div");
+    klevuSearchResults_wrapper.id = "klevuSearchResults_wrapper";
+    klevuSearchResults_wrapper.className = "klevuSearchResults_wrapper";
+
+    let klevuSearchResults = document.createElement("div");
+    klevuSearchResults.id = "klevuSearchResults";
+    klevuSearchResults.className = "klevuSearchResults";
+
+    klevuSearchResults_wrapper.appendChild(klevuSearchResults);
+    searchContentElement.appendChild(klevuSearchResults_wrapper);
+
+    options.search.searchBoxTarget = klevuSearchResults;
+}

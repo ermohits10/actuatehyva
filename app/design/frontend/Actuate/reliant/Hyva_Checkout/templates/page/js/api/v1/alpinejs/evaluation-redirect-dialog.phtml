@@ -1,0 +1,71 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+<script>
+    function initEvaluationRedirectDialog() {
+        return Object.assign(
+            {
+                url: null,
+                secure: false,
+                title: null,
+                message: null,
+                actions: {},
+                timeout: null,
+            },
+
+            <?php /* Include Hyvä modal methods. */ ?>
+            hyva.modal(),
+
+            {
+                initialize() {
+                    window.addEventListener('evaluation:redirect:dialog', event => {
+                        const details = event.detail
+
+                        this.url     = details.redirect.url
+                        this.secure  = details.redirect.url_secure || false
+                        this.title   = details.redirect.details.title
+                        this.message = details.redirect.details.message || '<?= $escaper->escapeJs(__('You are being redirected. Please wait...')) ?>'
+                        this.actions = details.redirect.details.actions || {}
+                        this.timeout = details.redirect.timeout
+
+                        this.show()
+                            .then(result => {
+                                this.$dispatch('evaluation:redirect:action', {
+                                    action: result ? 'confirm' : 'decline'
+                                })
+                            })
+                    })
+                },
+                buttonRedirect() {
+                    return {
+                        ['x-on:click']() {
+                            this.ok()
+                        }
+                    }
+                },
+                buttonDecline() {
+                    return {
+                        ['x-on:click']() {
+                            this.cancel()
+                        }
+                    }
+                }
+            }
+        )
+    }
+</script>
+
+<?= $this->getChildHtml('after') ?>

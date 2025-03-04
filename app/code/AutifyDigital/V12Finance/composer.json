@@ -1,0 +1,21 @@
+{
+    "name": "autifydigital/module-v12finance",
+    "description": "V12 Finance Module",
+    "type": "magento2-module",
+    "license": "OSL-3.0",
+    "authors": [
+        {
+            "name": "Autify Digital",
+            "email": "support@autify.co.uk"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "AutifyDigital\\V12Finance\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

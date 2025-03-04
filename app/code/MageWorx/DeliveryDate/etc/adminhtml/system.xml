@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="mageworx" sortOrder="2001">
+            <label>MageWorx</label>
+        </tab>
+        <section id="delivery_date" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Delivery Date</label>
+            <tab>mageworx</tab>
+            <resource>MageWorx_DeliveryDate::system_config</resource>
+            <group id="main" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Delivery Date Configuration</label>
+                <field id="enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Enabled]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <!--<field id="include_delivery_dates_reserved_by_unaccomplished_orders" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">-->
+                    <!--<label><![CDATA[Display Delivery Dates Reserved by Unaccomplished Orders as an Available]]></label>-->
+                    <!--<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>-->
+                <!--</field>-->
+                <field id="quote_limitation_mode" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label><![CDATA[Allow Delivery Queue Overloading]]></label>
+                    <source_model>MageWorx\DeliveryDate\Model\Source\QuoteLimitationMode</source_model>
+                    <comment>This setting allows delivery queue overloading even if the number of orders exceeds the quotes for specific day/time interval.</comment>
+                </field>
+                <field id="general_queue" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label><![CDATA[Delivery Queue]]></label>
+                    <source_model>MageWorx\DeliveryDate\Model\Source\GeneralQueue</source_model>
+                </field>
+                <field id="comment_field_visible" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Display Comment Field on the Checkout]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="comment_field_label" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Comment Field Label]]></label>
+                    <depends>
+                        <field id="comment_field_visible">1</field>
+                    </depends>
+                </field>
+                <field id="defaul_delivery_option_id"></field>
+                <field id="delivery_date_required" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label><![CDATA[Delivery Date Required]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="pre_select_delivery_date" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label><![CDATA[Pre-select Delivery Date]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If enabled, the next available delivery date will be pre-selected during the checkout</comment>
+                </field>
+                <field id="set_default_date_enabled" translate="label comment" type="select" sortOrder="94" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Reserve Delivery Date Automatically]]></label>
+                    <comment>If enabled, the next available delivery date will be pre-selected during the place order process (for orders without manually selected delivery date).</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="change_date_by_customer_enabled" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Allow Customers to change Delivery Date]]></label>
+                    <comment>This setting enabled the possibility for your customers to change the delivery date from their accounts before the shipments.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="display_dates_with_extra_charge" translate="label comment" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Display the dates with extra charge]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>This setting allows you to hide the delivery dates with extra charge if your customers want to change the delivery info after the order is placed.</comment>
+                    <depends>
+                        <field id="change_date_by_customer_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="include_non_working_days_in_processing_order_period" translate="label comment" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Include non-working days in processing period]]></label>
+                    <comment><![CDATA[This setting includes the non-working days to the order processing period. If disabled, the processing period will be calculated by the working days only for the certain delivery configuration ('Working Days' multi-select). If enabled, the days, which are not selected as the working days, will be added to the order processing period calculation. It might be helpful if you can process your orders during the non-working days.]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="reload_shipping_rates_on_price_change" translate="label comment" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Reload shipping rates after extra charge applied]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="visualisation" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Front-end Configuration</label>
+                <field id="date_template" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Date Display Mode]]></label>
+                    <source_model>MageWorx\DeliveryDate\Model\Source\DeliveryDateTemplates</source_model>
+                </field>
+                <field id="replace_date_to_words" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Display today and tomorrow as words]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="date_format" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Date Format]]></label>
+                    <source_model>MageWorx\DeliveryDate\Model\Source\DateFormat</source_model>
+                </field>
+                <field id="date_format_custom" translate="label comment" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Custom Date Format</label>
+                    <depends>
+                        <field id="date_format"><![CDATA[]]></field>
+                    </depends>
+                    <frontend_model>MageWorx\DeliveryDate\Model\Source\FrontendModel\CustomDateFormat</frontend_model>
+                </field>
+                <field id="delivery_date_placeholder" translate="label comment" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Delivery Date Placeholder]]></label>
+                    <comment><![CDATA[This text will be shown as the placeholder for the Delivery Date field on the front-end if the calendar mode is used and the setting "Pre-select Delivery Date" is disabled.]]></comment>
+                </field>
+                <field id="time_template" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Time Intervals Display Mode]]></label>
+                    <source_model>MageWorx\DeliveryDate\Model\Source\DeliveryTimeTemplates</source_model>
+                </field>
+                <field id="time_label_template" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Time Intervals Label Template]]></label>
+                    <comment><![CDATA[You can use any string to represent a delivery time interval. List of available variables are: {{from_time_24}}, {{to_time_24}}, {{from_time_12}}, {{to_time_12}}
+                    where the 12/24 at the ending means a time format. When the 12-hours format is used, a time will be displayed with the AM/PM suffix.]]></comment>
+                </field>
+                <field id="delivery_date_title" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Delivery Date Title]]></label>
+                    <comment><![CDATA[Leave blank to hide the text above the delivery dates on the checkout.]]></comment>
+                </field>
+                <field id="delivery_time_title" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Delivery Time Title]]></label>
+                    <comment><![CDATA[Leave blank to hide the text above the delivery time intervals on the checkout.]]></comment>
+                </field>
+                <field id="use_default_delivery_date_data_in_emails" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Default Delivery Date Output in Emails]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[This setting allows you to disable the default output of the delivery date info in the order emails. It might be helpful if you want to use custom variables to add the delivery date info to the order emails. Available variables: "deliveryDate", "deliveryTime", "deliveryComment".]]></comment>
+                </field>
+                <field id="display_empty_delivery_date_block_in_order_view_page" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label><![CDATA[Display empty delivery date block in order view page]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="product" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Estimated Delivery Date by Products]]></label>
+                <field id="block_if_on_any_disabled" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Enable Delivery Date Restrictions]]></label>
+                    <comment><![CDATA[Hides the delivery date feature on the checkout if at least one product with disabled "Allow Delivery Date" attribute is added to the cart.]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="use_min_time" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Use the 'From' Product Estimated Delivery Period]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[This setting defines whether to use the 'From' or 'To' product estimated delivery period to calculate the available dates in the delivery date functionality on the checkout.]]></comment>
+                </field>
+                <field id="limit_by_edt_to" translate="label comment" type="select" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Use the 'To' Product Estimated Delivery Period as limit for max calculation days]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[When enabled the max calculation days will be taken from the product configuration.]]></comment>
+                </field>
+                <field id="message_format" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Estimated Delivery Text]]></label>
+                    <comment><![CDATA[This setting allows you to specify a estimated delivery message, which appears on the product pages. List of available variables are: {{days_from_number}} , {{days_to_number}} , {{days_from_calendar}} , {{days_to_calendar}} , {{month_from}} , {{month_to}}]]></comment>
+                </field>
+                <field id="same_day_delivery_message_format" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Same Day Delivery Text]]></label>
+                    <comment><![CDATA[This message will be shown on the product page if same-day-delivery is available for the product. Leave blank if you wish to use default text, specified in the "Estimated Delivery Text" setting.]]></comment>
+                </field>
+                <field id="next_day_delivery_message_format" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Next Day Delivery Text]]></label>
+                    <comment><![CDATA[This message will be shown on the product page if next-day-delivery is available for the product. Leave blank if you wish to use default text, specified in the "Estimated Delivery Text" setting.]]></comment>
+                </field>
+                <field id="unavailable_delivery_action" translate="label comment" type="select" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[If Delivery Date is Unavailable]]></label>
+                    <source_model>MageWorx\DeliveryDate\Model\Source\UnavailableDeliveryAction</source_model>
+                    <comment><![CDATA[This setting determines what should be displayed on a configurable product if the delivery date is not available for the selected configuration. The delivery date can be unavailable in 2 cases: 1) if the setting "Allow Delivery Date" is disabled for the selected child product; 2) if the salable quantity of the selected child product equals or less than 0 (if the setting "Use Product Salable Quantity" is enabled).]]></comment>
+                </field>
+                <field id="error_message" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Error Message]]></label>
+                    <comment><![CDATA[This setting allows you to specify what message should be displayed on a configurable product if the delivery is unavailable for the selected configuration.]]></comment>
+                    <depends>
+                        <field id="unavailable_delivery_action">1</field>
+                    </depends>
+                </field>
+                <field id="display_select_options_message" translate="label comment" type="select" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA[Display 'Select Options' Message]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[This setting allows you to display a custom message on a configurable product to notify your customers to select the configuration to see the estimated delivery period if specified.]]></comment>
+                </field>
+                <field id="select_options_message" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label><![CDATA['Select Options' Message]]></label>
+                    <comment><![CDATA[This setting allows you to specify a message that will be displayed on a configurable product before a configuration is chosen.]]></comment>
+                    <depends>
+                        <field id="display_select_options_message">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

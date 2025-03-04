@@ -1,0 +1,46 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+/**
+ * @Internal Prefer utilizing the "after" container for injecting additional code.
+ */
+?>
+<script>
+    'use strict';
+
+    function initMagewireForm(form, wire) {
+        const magewireForm = Object.assign(
+            <?php /* Implement advanced form validation from Hyvä. */ ?>
+            hyva.formValidation(form),
+
+            <?php /* Enhance the default behavior by extending its functionality. */ ?>
+            {
+                initialize() {
+                    hyvaCheckout.navigation.addTask(() => this.validate())
+                }
+            }
+        )
+
+        document.addEventListener('DOMContentLoaded', event => {
+            const wireFormComponent = wire.__instance
+
+            Magewire.hook('message.processed', (message, component) => {
+                <?php /* Ensuring that the core initialize method is re-initialized when a component is updated. */ ?>
+                if (component.id === wireFormComponent.id) {
+                    magewireForm.initialize()
+                }
+            })
+        })
+
+        return magewireForm
+    }
+</script>
+
+<?= $this->getChildHtml('after') ?>

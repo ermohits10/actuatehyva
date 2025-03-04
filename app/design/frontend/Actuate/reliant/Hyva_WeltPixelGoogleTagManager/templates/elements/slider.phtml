@@ -1,0 +1,768 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\GraphqlViewModel\ViewModel\GraphqlViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Cart\Items;
+use Hyva\Theme\ViewModel\Currency;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\ProductCompare;
+use Hyva\Theme\ViewModel\Store;
+use Hyva\Theme\ViewModel\Wishlist;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Store $viewModelStore */
+$viewModelStore = $viewModels->require(Store::class);
+
+/** @var Wishlist $wishlistViewModel */
+$wishlistViewModel = $viewModels->require(Wishlist::class);
+
+/** @var ProductCompare $compareViewModel */
+$compareViewModel = $viewModels->require(ProductCompare::class);
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var GraphqlViewModel $gqlViewModel */
+$gqlViewModel = $viewModels->require(GraphqlViewModel::class);
+
+/** @var Currency $currencyViewModel */
+$currencyViewModel = $viewModels->require(Currency::class);
+$currencySymbol = $currencyViewModel->getCurrentCurrencySymbol();
+
+/** @var ProductPage $productPageViewModel */
+$productPageViewModel = $viewModels->require(ProductPage::class);
+$currentProduct = $productPageViewModel->getProduct();
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+$uniqueId = '_' . uniqid();
+$query = $block->getGraphqlQuery();
+/**
+ * Can be a custom filter, like  "color: { in: [\"yellow\",\"orange\"] },"
+ * @var string $productFilters
+ */
+$productFilters = $block->getProductFilters();
+$categoryIds = $block->getCategoryIds();
+$priceFrom = $block->getPriceFrom();
+$priceTo = $block->getPriceTo();
+$pageSize = $block->getPageSize() ?: '8';
+$sortAttribute = $block->getSortAttribute() ?: 'position';
+$sortDirection = $block->getSortDirection() ?: 'ASC';
+$title = $block->getTitle();
+$type = $block->getType() ?: "";
+
+$linkedProduct = (in_array($type, ['related', 'crosssell', 'upsell']));
+
+if ($linkedProduct) {
+    if ($type === 'crosssell') {
+        /** @var Items $cartItemsViewModel */
+        $cartItemsViewModel = $viewModels->require(Items::class);
+        $productSkus = $cartItemsViewModel->getCartItemsSkus();
+    } elseif ($product = $block->getProduct()) {
+        $productSkus = $block->getProduct()->getSku();
+    } else {
+        $productSkus = '';
+    }
+} else {
+    $productSkus = $block->getProductSkus();
+}
+
+$productSkuFilter = $productSkus ?
+    sprintf("sku: { in: [\"%s\"] },", join("\",\"", explode(',', $productSkus))) :
+    "";
+
+$categoryFilter = $categoryIds ?
+    sprintf("category_id: { in: [\"%s\"] }", join("\",\"", explode(',', $categoryIds))) :
+    "";
+$priceFilter = $priceFrom || $priceTo ? "price: { from: \"$priceFrom\", to: \"$priceTo\" }," : "";
+
+$productAttributes = "
+      sku
+      id
+      name
+      small_image {
+        label
+        url
+      }
+      url_key
+      url_suffix
+      visibility
+      status
+      manufacturer
+      nc1000000352
+      nc1000000466
+      nc1000000470
+      categories {
+        name
+      }
+      price_range {
+        minimum_price {
+          regular_price {
+            value
+            currency
+          }
+          final_price {
+            value
+            currency
+          }
+        }
+      }";
+
+$items = $linkedProduct ?
+    "{$type}_products {
+        $productAttributes
+    }" :
+    $productAttributes;
+
+$graphqlQuery = $gqlViewModel->query("slider_products_query", $query ?: "
+{
+  products(
+    filter: {
+      $productFilters
+      $productSkuFilter
+      $categoryFilter
+      $priceFilter
+      }
+    pageSize: {$pageSize},
+    sort: {{$sortAttribute}: {$sortDirection}}
+    ) {
+    items {
+        $items
+    }
+  }
+}", ['is_linked_product' => $linkedProduct, 'type' => $type]);
+
+$manugraphqlQuery = $gqlViewModel->query("slider_manufacturer_attr_query", $query ?: "
+{
+  customAttributeMetadata(
+    attributes: [
+      {
+        attribute_code: \"manufacturer\"
+        entity_type: \"catalog_product\"
+      }
+    ]
+  ) {
+    items {
+      attribute_code
+      attribute_type
+      entity_type
+      input_type
+      attribute_options {
+       value
+       label
+     }
+    }
+  }
+}");
+
+$promo1Query = $gqlViewModel->query("slider_promo1_attr_query", $query ?: "
+{
+  customAttributeMetadata(
+    attributes: [
+      {
+        attribute_code: \"nc1000000352\"
+        entity_type: \"catalog_product\"
+      }
+    ]
+  ) {
+    items {
+      attribute_code
+      attribute_type
+      entity_type
+      input_type
+      attribute_options {
+       value
+       label
+     }
+    }
+  }
+}");
+
+$promo2Query = $gqlViewModel->query("slider_promo2_attr_query", $query ?: "
+{
+  customAttributeMetadata(
+    attributes: [
+      {
+        attribute_code: \"nc1000000466\"
+        entity_type: \"catalog_product\"
+      }
+    ]
+  ) {
+    items {
+      attribute_code
+      attribute_type
+      entity_type
+      input_type
+      attribute_options {
+       value
+       label
+     }
+    }
+  }
+}");
+
+$promo3Query = $gqlViewModel->query("slider_promo3_attr_query", $query ?: "
+{
+  customAttributeMetadata(
+    attributes: [
+      {
+        attribute_code: \"nc1000000470\"
+        entity_type: \"catalog_product\"
+      }
+    ]
+  ) {
+    items {
+      attribute_code
+      attribute_type
+      entity_type
+      input_type
+      attribute_options {
+       value
+       label
+     }
+    }
+  }
+}");
+
+$promoCmsQuery = $gqlViewModel->query("slider_promo_content_query", $query ?: "
+{
+  cmsBlocks(identifiers: \"CMS_IDENTIFIER\") {
+    items {
+      identifier
+      title
+      content
+    }
+  }
+}");
+?>
+<script>
+    function initSliderComponent<?= /** @noEscape */$uniqueId ?>() {
+        return {
+            active: 0,
+            products: [],
+            manufacturer: [],
+            promo1: [],
+            promo2: [],
+            promo3: [],
+            promoContent: [],
+            currency: [],
+            loading: true,
+            minHeight() {
+                return 'min-height: ' + ((this.loading && '491px') || 0);
+            },
+            query: <?= /** @noEscape */ json_encode($graphqlQuery) ?>,
+            manufaturereQuery: <?= /** @noEscape */ json_encode($manugraphqlQuery) ?>,
+            promo1Query: <?= /** @noEscape */ json_encode($promo1Query) ?>,
+            promo2Query: <?= /** @noEscape */ json_encode($promo2Query) ?>,
+            promo3Query: <?= /** @noEscape */ json_encode($promo3Query) ?>,
+            promoCmsQuery: <?= /** @noEscape */ json_encode($promoCmsQuery) ?>,
+            getProducts($nextTick) {
+                fetch('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>graphql?query=' + encodeURIComponent(
+                    this.query
+                ), {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Store': '<?= /* @noEscape */ $viewModelStore->getStoreCode() ?>'
+                    },
+                })
+                    .then((response) =>  response.json())
+                    .then((data) => {
+                            this.currency = (data &&
+                                data.data &&
+                                data.data.currency);
+                            <?php if ($linkedProduct): ?>
+                            return this.products = (
+                                data &&
+                                data.data &&
+                                data.data.products &&
+                                data.data.products.items &&
+                                data.data.products.items[0] &&
+                                data.data.products.items[0]['<?= $escaper->escapeHtml($type) ?>_products'] &&
+                                // only use products with visibility set to `Catalog` or `Catalog, Search` (2 or 4)
+                                // with status set to '1' (enabled)
+                                data.data.products.items[0]['<?= $escaper->escapeHtml($type) ?>_products']
+                                    .filter(product => {
+                                        return (
+                                            [2,4].includes(product.visibility) &&
+                                            product.status.toString() === '1'
+                                        )
+                                    })
+                            ) || [];
+                            <?php else: ?>
+                            return this.products = (
+                                data &&
+                                data.data &&
+                                data.data.products &&
+                                data.data.products.items
+                            ) || [];
+                            <?php endif; ?>
+                        }
+                    ).finally(() => {
+                    this.loading = false
+                    $nextTick(() => this.calcPageSize());
+                });
+            },
+            getManufacturer() {
+                if (this.manufacturer.length === 0) {
+                    fetch('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>graphql?query=' + encodeURIComponent(
+                        this.manufaturereQuery
+                    ), {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Store': '<?= /* @noEscape */ $viewModelStore->getStoreCode() ?>'
+                        },
+                    })
+                        .then((response) =>  response.json())
+                        .then((data) => {
+                            if (data.data.customAttributeMetadata
+                                && data.data.customAttributeMetadata.items
+                                && data.data.customAttributeMetadata.items[0]
+                                && data.data.customAttributeMetadata.items[0].attribute_options
+                            ) {
+                                this.manufacturer = data.data.customAttributeMetadata.items[0].attribute_options;
+                            }
+                        });
+                }
+            },
+            getPromo1() {
+                if (this.promo1.length === 0) {
+                    fetch('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>graphql?query=' + encodeURIComponent(
+                        this.promo1Query
+                    ), {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Store': '<?= /* @noEscape */ $viewModelStore->getStoreCode() ?>'
+                        },
+                    })
+                        .then((response) =>  response.json())
+                        .then((data) => {
+                            if (data.data.customAttributeMetadata
+                                && data.data.customAttributeMetadata.items
+                                && data.data.customAttributeMetadata.items[0]
+                                && data.data.customAttributeMetadata.items[0].attribute_options
+                            ) {
+                                this.promo1 = data.data.customAttributeMetadata.items[0].attribute_options;
+                            }
+                        });
+                }
+            },
+            getPromo2() {
+                if (this.promo2.length === 0) {
+                    fetch('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>graphql?query=' + encodeURIComponent(
+                        this.promo2Query
+                    ), {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Store': '<?= /* @noEscape */ $viewModelStore->getStoreCode() ?>'
+                        },
+                    })
+                        .then((response) =>  response.json())
+                        .then((data) => {
+                            if (data.data.customAttributeMetadata
+                                && data.data.customAttributeMetadata.items
+                                && data.data.customAttributeMetadata.items[0]
+                                && data.data.customAttributeMetadata.items[0].attribute_options
+                            ) {
+                                this.promo2 = data.data.customAttributeMetadata.items[0].attribute_options;
+                            }
+                        });
+                }
+            },
+            getPromo3() {
+                if (this.promo3.length === 0) {
+                    fetch('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>graphql?query=' + encodeURIComponent(
+                        this.promo3Query
+                    ), {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Store': '<?= /* @noEscape */ $viewModelStore->getStoreCode() ?>'
+                        },
+                    })
+                        .then((response) =>  response.json())
+                        .then((data) => {
+                            if (data.data.customAttributeMetadata
+                                && data.data.customAttributeMetadata.items
+                                && data.data.customAttributeMetadata.items[0]
+                                && data.data.customAttributeMetadata.items[0].attribute_options
+                            ) {
+                                this.promo3 = data.data.customAttributeMetadata.items[0].attribute_options;
+                            }
+                        });
+                }
+            },
+            fetchPromo(promo1, promo2, promo3) {
+                let promo1Label = this.promo1.find(_ => parseInt(_.value) === parseInt(promo1))?.label || '';
+                let promo2Label = this.promo2.find(_ => parseInt(_.value) === parseInt(promo2))?.label || '';
+                let promo3Label = this.promo3.find(_ => parseInt(_.value) === parseInt(promo3))?.label || '';
+
+                fetch('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>graphql?query=' + encodeURIComponent(
+                    this.promoCmsQuery.replace('CMS_IDENTIFIER', 'deal-' + promo1Label)
+                ), {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Store': '<?= /* @noEscape */ $viewModelStore->getStoreCode() ?>'
+                    },
+                })
+                    .then((response) =>  response.json())
+                    .then((data) => {
+                        if (this.promoContent.find(_ => parseInt(_.promo) === parseInt(promo1)) === undefined
+                            && data.data.cmsBlocks.items
+                            && data.data.cmsBlocks.items[0]
+                            && data.data.cmsBlocks.items[0].content) {
+                            this.promoContent.push({
+                                'promo': promo1,
+                                'content': data.data.cmsBlocks.items[0].content
+                            });
+                        }
+                    });
+
+                    fetch('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>graphql?query=' + encodeURIComponent(
+                        this.promoCmsQuery.replace('CMS_IDENTIFIER', 'deal-' + promo2Label)
+                    ), {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Store': '<?= /* @noEscape */ $viewModelStore->getStoreCode() ?>'
+                        },
+                    })
+                        .then((response) =>  response.json())
+                        .then((data) => {
+                            if (this.promoContent.find(_ => parseInt(_.promo) === parseInt(promo2)) === undefined
+                                && data.data.cmsBlocks.items
+                                && data.data.cmsBlocks.items[0]
+                                && data.data.cmsBlocks.items[0].content) {
+                                this.promoContent.push({
+                                    'promo': promo2,
+                                    'content': data.data.cmsBlocks.items[0].content
+                                })
+                            }
+                        });
+
+
+
+                    fetch('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>graphql?query=' + encodeURIComponent(
+                        this.promoCmsQuery.replace('CMS_IDENTIFIER', 'deal-' + promo3Label)
+                    ), {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Store': '<?= /* @noEscape */ $viewModelStore->getStoreCode() ?>'
+                        },
+                    })
+                        .then((response) =>  response.json())
+                        .then((data) => {
+                            if (this.promoContent.find(_ => parseInt(_.promo) === parseInt(promo3)) === undefined
+                                && data.data.cmsBlocks.items
+                                && data.data.cmsBlocks.items[0]
+                                && data.data.cmsBlocks.items[0].content) {
+                                this.promoContent.push({
+                                    'promo': promo3,
+                                    'content': data.data.cmsBlocks.items[0].content
+                                })
+                            }
+                        });
+
+
+                return this.promoContent.find(_ => parseInt(_.promo) === parseInt(promo1))?.content
+                    || this.promoContent.find(_ => parseInt(_.promo) === parseInt(promo2))?.content
+                    || this.promoContent.find(_ => parseInt(_.promo) === parseInt(promo3))?.content
+                    || '';
+            },
+            fetchManufacturerFromList(manufacturerId) {
+                return this.manufacturer.find(_ => parseInt(_.value) === parseInt(manufacturerId))?.label || ''
+            },
+            fetchSavedAmount(regularPrice, finalPrice) {
+                if (regularPrice !== finalPrice) {
+                    return regularPrice - finalPrice;
+                }
+                return '';
+            },
+            addToWishlist(productId) {
+                var formKey = document.querySelector('input[name=form_key]').value;
+                var postUrl = BASE_URL+"wishlist/index/add/";
+                fetch(postUrl, {
+                    "headers": {
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    "body": "form_key="+ formKey + "&product="+productId+"&uenc="+btoa(window.location.href),
+                    "method": "POST",
+                    "mode": "cors",
+                    "credentials": "include"
+                }).then(function (response) {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else if (response.ok) {
+                        return response.json();
+                    } else {
+                        typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                            [{
+                                type: "warning",
+                                text: "<?= $escaper->escapeHtml(__('Could not add item to wishlist.')) ?>"
+                            }], 5000
+                        );
+                    }
+                }).then(function (response) {
+                    if(!response) { return }
+                    typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                        [{
+                            type: (response.success) ? "success" : "error",
+                            text: (response.success)
+                                ? "<?= $escaper->escapeHtml(
+                                    __("%1 has been added to your Wish List.", __("Product"))
+                                ) ?>" : response.error_message
+                        }], 5000
+                    );
+                    var reloadCustomerDataEvent = new CustomEvent("reload-customer-section-data");
+                    window.dispatchEvent(reloadCustomerDataEvent);
+                }).catch(function (error) {
+                    typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                        [{
+                            type: "error",
+                            text: error
+                        }], 5000
+                    );
+                });
+            },
+            addToCompare(productId) {
+                const formKey = document.querySelector('input[name=form_key]').value;
+                const postUrl = BASE_URL + 'catalog/product_compare/add/';
+
+                fetch(postUrl, {
+                    "headers": {
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    "body": "form_key="+ formKey + "&product="+productId+"&uenc="+btoa(window.location.href),
+                    "method": "POST",
+                    "mode": "cors",
+                    "credentials": "include"
+                }).then(function (response) {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    }
+                }).catch(function (error) {
+                    typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                        [{
+                            type: "error",
+                            text: error
+                        }], 5000
+                    );
+                });
+            },
+            getSlider() {
+                return this.$el.querySelector('.js_slides');
+            },
+            pageSize: 1,
+            pageFillers: 0,
+            calcPageSize() {
+                var slider = this.getSlider();
+                if (slider) {
+                    this.pageSize = Math.round(slider.clientWidth / slider.querySelector('.js_slide').clientWidth);
+                    this.pageFillers = (
+                        this.pageSize * Math.ceil(this.products.length / this.pageSize)
+                    ) - this.products.length;
+                }
+            },
+            calcActive(event) {
+                var slider = this.getSlider();
+                if (slider) {
+                    this.active = Math.ceil(
+                        Math.round(
+                            slider.scrollLeft / (slider.scrollWidth / this.products.length)
+                        ) / this.pageSize
+                    ) * this.pageSize;
+                }
+            },
+            /**
+             * Weltpixle GTM  product image click handler
+             */
+            weltpixelGtmAppendProductClickEvent(productObj, index) {
+                const pdpProductName = '<?= $currentProduct ? $currentProduct->getName(): "" ?>';
+                const pdpProductListPart = pdpProductName ? pdpProductName + ' ' : '';
+                const list = pdpProductListPart + '<?= ucfirst($type) ?> Products';
+                window.dataLayer.push({
+                    'event': 'productClick',
+                    'eventLabel': productObj.name,
+                    'ecommerce': {
+                        'click': {
+                            'actionField': {'list': list},
+                            'products': [{
+                                'name': productObj.name,
+                                'id': productObj.id,
+                                'price': this._get(productObj, 'price_range.minimum_price.final_price.value'),
+                                'position': index + 1
+                            }]
+                        }
+                    },
+                });
+            },
+            /**
+             * This is lodash.get method. A helper function to retrieve deep path values from an object
+             */
+            _get(object, path, value) {
+                const pathArray = Array.isArray(path) ? path : path.split('.').filter(key => key)
+                const pathArrayFlat = pathArray.flatMap(part => typeof part === 'string' ? part.split('.') : part)
+
+                return pathArrayFlat.reduce((obj, key) => obj && obj[key], object) || value
+            },
+        }
+    }
+
+</script>
+<section class="my-4 text-gray-700 body-font"
+         x-data="initSliderComponent<?= /** @noEscape */ $uniqueId?>()"
+         x-init="getManufacturer();getPromo1();getPromo2();getPromo3();getProducts($nextTick);"
+         :style="minHeight()"
+         @resize.window.debounce="calcPageSize(); $nextTick( function() { calcActive() })"
+>
+    <template x-if="products && products.length">
+        <div class="relative">
+            <?php if ($title): ?>
+                 <div class="flex flex-col items-center w-full pt-6 pb-3 mx-auto mb-6 md:flex-row">
+                    <h3 class="font-sans text-base leading-6 font-bold md:font-serif md:text-2xl md:leading-8 md:font-semibold text-[#1D3654] w-full mb-2">
+                        <?= $escaper->escapeHtml($title); ?>
+                    </h3>
+                </div>
+            <?php endif; ?>
+            <div class="relative w-full overflow-x-hidden">
+                <div class="relative flex flex-nowrap w-full overflow-auto transition-all js_slides snap"
+                     @scroll.debounce="calcActive"
+                >
+                    <template x-for="(product, productIndex) in products">
+                        <div class="product-item flex-none card w-full py-1 js_slide md:w-1/2 lg:w-1/3 xl:w-1/4 p-3">
+                            <a :href="'<?= $escaper->escapeUrl($block->getBaseUrl()) ?>' +
+                                product.url_key + (product.url_suffix || '')"
+                               class="relative flex items-center bg-white product photo product-item-photo"
+                               style="padding-top:100%"
+                               @click="weltpixelGtmAppendProductClickEvent(product, productIndex)"
+                               tabindex="-1">
+                                <span class="absolute top-0 left-0 flex flex-wrap content-center w-full h-full p-2
+                                    overflow-hidden align-center hover:shadow-sm">
+                                    <img class="self-center w-full h-auto"
+                                         :src="product.small_image.url"
+                                         :alt="product.small_image.label"
+                                         loading="lazy"
+                                         width="500"
+                                         height="500"
+                                    />
+                                </span>
+                            </a>
+                            <span class="font-sans text-base leading-6 font-medium text-gray-900" x-text="fetchManufacturerFromList(product.manufacturer)"></span>
+                            <p class="mb-1 items-center justify-center text-sans-serif text-lg leading-7 font-bold text-gray-900">
+                                <a class="product-item-link"
+                                   :href="'<?= $escaper->escapeUrl($block->getBaseUrl()) ?>' +
+                                        product.url_key + (product.url_suffix || '')"
+                                >
+                                    <span x-html="product.name"></span>
+                                </a>
+                            </p>
+                            <template x-if="fetchSavedAmount(product.price_range.minimum_price.regular_price.value, product.price_range.minimum_price.final_price.value) !== ''">
+                                <span class="inline-flex flex-wrap old-price mt-3 bg-[#D30202] py-0.5 px-2 text-white font-sans leading-6 rounded-md">
+                                    <div class="price-container">
+                                        <span class="save-upto text-white text-sm leading-6">
+                                            <strong>Save <span class="price" x-html="hyva.formatPrice(fetchSavedAmount(product.price_range.minimum_price.regular_price.value, product.price_range.minimum_price.final_price.value))"></span></strong>
+                                        </span>
+                                    </div>
+                                    <span class="price-container price-final_price tax weee">
+                                        <span class="price-label"></span>
+                                        <span id="old-price-437" data-price-type="oldPrice" class="price-wrapper ">
+                                            <span class="price" x-html="hyva.formatPrice(product.price_range.minimum_price.regular_price.value)"></span>
+                                        </span>
+                                    </span>
+                                </span>
+                            </template>
+                            <span class="price-container price-final_price tax weee">
+                                <span class="pt-1 text-lg text-gray-900 price"
+                                   x-text="hyva.formatPrice(product.price_range.minimum_price.final_price.value)"></span>
+                            </span>
+                            <template x-if="fetchPromo(product.nc1000000352, product.nc1000000466, product.nc1000000470) !== ''">
+                                <div class="deal-1 mt-4 flex inline-block text-xs bg-deal-rgba px-2.5 py-1.5 rounded-md text-gray-900 font-serif">
+                                    <strong class="uppercase mr-2">Deal</strong>
+                                    <div x-html="fetchPromo(product.nc1000000352, product.nc1000000466, product.nc1000000470)"></div>
+                                </div>
+                            </template>
+                            <p class="flex flex-wrap flex-col text-center gap-2 inline mt-3">
+                                <a class="justify-center w-full btn btn-primary"
+                                   :href="'<?= $escaper->escapeUrl($block->getBaseUrl()) ?>' +
+                                        product.url_key + (product.url_suffix || '')">
+                                    <span class="inline"><?= $escaper->escapeHtml(__('View Product')) ?></span>
+                                </a>
+                                <span class="inline-flex justify-center gap-2">
+                                    <?php if ($compareViewModel->showInProductList()): ?>
+                                        <button @click.prevent="addToCompare(product.id)"
+                                                aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>"
+                                                class="h-9 p-0 border-0 inline-flex flex-shrink-0 items-center justify-center text-gray-500 hover:text-yellow-500"
+                                        >
+                                        <svg width="19" height="18" viewBox="0 0 19 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                            <path d="M5.5 13H3.5C2.39543 13 1.5 12.1046 1.5 11V3C1.5 1.89543 2.39543 1 3.5 1H11.5C12.6046 1 13.5 1.89543 13.5 3V5M7.5 17H15.5C16.6046 17 17.5 16.1046 17.5 15V7C17.5 5.89543 16.6046 5 15.5 5H7.5C6.39543 5 5.5 5.89543 5.5 7V15C5.5 16.1046 6.39543 17 7.5 17Z" stroke="#5D6070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <?= $escaper->escapeHtmlAttr(__('Compare')) ?>
+                                    </button>
+                                    <?php endif; ?>
+                                </span>
+                            </p>
+                        </div>
+                    </template>
+                    <div :class="{
+                        'js_dummy_slide w-full md:w-1/2 lg:w-1/3 xl:w-1/4 flex-none py-1' : pageFillers > 0
+                        }"></div>
+                    <div :class="{
+                        'js_dummy_slide w-full md:w-1/2 lg:w-1/3 xl:w-1/4 flex-none py-1' : pageFillers > 1
+                        }"></div>
+                    <div :class="{
+                        'js_dummy_slide w-full md:w-1/2 lg:w-1/3 xl:w-1/4 flex-none py-1' : pageFillers > 2
+                        }"></div>
+                </div>
+            </div>
+            <template x-if="products.length && products.length > pageSize">
+                <div class="flex items-center justify-center flex-1 p-4" x-cloak>
+                    <button
+                        aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>"
+                        class="w-8 h-8 mx-4 text-black rounded-full outline-none focus:outline-none"
+                        :class="{ 'invisible' : active === 0 }"
+                        @click="getSlider().scrollLeft =
+                            (getSlider().scrollWidth / products.length) * (active-pageSize); active=active-pageSize;">
+                        <?= $heroicons->chevronLeftHtml("w-5 h-5", 25, 25) ?>
+                    </button>
+                    <template x-for="(product, index) in products" :key="index">
+                        <span class="flex-shrink-0 block w-3 h-3 mx-1 bg-black bg-opacity-25 rounded-full shadow cursor-pointer"
+                              :class="{
+                                    'bg-opacity-100': active === index,
+                                    'hidden': (pageSize !== 1 && !!(index % pageSize))
+                                    }"
+                              @click="getSlider().scrollLeft =
+                                    (getSlider().scrollWidth / products.length) * index; active=index;">
+                        </span>
+                    </template>
+                    <button
+                        aria-label="<?= $escaper->escapeHtml(__('Next')) ?>"
+                        class="w-8 h-8 mx-4 text-black rounded-full outline-none focus:outline-none"
+                        :class="{ 'invisible' : active >= products.length-pageSize }"
+                        @click="getSlider().scrollLeft =
+                            (getSlider().scrollWidth / products.length) * (active+pageSize); active=active+pageSize">
+                        <?= $heroicons->chevronRightHtml("w-5 h-5", 25, 25) ?>
+                    </button>
+                </div>
+            </template>
+        </div>
+    </template>
+</section>

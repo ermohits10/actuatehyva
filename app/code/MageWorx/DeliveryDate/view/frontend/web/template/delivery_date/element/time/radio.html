@@ -1,0 +1,24 @@
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div data-bind="if: options">
+    <div class="data-row" outereach="options">
+        <div class="delivery-date-cell">
+            <input
+                ko-name="$parent.inputName"
+                ko-checked="$parent.value"
+                ko-disabled="$parent.disabled"
+                attr="
+                        id: ++ko.uid,
+                        value: $data.value,
+                        type: 'radio'
+            ">
+            <label html="$data.label" attr="for: ko.uid"></label>
+            </input>
+        </div>
+    </div>
+
+</div>

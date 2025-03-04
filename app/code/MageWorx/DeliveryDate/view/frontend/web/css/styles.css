@@ -1,0 +1,160 @@
+#delivery-date-container {
+    padding-bottom: 20px;
+}
+
+#delivery-date-container .data-row {
+    font-size: 0;
+}
+
+#delivery-date-container .data-row label {
+    font-size: 12px;
+}
+
+#delivery-date-container .delivery-date-cell input {
+    vertical-align: middle;
+}
+
+#delivery-date-container .delivery-date-submit-button-wrapper {
+    flex: 1 0 100%;
+}
+
+/** Buttons style */
+#delivery-date-container .data-item {
+    background: none;
+    width: 120px;
+    padding: 13px;
+    display: inline-block;
+    color: #000;
+    text-decoration: none;
+    text-align: center;
+    border: 1px solid #cccccc;
+    font-size: 12px;
+    margin: -1px 0 0 -1px;
+}
+
+#delivery-date-container .data-item .data-item__price, #delivery-date-container .delivery-date-cell .data-item__price {
+    color: #ff5501;
+    font-weight: 600;
+}
+
+#delivery-date-container .data-item:hover {
+    text-decoration: none;
+    background: #efefef;
+    cursor: pointer;
+}
+
+#delivery-date-container .data-item:active {
+    cursor: pointer;
+    background: #efefef;
+    box-shadow: inset 0 0 4px 0 rgba(0,0,0,.2);
+}
+
+#delivery-date-container .data-item-selected,
+#delivery-date-container .data-item-selected:hover {
+    box-shadow: inset 0 0 0 2px #ff5501;
+    background: #fff;
+    color: #ff5501;
+    font-weight: 600;
+}
+
+/** Errors */
+#delivery-date-container .admin__field-error {
+    background: #fffbbb;
+    border: 1px solid #ee7d7d;
+    box-sizing: border-box;
+    color: #555;
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: .2rem 0 0;
+    padding: .8rem 1rem .9rem
+}
+
+#delivery-date-container .admin__field, #delivery-date-container .field {
+    padding: 10px;
+}
+
+#delivery-date-container .admin__field {
+    margin-bottom: 20px;
+}
+
+#delivery-date-container .delivery-date-cell {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#delivery-date-container .delivery-date-cell label {
+    vertical-align: middle;
+}
+
+#delivery-date-container .admin__control-select,
+#delivery-date-container .admin__control-text,
+#delivery-date-container .admin__control-textarea {
+    width: 100%;
+    max-width: 300px;
+    height: 46px;
+    overflow-x: hidden;
+    color: #fff;
+    border-color: #ff5501;
+    color:#000;
+    background-image: url(select-bg.svg);
+    background-position: right 15px center;
+    background-repeat: no-repeat;
+    background-size: 14px 9px;
+    padding: 0 40px 0 20px;
+}
+
+#delivery-date-container .admin__control-text:not(._has-datepicker),
+#delivery-date-container .admin__control-textarea {
+    background-image: none;
+}
+
+#delivery-date-container .admin__control-textarea {
+    max-width: none;
+    min-height: 100px;
+}
+
+#delivery-date-container .admin__field.mw-dd__date .admin__field-label::before,
+#delivery-date-container .admin__field.mw-dd__time .admin__field-label::before,
+#delivery-date-container .admin__field.mw-dd__comments .admin__field-label::before {
+    content: "";
+    display: inline-block;
+    width: 26px;
+    height: 26px;
+    background-position: center;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+#delivery-date-container .admin__field.mw-dd__date .admin__field-label::before {
+    background-image: url(calendar.svg);
+}
+
+#delivery-date-container .admin__field.mw-dd__time .admin__field-label::before {
+    background-image: url(clock.svg);
+}
+
+#delivery-date-container .admin__field.mw-dd__comments .admin__field-label::before {
+    background-image: url(comment.svg);
+}
+
+#delivery-date-container .admin__field-label {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 17px;
+}
+
+#delivery-datetime-container:not(.mw-dd—has-buttons) {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+    #delivery-datetime-container:not(.mw-dd—has-buttons) {
+        display: block;
+    }
+}

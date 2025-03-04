@@ -1,0 +1,38 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\CheckoutPayPal\Magewire\Payment\Method\PaypalExpress;
+use ReliantDirect\Checkout\Block\TermAndCondition;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var PaypalExpress $magewire */
+
+$magewire = $block->getData('magewire');
+$methodCode = $magewire->getMethodCode();
+$termAndCondition = $block->getLayout()->createBlock(TermAndCondition::class);
+?>
+
+<div id="paypal-button-<?= $escaper->escapeHtmlAttr($methodCode) ?>" class="relative z-10">
+    <?php if ($magewire->isAuthorized): ?>
+        <?= /** noEscape */ $block->getChildHtml('paypal_express_review') ?>
+    <?php elseif ($magewire->isInContext()): ?>
+        <?= /** noEscape */ $block->getChildHtml('paypal_express_in_context') ?>
+    <?php else: ?>
+        <?= /** noEscape */ $block->getChildHtml('paypal_express_redirect') ?>
+        <?= /** noEscape */ $block->getChildHtml('paypal_billing_agreement') ?>
+        <?= /** noEscape */ $block->getChildHtml('pay_later') ?>
+    <?php endif; ?>
+
+    <?= $termAndCondition->toHtml() ?>
+    <?= $block->getChildHtml('hyva.checkout.navigation.placeorder.button.paypal_express') ?>
+</div>

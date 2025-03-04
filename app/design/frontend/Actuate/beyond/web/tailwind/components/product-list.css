@@ -1,0 +1,33 @@
+
+.product-item {
+    .price-container {
+        @apply block;
+        .price {
+            @apply font-sans font-semibold text-2xl;
+        }
+
+        .price-label {
+            @apply text-sm;
+        }
+    }
+
+    .normal-incl-vat {
+        @apply font-serif font-semibold text-[#135E64];
+        .price-container {
+            .price {
+                @apply font-serif text-base font-semibold;
+            }
+        }
+    }
+
+    .special-price .price-container .price-label {
+        @apply sr-only;
+    }
+
+    .old-price .price-container {
+        @apply text-gray-500;
+        .price {
+            @apply font-normal text-base;
+        }
+    }
+}

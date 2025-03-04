@@ -1,0 +1,90 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/**
+ * @deprecated has been replaced by Hyva_Checkout::page/js/api/v1/alpinejs/magewire-form-component.phtml
+ */
+?>
+<script>
+    function initAddressForm(form, wire) {
+        let timeout = null;
+        let dirty = false;
+
+        return Object.assign(
+            {},
+            hyva.formValidation(form),
+            {
+                init() {
+                    const doSave = async (isWithValidation = true) => {
+                        clearTimeout(timeout);
+
+                        if (isWithValidation) {
+                            await this.validate();
+                        }
+
+                        try {
+                            if (! dirty) {
+                                return;
+                            }
+
+                            dirty = false;
+                            await wire.store();
+                        } catch (exception) {
+                            // ignore
+                        }
+                    }
+
+                    const interactionCallback = () => {
+                        dirty = true;
+
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => doSave(false), wire.autoSaveTimeout);
+                    }
+
+                    hyvaCheckout.navigation.addTask(doSave)
+
+                    const addEventListeners = (el) => {
+                        if (el !== form) return;
+
+                        this.$nextTick(() => {
+                            Array.from(form.querySelectorAll('[data-autosave]')).forEach(field => {
+                                ['input', 'change'].map(eventName => {
+                                    field.removeEventListener(eventName, interactionCallback);
+                                    field.addEventListener(eventName, interactionCallback);
+                                })
+                            })
+                        })
+                    }
+
+                    addEventListeners(form);
+                    Magewire.hook('element.updated', addEventListeners);
+                },
+
+                validateAddressForm(event) {
+                    if (event.detail && event.detail.form && event.detail.form === form) {
+                        return this.validate().catch(() => {});
+                    }
+
+                    if (event.detail && event.detail.event) {
+                        window.dispatchEvent(new CustomEvent(event.detail.event, { detail: event.detail }));
+                    }
+                }
+            }
+        )
+    }
+</script>

@@ -1,0 +1,29 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\Form\EntityFormElementInterface;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var EntityFormElementInterface $element */
+/** @var Escaper $escaper */
+
+$element = $block->getData('element');
+?>
+<div class="flex flex-row items-center gap-x-4">
+    <?= /* @noEscape */ $element->getRenderer()->renderWithTemplate('Hyva_Checkout::form/element/button.phtml', $element) ?>
+
+    <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/forgotpassword')) ?>"
+       class="font-medium text-gray-700"
+    >
+        <?= $escaper->escapeHtml(__('Forgot Your Password?')) ?>
+    </a>
+</div>

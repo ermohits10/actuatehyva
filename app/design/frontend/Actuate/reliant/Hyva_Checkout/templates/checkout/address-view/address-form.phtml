@@ -1,0 +1,75 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\Form\EntityFormInterface;
+use Hyva\Checkout\Magewire\Checkout\AddressView\MagewireAddressFormInterface;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use ReliantDirect\Checkout\ViewModel\Checkout;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var MagewireAddressFormInterface $magewire */
+/** @var Escaper $escaper */
+/** @var EntityFormInterface $form */
+
+$iconsViewModel = $viewModels->require(HeroiconsOutline::class);
+$form = $magewire->getPublicForm();
+$namespace = $form->getNamespace();
+
+/** @var Checkout $actuateCheckoutViewModel */
+$actuateCheckoutViewModel = $viewModels->require(Checkout::class);
+$formAttribute = $form->getAttributes() ?? [];
+$id = $formAttribute['id'] ?? uniqid();
+?>
+<form <?= /* @noEscape */ $form->renderAttributes($escaper) ?>
+      class="space-y-2 address-form"
+      x-data="initAddressForm($el, $wire)"
+      novalidate
+      <?php if ($magewire->canAutoSave()): ?>
+          x-init="init()"
+          x-on:validate-address-form.window="() => validateAddressForm($event)"
+          wire:loading.class="loading"
+          wire:target="save"
+      <?php endif ?>
+>
+    <div class="grid grid-cols-12 gap-x-4">
+        <?= /** @noEscape */ $block->getChildHtml('address-form.before') ?>
+
+        <?php if ($form->hasFields()): ?>
+            <?php foreach ($form->getFields() as $field): ?>
+                <?php if ($field->canRender()): ?>
+                    <?php /** @purge: md:col-span-3 md:col-span-6 md:col-span-9 md:col-span-12 */ ?>
+                    <div class="flex flex-wrap <?= $escaper->escapeHtmlAttr($field->renderWrapperClass(['col-span-12'])) ?><?= $field->getName() === 'country_id' ? ' hidden': ''; ?>"
+                         <?= /* @noEscape */ $field->renderAttributes($escaper, 'wrapper') ?>
+                    >
+                        <?= /* @noEscape */ $field->render() ?>
+
+                        <?php if ($actuateCheckoutViewModel->isUkPostCodeLookUpEnabled()): ?>
+                            <?php if ($field->getName() == 'postcode'): ?>
+                                <div id="crafty_postcode_result_<?= $id;?>" class="lookup-result"></div>
+                                <button type="button" id="lookup-address-<?= $id;?>" class="lookup-btn btn btn-primary mt-[30px] px-4 py-0 !w-[35%] md:!w-[24.3%] h-[48px] text-sm font-semibold justify-center rounded-[3px]">
+                                    <?= __('Find Address');?>
+                                </button>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        <?php if ($magewire->hasError($field->getId())): ?>
+                            <?= /** @noEscape */ $magewire->getError($field->getId()) ?>
+                        <?php endif ?>
+                    </div>
+                <?php endif ?>
+            <?php endforeach ?>
+        <?php endif ?>
+
+        <?= /** @noEscape */ $block->getChildHtml('address-form.after') ?>
+    </div>
+</form>

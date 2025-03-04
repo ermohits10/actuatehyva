@@ -1,0 +1,33 @@
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div data-bind="if: options">
+    <input class="admin__control-text" type="text" hidden="hidden" data-bind="
+    valueUpdate: valueUpdate,
+    attr: {
+        id: uid,
+        value: value,
+        name: inputName,
+        'aria-describedby': noticeId,
+        disabled: disabled
+    }"/>
+    <div data-bind="if: disabled()">
+        <div class="data-row" data-bind="foreach: {data: options">
+            <!-- ko if: $parent.value() && $parent.value() == $data.value -->
+            <div class="data-item" data-bind="click: $parent.value.bind($parent, $data.value), css: { 'data-item-selected': $parent.value() && $parent.value() == $data.value }">
+                <span data-bind="html: $data.label"></span>
+            </div>
+            <!-- /ko -->
+        </div>
+    </div>
+    <div data-bind="ifnot: disabled()">
+        <div class="data-row" data-bind="foreach: {data: options}">
+            <div class="data-item" data-bind="click: $parent.value.bind($parent, $data.value), css: { 'data-item-selected': $parent.value() && $parent.value() == $data.value }">
+                <span data-bind="html: $data.label"></span>
+            </div>
+        </div>
+    </div>
+</div>

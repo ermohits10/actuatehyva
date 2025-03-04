@@ -1,0 +1,23 @@
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<div data-bind="if: dates">
+    <div class="admin__field-control" outereach="dates">
+        <div class="delivery-date-cell">
+            <input
+                name="delivery_day_selector"
+                ko-checked="$parent.value"
+                ko-disabled="$parent.disabled"
+                attr="
+                        id: ++ko.uid,
+                        value: date,
+                        type: 'radio'
+            ">
+                <label text="date_formatted" attr="for: ko.uid"></label>
+            </input>
+        </div>
+    </div>
+</div>

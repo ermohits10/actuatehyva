@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+Copyright MageWorx. All rights reserved.
+See LICENSE.txt for license details.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="mageworx_deliverydate_tui_calendar" />
+    <update handle="styles"/>
+    <head>
+        <title>
+            Delivery Date
+        </title>
+    </head>
+    <body>
+        <referenceContainer name="page.main.actions">
+            <block class="Magento\Backend\Block\Store\Switcher" name="store_switcher">
+                <action method="setUseConfirm">
+                    <argument name="params" xsi:type="string">1</argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block name="queue_content" class="MageWorx\DeliveryDate\Block\Adminhtml\Queue" template="MageWorx_DeliveryDate::queue/content.phtml">
+                <block name="queue_calendar_config" class="MageWorx\DeliveryDate\Block\Adminhtml\Queue\Calendar\Config" template="MageWorx_DeliveryDate::queue/content/calendar/config.phtml" />
+                <block name="queue_calendar" class="MageWorx\DeliveryDate\Block\Adminhtml\Queue\Calendar" template="MageWorx_DeliveryDate::queue/content/calendar.phtml" />
+            </block>
+        </referenceContainer>
+    </body>
+</page>

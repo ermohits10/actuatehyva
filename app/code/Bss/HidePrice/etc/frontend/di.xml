@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ * @category   BSS
+ * @package    Bss_HidePrice
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2018-2019 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Wishlist\Controller\Index\Cart">
+        <plugin name="bss_hide_price_plugin_add_item_wishlist_to_cart" type="Bss\HidePrice\Plugin\WishlistCart" sortOrder="10" />
+    </type>
+
+    <type name="Magento\Catalog\Pricing\Render\FinalPriceBox">
+        <plugin name="bss_hide_price_plugin_finalprice" type="Bss\HidePrice\Plugin\CategoryHidePrice" sortOrder="10" />
+    </type>
+    <type name="Magento\Catalog\Block\Product\View">
+        <plugin name="bss_hide_price_hide_button" type="Bss\HidePrice\Plugin\HideButtonCart" sortOrder="15" />
+    </type>
+    <type name="Magento\Catalog\Pricing\Price\TierPrice">
+        <plugin name="bss_hide_price_hide_tier_price" type="Bss\HidePrice\Plugin\HideTierPrice" sortOrder="10" />
+    </type>
+    <type name="Magento\Catalog\Block\Product\View\Options\AbstractOptions">
+        <plugin name="bss_hide_price_hide_custom_option_price"
+                type="Bss\HidePrice\Plugin\Catalog\Block\Product\View\Options\AbstractOptions" sortOrder="10" />
+    </type>
+    <type name="Magento\Catalog\Model\Product\Option\Value">
+        <plugin name="bss_hide_price_hide_custom_option_price_select"
+                type="Bss\HidePrice\Plugin\Catalog\Model\Option\Value" sortOrder="10" />
+    </type>
+
+    <type name="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option">
+        <plugin name="bss_hide_price_hide_custom_option_bundle"
+                type="Bss\HidePrice\Plugin\Bundle\Block\Option" sortOrder="10" />
+    </type>
+    <type name="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle">
+        <plugin name="bss_hide_price_hide_custom_option_bundle_data"
+                type="Bss\HidePrice\Plugin\Bundle\Block\Bundle" sortOrder="10" />
+    </type>
+    <type name="Magento\Catalog\Pricing\Render\PriceBox">
+        <plugin name="bss_hide_price_plugin_final_price" type="Bss\HidePrice\Plugin\CategoryHidePrice" sortOrder="10" />
+    </type>
+
+    <type name="Magento\Catalog\Block\Ui\ProductViewCounter">
+        <plugin name="bss_hide_price_recently_widget_button" type="Bss\HidePrice\Plugin\Block\Ui\ProductViewCounter" sortOrder="10" />
+    </type>
+
+    <type name="Magento\Catalog\Ui\DataProvider\Product\Listing\Collector\Price">
+        <plugin name="bss_hide_price_recently_widget_price" type="Bss\HidePrice\Plugin\Block\Ui\DataProvider\Product\Listing\Collector\Price" sortOrder="10" />
+    </type>
+
+    <type name="Magento\Checkout\Model\Cart">
+        <plugin name="bss_hide_price_prevent_addtocart" type="Bss\HidePrice\Plugin\Checkout\Model\Cart" sortOrder="10" />
+    </type>
+    <!-- <type name="Magento\Checkout\Block\Cart\AbstractCart">
+        <plugin name="bss_hide_price_cart_item" type="Bss\HidePrice\Plugin\Block\AbstractCart" sortOrder="1"/>
+    </type> -->
+    <type name="Magento\CatalogPermissions\Observer\ApplyIsSalableToProductObserver">
+        <plugin name="bss_hide_price_set_salable_product" type="Bss\HidePrice\Plugin\Observer\ApplyIsSalableToProductObserver" sortOrder="10" />
+    </type>
+    <type name="Magento\Bundle\Helper\Catalog\Product\Configuration">
+        <plugin name="bss_hide_price_bundle_option_quote" type="Bss\HidePrice\Plugin\Bundle\Helper\Catalog\Product\Configuration" sortOrder="10" />
+    </type>
+    <type name="Magento\Framework\Pricing\Helper\Data">
+        <plugin name="bss_hide_price_text" type="Bss\HidePrice\Plugin\Pricing\Helper\Data" sortOrder="10" />
+    </type>
+    <type name="Magento\ConfigurableProduct\Block\Product\View\Type\Configurable">
+        <plugin name="bss_hide_price_json_config" type="Bss\HidePrice\Plugin\Block\Product\View\Type\Configurable" sortOrder="10" />
+    </type>
+    <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="bss_hide_price_mini_cart" type="Bss\HidePrice\Plugin\Checkout\CustomerData\Cart" sortOrder="10"/>
+    </type>
+    <type name="Magento\Checkout\Block\Cart\Totals">
+        <plugin name="bss_hide_price_cart_total" type="Bss\HidePrice\Plugin\Checkout\Block\Cart\Totals" sortOrder="10"/>
+    </type>
+    <type name="Magento\Checkout\Block\Cart\Shipping">
+        <plugin name="bss_hide_price_cart_shipping" type="Bss\HidePrice\Plugin\Checkout\Block\Cart\Shipping" sortOrder="10"/>
+    </type>
+    <type name="Magento\Checkout\Helper\Data">
+        <plugin name="bss_hide_price_disable_checkout" type="Bss\HidePrice\Plugin\Checkout\Helper\Data" sortOrder="10"/>
+    </type>
+    <type name="Magento\Multishipping\Helper\Data">
+        <plugin name="bss_hide_price_disable_multi_checkout_address" type="Bss\HidePrice\Plugin\Multishipping\Helper\Data" sortOrder="10"/>
+    </type>
+    <type name="Magento\Paypal\Model\AbstractConfig">
+        <plugin name="bss_hide_price_disable_paypal" type="Bss\HidePrice\Plugin\Paypal\Model\AbstractConfig" sortOrder="10"/>
+    </type>
+    <type name="Bss\ConfigurableProductWholesale\Block\Product\Renderer\ConfigurableProductWholesale">
+        <plugin name="bss_hide_price_json_config_wholesale" type="Bss\HidePrice\Plugin\Block\Product\View\Type\ConfigurableProductWholesale" sortOrder="10" />
+    </type>
+    <type name="Bss\QuoteExtension\Helper\CartHidePrice">
+        <plugin name="bss_hide_price_quote_render_item" type="Bss\HidePrice\Plugin\Helper\CartHidePrice" sortOrder="10" />
+    </type>
+    <type name="Bss\QuoteExtension\CustomerData\QuoteExtension">
+        <plugin name="bss_hide_price_mini_quote" type="Bss\HidePrice\Plugin\Checkout\CustomerData\QuoteExtension" sortOrder="10"/>
+    </type>
+    <type name="Bss\ReorderProduct\Block\ReorderProduct">
+        <plugin name="reorder-add-to-cart-button" type="Bss\HidePrice\Plugin\Block\ReorderProduct" sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Swatches\Block\Product\Renderer\Listing\Configurable">
+        <plugin name="bss_hide_price_json_config_configurable_list" type="Bss\HidePrice\Plugin\Block\Product\ConfigurableListingRenderer" sortOrder="10" />
+    </type>
+    <type name="Magento\Catalog\Block\Product\View">
+        <plugin name="bss_hide_price_json_config_product_view" type="Bss\HidePrice\Plugin\Block\Product\View" sortOrder="10" />
+    </type>
+
+</config>

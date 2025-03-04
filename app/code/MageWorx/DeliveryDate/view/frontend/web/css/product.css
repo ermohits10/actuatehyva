@@ -1,0 +1,30 @@
+.mw-deliverydate-info {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.mw-deliverydate-info__term {
+    margin-right: 50px;
+    position: relative;
+}
+
+.mw-deliverydate-info__term__icon,
+.mw-deliverydate-info__date__icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.mw-deliverydate-info__term__text,
+.mw-deliverydate-info__date__text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #353535;
+}
+
+@media (max-width: 500px) {
+    .mw-deliverydate-info__term,
+    .mw-deliverydate-info__date {
+        width: 100%
+    }
+}

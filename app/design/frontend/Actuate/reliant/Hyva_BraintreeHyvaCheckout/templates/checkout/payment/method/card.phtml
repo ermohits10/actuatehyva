@@ -1,0 +1,460 @@
+<?php
+
+declare(strict_types=1);
+
+/** @var AbstractBlock $block */
+/** @var Escaper $escaper */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\AbstractBlock;
+use Hyva\BraintreeHyvaCheckout\ViewModel\Braintree as BraintreeViewModel;
+use Hyva\BraintreeHyvaCheckout\ViewModel\Payment\Method\Card as CardViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ReCaptcha;
+use Hyva\Theme\ViewModel\StoreConfig;
+use ReliantDirect\Checkout\Block\TermAndCondition;
+
+/** @var BraintreeViewModel $braintreeViewModel */
+$braintreeViewModel = $viewModels->require(BraintreeViewModel::class);
+/** @var CardViewModel $cardViewModel */
+$cardViewModel = $viewModels->require(CardViewModel::class);
+/** @var StoreConfig $storeConfig */
+$storeConfig = $viewModels->require(StoreConfig::class);
+
+// Do not replace this with $viewModels->require(ReCaptcha::class); that would break the dependency
+// on the Magento_ReCaptchaContact module
+$recaptcha = $block->getData('viewModelRecaptcha');
+$recaptchaType = $braintreeViewModel->getSelectedTypeForForm(ReCaptcha::RECAPTCHA_FORM_ID_BRAINTREE);
+$siteKey = $braintreeViewModel->getReCaptchaSiteKey($recaptchaType);
+$threeDEnabled = $braintreeViewModel->is3dsEnabled();
+
+$grecaptchaCallback = 'googleRecaptchaCallbackBraintree';
+$grecaptchaInstanceId  = "grecaptchaInstanceBraintree";
+
+$icons = $cardViewModel->getIcons();
+$availableCardTypes = $cardViewModel->getAvailableCardTypes();
+$termAndCondition = $block->getLayout()->createBlock(TermAndCondition::class);
+?>
+
+<div>
+    <div id="braintree" x-data='{
+            icons: <?= json_encode($icons); ?>,
+            selectedCard: {
+                type: "NONE",
+                code: {
+                    name: "<?= $escaper->escapeJs(__("CVV")) ?>"
+                }
+            }
+        }' x-init="window.braintree.activateBraintree" wire:key="<?= uniqid('', true); ?>" @braintree-set-card.window="selectedCard = $event.detail.selectedCard">
+        <form id="braintree-card" class="braintree-card">
+            <div class="field field-reserved">
+                <div class="block text-sm font-medium text-gray-700 required">
+                    <label for="card-number" class="field__label">
+                        <span><?= $escaper->escapeHtml(__('Card Number')) ?></span>
+                    </label>
+                    <div id="card-number" class="h-12 pl-16 form-input relative" wire:key="<?= uniqid('', true); ?>">
+                        <img class="absolute top-1 left-3 h-4/5" :src="icons[selectedCard.type].url"/>
+                    </div>
+                    <div class="flex gap-2 mt-1">
+                        <?php foreach ($availableCardTypes as $availableCardType) : ?>
+                            <img src="<?= $icons[$availableCardType]['url'] ?>" class="h-8" />
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field field-reserved">
+                <div class="block text-sm font-medium text-gray-700 required">
+                    <label for="expiration-date" class="field__label">
+                        <span><?= $escaper->escapeHtml(__('Expiry Date')) ?></span>
+                    </label>
+                    <div id="expiration-date" class="h-12 form-input"></div>
+                </div>
+            </div>
+
+            <div class="field field-reserved">
+                <div class="block text-sm font-medium text-gray-700 required" wire:key="<?= uniqid('', true); ?>">
+                    <label for="cvv" class="field__label">
+                        <span x-text="selectedCard.code.name"></span>
+                    </label>
+                    <div id="cvv" class="h-12 form-input"></div>
+                </div>
+                <div></div>
+            </div>
+
+            <?php if ($cardViewModel->isVaultEnabled() && !$braintreeViewModel->isGuestQuote()) : ?>
+                <div class="field field-reserved flex">
+                    <label class="flex items-center" for="braintree_vault">
+                        <input type="checkbox" id="braintree_vault" name="payment[is_active_payment_token_enabler]" class="admin__control-checkbox" />
+                        <span class="ml-2 font-bold text-gray-700 cursor-pointer">
+                            <?= $escaper->escapeHtml(__('Save for later use.')) ?>
+                        </span>
+                    </label>
+                </div>
+            <?php endif; ?>
+
+            <?= $recaptcha ? $recaptcha->getInputHtml(ReCaptcha::RECAPTCHA_FORM_ID_BRAINTREE) : '' ?>
+
+            <?= $recaptcha ? $recaptcha->getLegalNoticeHtml(ReCaptcha::RECAPTCHA_FORM_ID_BRAINTREE) : '' ?>
+        </form>
+    </div>
+
+    <?= $termAndCondition->toHtml() ?>
+    <?= $block->getChildHtml('hyva.checkout.navigation.placeorder.button.braintree') ?>
+
+    <script>
+        const braintreeId = "braintree";
+
+        window.braintree = window.braintree || {};
+
+        window.braintree.activateBraintree = function () {
+            const requiredJsFiles = [];
+
+            if (!window.braintree?.client) {
+                requiredJsFiles.push(createScriptLoadPromise('https://js.braintreegateway.com/web/3.88.1/js/client.min.js'));
+            }
+
+            if (!window.braintree?.hostedFields) {
+                requiredJsFiles.push(createScriptLoadPromise('https://js.braintreegateway.com/web/3.88.1/js/hosted-fields.min.js'));
+            }
+
+            <?php if ($threeDEnabled): ?>
+            if (!window.braintree?.threeDSecure) {
+                requiredJsFiles.push(createScriptLoadPromise('https://js.braintreegateway.com/web/3.88.1/js/three-d-secure.min.js'));
+            }
+            <?php endif; ?>
+
+            Promise.all(requiredJsFiles)
+                .then(initBraintree)
+                .then(addEvents.bind(this));
+        }
+
+        async function initBraintree() {
+            if (window.braintree?.cardInstances?.hostedFieldsInstance) {
+                window.braintree.cardInstances.hostedFieldsInstance.teardown();
+            }
+
+            const fields = {
+                number: {
+                    selector: "#card-number",
+                    placeholder: "<?= $escaper->escapeHtml(__('4111 1111 1111 1111')) ?>",
+                },
+                cvv: {
+                    selector: "#cvv",
+                    placeholder: "<?= $escaper->escapeHtml(__('123')) ?>",
+                },
+                expirationDate: {
+                    selector: "#expiration-date",
+                    placeholder: "<?= $escaper->escapeHtml(__('MM / YY')) ?>",
+                },
+            };
+            const instances = {};
+
+            instances.clientInstance = await window.braintree.client.create({
+                authorization: '<?= $escaper->escapeJs($braintreeViewModel->getClientToken()) ?>',
+            });
+            const options = {
+                client: instances.clientInstance,
+                fields,
+            };
+
+            <?php if ($threeDEnabled): ?>
+            instances.threeDSecureInstance = await window.braintree.threeDSecure
+                .create({
+                    version: 2,
+                    client: instances.clientInstance,
+                });
+            <?php endif; ?>
+
+            instances.hostedFields = await window.braintree.hostedFields.create(options);
+
+            instances.hostedFields.on('cardTypeChange', function (event) {
+                const noCard = {
+                    type: 'none',
+                    code: {
+                        name: '<?= $escaper->escapeJs(__('CVV')) ?>'
+                    }
+                };
+                const cardMap = {
+                    "american-express": "AE",
+                    "diners-club": "DI",
+                    "discover": "DN",
+                    "jcb": "JCB",
+                    "master-card": "MC",
+                    "maestro": "MI",
+                    "none": "NONE",
+                    "visa": "VI",
+                    "unionpay": "UPD",
+                };
+                const icons = JSON.parse('<?= json_encode($icons) ?>');
+
+                const selectedCard = event.cards.length === 1
+                    ? event.cards[0]
+                    : noCard;
+
+                selectedCard.type = cardMap[selectedCard.type];
+
+                if (!icons[selectedCard.type]) {
+                    selectedCard.type = 'NONE';
+                }
+
+                window.dispatchEvent(new CustomEvent('braintree-set-card', { detail: { selectedCard } }));
+            });
+
+            window.braintree.cardInstances = instances;
+
+            if (window?.grecaptcha) {
+                try {
+                    window.grecaptcha.reset();
+                } catch {
+                    initRecaptcha();
+                }
+            }
+
+            <?php if ($recaptcha): ?>
+            if (!window.grecaptcha) {
+                initRecaptcha();
+            }
+            <?php endif; ?>
+
+            return instances;
+        }
+
+        function initRecaptcha() {
+            const containerId = 'grecaptcha-container-Braintree';
+            const containerElement = document.getElementById(containerId);
+
+            <?php if ($recaptchaType === 'recaptcha'): ?>
+            grecaptchaV2LoadCallbacks.push(() => {
+                window.<?= /** @noEscape */ $grecaptchaInstanceId ?> = window.grecaptcha.render(containerId, {
+                    sitekey: '<?= $escaper->escapeJs($siteKey) ?>',
+                });
+            });
+            <?php elseif ($recaptchaType === 'invisible'): ?>
+            grecaptchaV2LoadCallbacks.push(() => {
+                window.<?= /** @noEscape */ $grecaptchaInstanceId ?> = window.grecaptcha.render(containerId, {
+                    sitekey: '<?= $escaper->escapeJs($siteKey) ?>',
+                    callback: '<?= $escaper->escapeJs($grecaptchaCallback) ?>',
+                    size: 'invisible'
+                });
+            });
+            <?php endif; ?>
+
+            if (containerElement) {
+                forceLoadRecaptchaScript(containerElement.closest('form'));
+            }
+        }
+
+        function addEvents(instances) {
+            window.addEventListener('checkout:init:after', event => {
+                hyvaCheckout.validation.register(braintreeId, async () => {
+                    const callback = createPayment.bind(this);
+                    return await callback(instances);
+                }, document.getElementById(braintreeId));
+            }, {once: true});
+
+            hyvaCheckout.validation.register(braintreeId, async () => {
+                const callback = createPayment.bind(this);
+                return await callback(instances);
+            }, document.getElementById(braintreeId));
+        }
+
+        function escapeNonAsciiCharacters(str) {
+            return str.split("").map(function (c) { return /[^\x00-\x7F]$/.test(c) ? c : c.split("").map(function (a) { return "\\u00" + a.charCodeAt().toString(16)}).join("")}).join("");
+        }
+
+        async function createPayment(instances) {
+            <?php if ($recaptchaType): ?>
+            // Do not rename $form, the variable is expected to be declared in the recaptcha output
+            const $form = document.querySelector('#braintree-card');
+
+            if ($form) {
+                <?php if ($recaptchaType === 'recaptcha'): ?>
+                <?= $recaptcha->getValidationJsHtml(ReCaptcha::RECAPTCHA_FORM_ID_BRAINTREE) ?>
+                <?php else: ?>
+                if (!this.hasCaptchaToken) {
+                    await new Promise(resolve => {
+                        this.submitForm = resolve;
+
+                        <?= $recaptcha->getValidationJsHtml(ReCaptcha::RECAPTCHA_FORM_ID_BRAINTREE) ?>
+                    });
+                }
+                <?php endif; ?>
+            }
+
+            if (this.errors) {
+                return false;
+            }
+            <?php endif; ?>
+
+            const {
+                checked: vault = false
+            } = document.querySelector('#braintree_vault') || {};
+
+            <?php
+            $billingAddress = $braintreeViewModel->getBillingAddress();
+            $street = $billingAddress->getStreet();
+
+            if (is_array($street)) {
+                $firstLine = array_shift($street);
+                $remainingLine = implode(' ', $street);
+            } else {
+                $firstLine = $street;
+                $remainingLine = '';
+            }
+            ?>
+
+            const firstName = escapeNonAsciiCharacters('<?= $billingAddress->getFirstname() ?>');
+            const lastName = escapeNonAsciiCharacters('<?= $billingAddress->getLastname() ?>');
+            const billingAddress = {
+                givenName: firstName,
+                surname: lastName,
+                phoneNumber: '<?= $billingAddress->getTelephone(); ?>',
+                streetAddress: '<?= $firstLine ?>',
+                extendedAddress: '<?= $remainingLine ?>',
+                locality: '<?= $billingAddress->getCity(); ?>',
+                region: '<?= $billingAddress->getRegionCode(); ?>',
+                postalCode: '<?= $billingAddress->getPostcode(); ?>',
+                countryCodeAlpha2: '<?= $billingAddress->getCountryId(); ?>',
+            };
+
+            return instances.hostedFields
+                .tokenize({
+                    vault,
+                    billingAddress
+                })
+                .then(async payload => {
+                    const price = <?= $escaper->escapeJs($braintreeViewModel->getTotal()) ?>;
+                    const threshold = <?= $braintreeViewModel->getThresholdAmount() ?>;
+
+                    if (!instances.threeDSecureInstance || price < threshold) {
+                        return payload;
+                    }
+
+                    return new Promise((resolve, reject) => {
+                        const threeDSecureParameters = {
+                            amount: parseFloat(price).toFixed(2),
+                            nonce: payload.nonce,
+                            challengeRequested: <?= json_encode($braintreeViewModel->alwaysRequest3ds()) ?>,
+                            billingAddress,
+                            onLookupComplete: (data, next) => {
+                                next();
+                            },
+                        };
+
+                        <?php $street = $billingAddress->getStreet(); ?>
+                        instances.threeDSecureInstance.verifyCard(threeDSecureParameters, function (err, response) {
+                            if (err) {
+                                if (err.code === 'THREEDS_LOOKUP_VALIDATION_ERROR') {
+                                    let errorMessage = err.details.originalError.details.originalError.error.message;
+                                    if (errorMessage === 'Billing line1 format is invalid.' && '<?= $firstLine ?>'.length > 50) {
+                                        return reject(
+                                            new Error('<?= $escaper->escapeJs(__('Billing line1 must be string and less than 50 characters. Please update the address and try again.')) ?>')
+                                        );
+                                    } else if (errorMessage === 'Billing line2 format is invalid.' && '<?= isset($street[1]) ? $street[1] : '' ?>'.length > 50) {
+                                        return reject(
+                                            new Error('<?= $escaper->escapeJs(__('Billing line2 must be string and less than 50 characters. Please update the address and try again.')) ?>')
+                                        );
+                                    }
+                                }
+
+                                return reject(err);
+                            }
+
+                            const liability = {
+                                shifted: response.liabilityShifted,
+                                shiftPossible: response.liabilityShiftPossible
+                            };
+
+                            if (liability.shifted || (!liability.shifted && !liability.shiftPossible)) {
+                                resolve(response);
+                            } else {
+                                reject(new Error('<?= $escaper->escapeJs(__('Please try again with another form of payment.')) ?>'));
+                            }
+                        });
+                    });
+                })
+                .then(async response => {
+                    if (response?.rawCardinalSDKVerificationData?.ActionCode === 'FAILURE') {
+                        throw new Error('<?= $escaper->escapeJs(__("3DS validation failed.")) ?>');
+                    }
+
+                    await Magewire.find('checkout.payment.method.' + braintreeId).call('setIsVaulted', vault);
+                    await Magewire.find('checkout.payment.method.' + braintreeId).call('setToken', response.nonce);
+                    clearError();
+                    return true;
+                })
+                .catch(error => {
+                    const message = getErrorMessage(error);
+                    showError(message);
+                    return false;
+                })
+        }
+
+        function getErrorMessage(error) {
+            const errorMessage = error?.details?.originalError?.details?.originalError?.fieldErrors?.[0]?.fieldErrors?.[0].message
+                || error?.details?.originalError?.details?.originalError?.error?.message;
+
+            if (errorMessage) {
+                return errorMessage;
+            }
+
+            switch (error.code) {
+                case 'HOSTED_FIELDS_FIELDS_EMPTY':
+                    return '<?= $escaper->escapeJs(__('Please enter a card number, expiration date and CVV')) ?>';
+                    break;
+                case 'HOSTED_FIELDS_FIELDS_INVALID':
+                    return '<?= $escaper->escapeJs(__('Please correct the problems with the Credit Card fields.')) ?>';
+                    break;
+                case 'HOSTED_FIELDS_TOKENIZATION_FAIL_ON_DUPLICATE':
+                    return '<?= $escaper->escapeJs(__('The payment method used, already exists in the user\'s vault. Please use the vault option instead.')) ?>';
+                    break;
+                case 'HOSTED_FIELDS_TOKENIZATION_CVV_VERIFICATION_FAILED':
+                    return '<?= $escaper->escapeJs(__('CVV did not pass verification')) ?>';
+                    break;
+                case 'HOSTED_FIELDS_FAILED_TOKENIZATION':
+                    return '<?= $escaper->escapeJs(__('There was an issue tokenizing the card. Please check the card is valid.')) ?>';
+                    break;
+                case 'HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR':
+                    return '<?= $escaper->escapeJs(__('There was an error connecting to Braintree. Please try again.')) ?>';
+                    break;
+                default:
+                    return error.message || '<?= $escaper->escapeJs(__('Please try again with another form of payment.')) ?>';
+                    break;
+            }
+        }
+
+        function createScriptLoadPromise(url) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+
+                script.addEventListener('load', function() {
+                    resolve();
+                }, false);
+
+                script.addEventListener('error', function(event) {
+                    reject();
+                }, false);
+
+                document.body.appendChild(script);
+            })
+        }
+
+        function hideLoader() {
+            window.dispatchEvent(new Event('magewire:loader:done'));
+        }
+
+        function showError(message) {
+            hideLoader();
+            hyvaCheckout.payment.dispatchExceptionMessage(
+                message,
+                'error'
+            );
+        }
+
+        function clearError() {
+            hyvaCheckout.payment.dispatchSuccessMessage('');
+        }
+    </script>
+</div>

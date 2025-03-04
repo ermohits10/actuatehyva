@@ -1,0 +1,30 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\Form\EntityFieldInterface;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magewirephp\Magewire\Component\Form as MagewireFormComponent;
+
+/** @var Template $block */
+/** @var EntityFieldInterface $element */
+/** @var Escaper $escaper */
+/** @var MagewireFormComponent $magewire */
+
+$element = $block->getData('element');
+
+// Enforce the input type attribute to align with the specified template.
+$element->setAttribute('type', 'hidden');
+?>
+<input
+    <?php if ($element->hasAttributes()): ?>
+        <?= /* @noEscape */ $element->renderAttributes($escaper) ?>
+    <?php endif ?>
+/>

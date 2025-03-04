@@ -1,0 +1,68 @@
+<div class="featured-categories">
+    <div class="block-title">
+        <h2 class="text-xl leading-7 font-semibold font-serif lg:text-3xl lg:leading-8 mb-6 lg:font-extrabold lg:text-[#1D3654]"><?= $escaper->escapeHtml(__('Categories')) ?></h2>
+    </div>
+    <div class="category-swiper relative w-full overflow-hidden px-10 pb-8 lg:px-0 lg:pb-0">
+        <?php
+            $productCollection = $block->getCategoryCollection();
+        ?>
+        <div class="swiper-wrapper">
+            <?php
+            $i = 1;
+            foreach ($productCollection as $category) {
+                $id = $category->getId();
+                $_imgUrl = $block->getCategoryImage($id);
+                $_imgUrl = $category->getImageUrl();
+                if($_imgUrl == ''):
+                    $_imgUrl = 'https://via.placeholder.com/280';
+                endif;
+                if($i <= 7):
+            ?>
+            <div class="swiper-slide w-auto">
+                <a href="<?php echo $category->getUrl() ?>" class="block text-center">
+                    <div class="category-image rounded-full mb-4 bg-[#f2f2f2] overflow-hidden">
+                        <img src="<?php echo $_imgUrl ?>" alt="<?php echo $category->getName() ?>" width="280" height="280" >
+                    </div>
+                    <h3 class="font-sans text-base font-medium"><?php echo $category->getName() ?></h3>
+                </a>
+            </div>
+            <?php endif; $i++; } ?>
+        </div>
+        <div class="category-button-next absolute right-0 top-2/4 -translate-y-2/4 z-[99]">
+            <svg width="13" height="20" viewBox="0 0 13 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 2L10 10L2 18" stroke="#126366" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="category-button-prev absolute left-0 top-2/4 -translate-y-2/4 z-[99]">
+            <svg width="13" height="20" viewBox="0 0 13 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 18L3 10L11 2" stroke="#126366" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="category-pagination absolute bottom-0 text-center"></div>
+         <script>
+            var cat_swiper = new Swiper(".category-swiper", {
+                slidesPerView: 2,
+                spaceBetween: 40,
+                navigation: {
+                    nextEl: ".category-button-next",
+                    prevEl: ".category-button-prev",
+                },
+                pagination: {
+                    el: ".category-pagination",
+                    clickable: true,
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 2,
+                    },
+                    768: {
+                        slidesPerView: 4,
+                    },
+                    1024: {
+                        slidesPerView: 7,
+                    },
+                },
+            });
+        </script>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/**
+ * @var \MageWorx\DeliveryDate\Block\PayPal\Express\DeliveryDate $block
+ */
+?>
+<?php
+try {
+    ?>
+    <div class="block delivery" id="block-delivery"
+         data-mage-init='{"collapsible":{"openedState": "active", "saveState": false}}'>
+        <div data-role="title" class="title">
+            <strong id="block-delivery-heading" role="heading" aria-level="2">
+                <?= $block->escapeHtml(__('Delivery Information')) ?>
+            </strong>
+        </div>
+        <div data-role="content" class="content" aria-labelledby="block-delivery-heading">
+        <span id="delivery-date-please-wait" class="please-wait load indicator" style="display: none;"
+              data-text="<?= $block->escapeHtml(__('This won\'t take long . . .')) ?>">
+            <span><?= $block->escapeHtml(__('This won\'t take long . . .')) ?></span>
+        </span>
+            <form class="form delivery add" id="delivery-form"
+                  action="<?= $block->escapeUrl($block->getUrl('mageworx_deliverydate/queue/reserve')) ?>" method="post"
+                  data-mage-init='{"validation": {},"deliveryDateWidget": {
+                "deliveryDaySelector": "#delivery-day-input",
+                "deliveryTimeSelector": "#delivery-time-input",
+                "deliveryDateSpinnerId": "#delivery-date-please-wait",
+                "messages": ".page.messages .messages",
+                "deliveryDateSubmitButton": "#dd-submit-button",
+                "submitUrl": "<?= $block->escapeUrl($block->getUrl('mageworx_deliverydate/queue/reserve')); ?>",
+                "config": <?= /* @noEscape */
+                  json_encode($block->getDeliveryDataConfig(), true); ?>
+              }}'>
+                <div class="fieldset">
+                    <input type="hidden" id="delivery-option-id-input" name="delivery_option_id"/>
+                    <div class="field">
+                        <label class="label" for="delivery-day-input">
+                            <span><?= $block->escapeHtml(__('Select Day')) ?></span>
+                        </label>
+                        <div class="control">
+                            <select class="input-dropdown"
+                                    id="delivery-day-input"
+                                    name="delivery_day"
+                                    data-validate="{'required-entry':true}">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field" id="delivery-time-input-container">
+                        <label class="label" for="delivery-time-input">
+                            <span><?= $block->escapeHtml(__('Select Time')) ?></span>
+                        </label>
+                        <div class="control">
+                            <select class="input-dropdown"
+                                    id="delivery-time-input"
+                                    name="delivery_time"
+                                    data-validate="{'required-entry':true}">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="delivery-comment-input">
+                            <span><?= $block->escapeHtml(__('Comment')) ?></span>
+                        </label>
+                        <div class="control">
+                            <textarea class="input-textarea"
+                                      id="delivery-comment-input"
+                                      name="delivery_comment"
+                                      data-validate="{'required-entry':false}"></textarea>
+                        </div>
+                    </div>
+                    <div class="actions-toolbar">
+                        <div class="primary">
+                            <button class="action add primary"
+                                    type="button"
+                                    id="dd-submit-button"
+                                    value="<?= $block->escapeHtml(__('Submit')) ?>">
+                                <span><?= $block->escapeHtml(__('Submit')) ?></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php
+} catch (\Magento\Framework\Exception\LocalizedException $e) {
+    $block->logException($e);
+}

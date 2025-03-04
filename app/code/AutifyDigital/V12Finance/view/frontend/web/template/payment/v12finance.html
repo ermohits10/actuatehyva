@@ -1,0 +1,112 @@
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<div class="payment-method autify-v12-finance" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <div class="control">
+            <input type="radio" name="v12finance-payment-method" class="v12finance-payment-method" data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+            <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+        </div>
+        <img data-bind="attr: {src: financeLogo, alt: $t('V12 Finance Logo'), height: '', width: '110' }" class="payment-icon v12-logo"/>
+    </div>
+    <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address" style="display: none;">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <div class="v12finance-checkout">
+            <div class="billing-address-text-match"><span data-bind="i18n: getBillingAddressText()"></span></div>
+            <div class="v12finance-core">
+                <div class="deposit">
+                    <h4 class="title-small" data-bind="i18n: 'Deposit Payment'"></h4>
+                    <p class="repayment-text">This is the amount of money you pay upfront. Please be aware that you must pay a minimum of <span class="min-percentage" data-bind="i18n:getMinimumFinancePercentage()"></span>% upfront (<span class="depositamount_small"></span>). You can pay upto maximum amount of <span class="max-percentage" data-bind="i18n:getMaximumFinancePercentage()"></span>%(<span class="depositamount_smallmax"></span>)</p>
+                    <div class="deposit-text-area">
+                        <span id="minus-icon" href="#">-</span>
+                        <div class="deposit-input-area">
+                            <span class="currency-symbol" data-bind="i18n: getCurrencyCode()"></span>
+                            <input type="number" class="value deposit_amount" data-price="" value="" />
+                        </div>
+                        <span id="plus-icon" href="#">+</span>
+                    </div>
+                    <div id="slider-finance" class="slider-finance"></div>
+                </div>
+                <div class="repayment v12finance-options-area">
+                    <h4 class="title-small" data-bind="i18n: 'Repayment Condition'"></h4>
+                    <p class="repayment-text v12repayment-area" data-bind="i18n: 'You can choose how many months you want to repay your finance over. The longer the term the lower the monthly repayments.'"></p>
+                    <h5 class="title-terms-length" data-bind="i18n: 'Term Length'"></h5>
+                    <select id="v12-finance-options" name="v12-finance-options" data-bind="html: getFinanceOptions()">
+                        <option value="">-- Select number of monthly repayments --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="v12finance-summary">
+                <ul class="finance-summary" id="finance-calculator-summary">
+                    <li class="amount-deposit-price">
+                        <label data-bind="i18n: 'Deposit Payment '"></label>
+                        <span class="value"></span>
+                    </li>
+                    <li class="amount-loan-price">
+                        <label data-bind="i18n: 'Finance Amount '"></label>
+                        <span class="value"></span>
+                    </li>
+                    <li class="monthly-contract">
+                        <label data-bind="i18n: 'Repayment Term '"></label>
+                        <label></label>
+                        <span class="value"></span>
+                    </li>
+                    <li class="monthly-amount">
+                        <label data-bind="i18n: 'Instalment Amount '"></label>
+                        <span class="value"></span>
+                    </li>
+                    <li class="amount-interest">
+                        <label data-bind="i18n: 'Representative APR '"></label>
+                        <span class="value"></span>
+                    </li>
+                    <li class="annual-rate-of-interest">
+                        <label data-bind="i18n: 'Annual Rate Of Interest '"></label>
+                        <span class="value"></span>
+                    </li>
+                    <li class="total-amount-payable">
+                        <label data-bind="i18n: 'Total Amount Payable '"></label>
+                        <span class="value"></span>
+                    </li>
+                    <li class="total-amount-payable-now">
+                        <label data-bind="i18n: 'Total Amount Payable Now '"></label>
+                        <span class="value"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <p id="v12-finance-deposit-error" class="message-error error message" style="display: none"></p>
+        <p class="error-message-v12" style="display:none;">You can get a min loan amount of &pound;<span class="minloan-v12"></span> and max loan amount of &pound;<span class="maxloan-v12"></span>.</p>
+        <div class="actions-toolbar" id="v12-finance-placeorder-click">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="
+                        click: placeOrder,
+                        attr: {title: getPlaceOrderText()},
+                        css: {disabled: !isPlaceOrderActionAllowed()}"
+                        disabled>
+                    <span data-bind="i18n: getPlaceOrderText()"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<?php
+// @codingStandardsIgnoreFile
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+$_helper = $this->helper('WeltPixel\GA4\Helper\Data');
+$scriptAdditionalTag = '';
+if ($_helper->isDevMoveJsBottomEnabled()) {
+    $scriptAdditionalTag = ' exclude-this-tag="text/x-magento-template"';
+}
+?>
+<?php if ($this->isEnabled()) : ?>
+    <?php $dataLayerObject = $this->getDataLayerAsJson(); ?>
+    <?php
+    $scriptString = 'window.getWpGA4Cookie = function(name) {';
+    $scriptString .= '    match = document.cookie.match(new RegExp(name + \'=([^;]+)\'));';
+    $scriptString .= '    if (match) return decodeURIComponent(match[1].replace(/\+/g, \' \')) ;';
+    $scriptString .= '};';
+    $scriptString .= 'window.dataLayer = window.dataLayer || [];';
+    if ($dataLayerObject != '[[]]') :
+        $scriptString .= 'var dl4Objects = ' . $dataLayerObject . ';';
+        $scriptString .= 'for (var i in dl4Objects) {';
+        $scriptString .= '    window.dataLayer.push({ecommerce: null});';
+        $scriptString .= '    window.dataLayer.push(dl4Objects[i]);';
+        $scriptString .= '}';
+        $scriptString .= 'var wpGA4Cookies = ['.$this->getWpGA4CookiesForJs().'];';
+        $scriptString .= 'wpGA4Cookies.map(function(cookieName) {';
+        $scriptString .= '    var cookieValue = window.getWpGA4Cookie(cookieName);';
+        $scriptString .= '    if (cookieValue) {';
+        $scriptString .= '        var dl4Object = {};';
+        $scriptString .= '        dl4Object[cookieName.replace(\'wp_ga4_\', \'\')] = cookieValue;';
+        $scriptString .= '    }';
+        $scriptString .= '});';
+    endif;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php endif; ?>

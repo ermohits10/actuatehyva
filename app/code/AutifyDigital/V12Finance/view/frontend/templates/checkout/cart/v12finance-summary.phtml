@@ -1,0 +1,63 @@
+<?php
+use Magento\Framework\App\ObjectManager;
+
+$autifyDigitalHelper = $this->helper('AutifyDigital\V12Finance\Helper\Data');
+if($autifyDigitalHelper->checkModuleEnable() !== '1'){
+	return false;
+}
+
+$checkoutConfigArray = $autifyDigitalHelper->getCheckoutConfig();
+
+$checkProductLevelFinanceConfig = $autifyDigitalHelper->getProductFinanceEnableConfig();
+
+$quote = $autifyDigitalHelper->getQuote();
+$quoteItems = $quote->getAllVisibleItems();
+$couponCode = $quote->getCouponCode();
+
+$v12FinanceEnableProductArray =[];
+$productDisableCategoryIdsArray = [];
+$displayFinanceCategory= [];
+
+$productDisableCategory = $autifyDigitalHelper->getConfig('autifydigital/v12finance/finance_category_option');
+$productDisableCategoryIds = $autifyDigitalHelper->getConfig('autifydigital/v12finance/finance_category_list');
+if($productDisableCategory && $productDisableCategoryIds) {
+    $productDisableCategoryIdsArray = explode(",", $productDisableCategoryIds);
+}
+
+$displayFinanceCategory= [];
+foreach ($quoteItems as $item) {
+    $productId = $item->getProduct()->getId();
+    $product = ObjectManager::getInstance()->get(\Magento\Catalog\Api\ProductRepositoryInterface::class)->getById($productId);
+    $productLevelFinance = $product->getData('v12_finance_enable');
+    if($productLevelFinance === '0') {
+        $v12FinanceEnableProductArray[] = 0;
+    }
+    if($productDisableCategory) {
+        foreach($product->getCategoryIds() as $productCategoryId) {
+            if(in_array($productCategoryId, $productDisableCategoryIdsArray)) {
+                $displayFinanceCategory[] = 1;
+            }
+        }
+    }
+}
+
+if($productDisableCategory) {
+    if(in_array(1, $displayFinanceCategory)) {
+        return false;
+    }
+}
+
+if($checkProductLevelFinanceConfig === '1') {
+    if(in_array(0, $v12FinanceEnableProductArray)) {
+        return false;
+    }
+}
+
+$financeEnable = $quote->getData('v12_finance_enable');
+
+if($financeEnable === "0") {
+    return false;
+}
+?>
+
+<div class="cart-v12finance-summary"><?= __("Or from <span class='cart-v12finance-month'></span> per month*") ?></div>

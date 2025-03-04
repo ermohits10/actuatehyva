@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+	<table comment="autifydigital_v12finance_application Table" engine="innodb" name="autifydigital_v12finance_application" resource="default">
+		<column comment="Entity Id" identity="true" name="application_id" nullable="false" padding="6" unsigned="true" xsi:type="smallint"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="application_id"/>
+		</constraint>
+		<column identity="false" name="order_id" nullable="true" xsi:type="int" comment="Order ID"/>
+		<column length="255" name="order_increment_id" nullable="true" xsi:type="varchar" comment="Order Increment ID"/>
+		<column length="255" name="customer_email" nullable="true" xsi:type="varchar" comment="Customer Email" />
+		<column length="255" name="retailer_product_guid" nullable="true" xsi:type="varchar" comment="Retailer Product GUID" />
+		<column length="255" name="retailer_id" nullable="true" xsi:type="varchar" comment="Retailer Product ID" />
+		<column identity="false" name="finance_length" nullable="true" xsi:type="int" comment="Month Of Contracts" />
+		<column name="order_amount" nullable="true" precision="12" scale="4" xsi:type="decimal" comment="Order Amount"/>
+		<column name="deposit_amount" nullable="true" precision="12" scale="4" xsi:type="decimal" comment="Deposit Amount"/>
+		<column name="interest_amount" nullable="true" precision="12" scale="4" xsi:type="decimal" comment="Interest Amount"/>
+		<column name="finance_amount" nullable="true" precision="12" scale="4" xsi:type="decimal" comment="Finance Amount"/>
+		<column name="total_amount_payable" nullable="true" precision="12" scale="4" xsi:type="decimal" comment="Finance Total Amount Payable"/>
+		<column name="application_status" nullable="true" xsi:type="smallint" comment="Application Status"/>
+		<column length="255" name="finance_application_id" nullable="true" xsi:type="varchar" comment="Finance Application ID"/>
+		<column length="255" name="application_form_url" nullable="true" xsi:type="varchar" comment="Application Form URL"/>
+		<column length="255" name="application_guid" nullable="true" xsi:type="varchar" comment="Application GUID"/>
+		<column length="255" name="authorization_code" nullable="true" xsi:type="varchar" comment="Auth Code"/>
+		<column name="pending_email_sent" nullable="true" xsi:type="smallint" comment="Pending Email Sent"/>
+		<column length="255" name="card_summary" nullable="true" xsi:type="varchar" comment="Card Summary Click and Collect"/>
+		<column identity="false" name="analytics_sent" nullable="true" xsi:type="int" comment="Analytics Tracking Send"/>
+		<column identity="false" name="ads_sent" nullable="true" xsi:type="int" comment="Adwords Tracking Send"/>
+		<column identity="false" name="layer_sent" nullable="true" xsi:type="int" comment="Data Layer Tracking Send"/>
+		<column identity="false" name="address_update" nullable="true" xsi:type="int" default="0" comment="Address Updated"/>
+		<column name="created_at" xsi:type="timestamp" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+		<column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Modification Time"/>
+	</table>
+	<table comment="autifydigital_v12finance_financeoptions Table" engine="innodb" name="autifydigital_v12finance_financeoptions" resource="default">
+		<column comment="Entity Id" identity="true" name="financeoptions_id" nullable="false" padding="6" unsigned="true" xsi:type="smallint"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="financeoptions_id"/>
+		</constraint>
+		<column identity="false" name="finance_id" nullable="true" xsi:type="int" comment="Finance ID" />
+		<column length="255" name="finance_guid" nullable="true" xsi:type="varchar" comment="Finance GUID" />
+		<column length="255" name="finance_name" nullable="true" xsi:type="varchar" comment="Finance Name" />
+		<column name="interest_rate" nullable="true" xsi:type="float" comment="Interest Rate" />
+		<column identity="false" name="contract_length" nullable="true" xsi:type="int" comment="Contract Length" />
+		<column name="calculation_factor" nullable="true" xsi:type="float" comment="Calculation Factor" />
+		<column name="min_loan" nullable="true" xsi:type="float" comment="Min Loan" />
+		<column name="max_loan" nullable="true" xsi:type="float" comment="Max Loan" />
+	</table>
+	<table comment="autifydigital_v12finance_priceoptions Table" engine="innodb" name="autifydigital_v12finance_priceoptions" resource="default">
+		<column comment="Entity Id" identity="true" name="priceoptions_id" nullable="false" padding="6" unsigned="true" xsi:type="smallint"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="priceoptions_id"/>
+		</constraint>
+		<column name="price_from" nullable="true" xsi:type="float" comment="Price From" />
+		<column name="price_to" nullable="true" xsi:type="float" comment="Price To" />
+		<column name="finance_options" nullable="true" xsi:type="text" comment="Finance Options" />
+	</table>
+	<table name="quote" resource="default" engine="innodb" comment="Sales Flat Quote">
+      <column xsi:type="int" name="v12_finance_enable" nullable="true" comment="V12 Finance Failed"/>
+      <column xsi:type="timestamp" name="finance_updated_at" on_update="false" nullable="true" comment="Finance Updated At"/>
+    </table>
+</schema>

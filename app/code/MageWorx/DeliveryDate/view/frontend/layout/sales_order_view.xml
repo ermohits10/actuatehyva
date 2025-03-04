@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="MageWorx_DeliveryDate::css/customer_page.css"/>
+        <css src="MageWorx_DeliveryDate::css/styles.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="MageWorx\DeliveryDate\Block\DeliveryInfo"
+                   as="mageworx_delivery_info"
+                   name="sales.order.mageworx.delivery_info"
+                   after="sales.order.info"
+                   template="MageWorx_DeliveryDate::sales/order/info/delivery_date.phtml">
+                <arguments>
+                    <argument name="is_editable" xsi:type="boolean">true</argument>
+                </arguments>
+                <block class="MageWorx\DeliveryDate\Block\FormKey"
+                       as="form_key"
+                       template="MageWorx_DeliveryDate::form-key.phtml" />
+                <block class="MageWorx\DeliveryDate\Block\Js"
+                       as="delivery_date_js"
+                       template="MageWorx_DeliveryDate::js.phtml" />
+                <uiComponent name="change_delivery_date_customer_form"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

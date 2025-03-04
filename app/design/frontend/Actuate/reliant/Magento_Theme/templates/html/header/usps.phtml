@@ -1,0 +1,49 @@
+<div id="header-usps" class="bg-gradient-to-r from-[#1D3654] to-[#126366] py-1">
+    <?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('header-usps')->toHtml(); ?>
+    <script>
+        var swiper = Swiper;
+        var init = false;
+        function swiperMode() {
+            let mobile = window.matchMedia('(min-width: 0px) and (max-width: 768px)');
+            let tablet = window.matchMedia('(min-width: 769px) and (max-width: 1024px)');
+            let desktop = window.matchMedia('(min-width: 1025px)');
+
+            // Enable (for mobile)
+            if(mobile.matches) {
+                if (!init) {
+                    init = true;
+                    swiper = new Swiper('#header-usps .swiper-container', {
+                        slidesPerView: 1,
+                        autoplay: {
+                            delay: 8000,
+                        },
+                        centeredSlides: false,
+                        loop: true,
+                        spaceBetween: 0,
+                        direction: 'horizontal',
+                        centeredSlides: true,
+                    });
+                }
+
+            }
+            else if(tablet.matches) {
+                if (init == true) {
+                    swiper.destroy();
+                    init = false;
+                }
+            }
+            else if(desktop.matches) {
+                if (init == true) {
+                    swiper.destroy();
+                    init = false;
+                }
+            }
+        }
+        window.addEventListener('load', function() {
+            swiperMode();
+        });
+        window.addEventListener('resize', function() {
+            swiperMode();
+        });
+    </script>
+</div>

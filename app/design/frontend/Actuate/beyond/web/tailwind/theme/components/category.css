@@ -1,0 +1,37 @@
+.category-view {
+    .sidebar .block.filter {}
+    .page-main {
+        @apply !mt-0;
+    }
+}
+.catalog-category-view {
+    .page-main {
+        @apply !mt-0;
+    }
+}
+.pdp-deal-strip {
+    @apply flex inline-block relative text-base text-gray-900 font-serif mb-4;
+    [data-content-type="html"] {
+        @apply !w-full;
+    }
+    .pdp-deal-link {
+        @apply block px-2.5 py-1.5 pr-6 rounded-md text-base font-bold lg:font-extrabold leading-[19px] lg:text-[22px] lg:leading-[26px] text-black font-serif no-underline inline-block w-full border border-[#000d40] bg-white;
+    }
+}
+.att-tooltip {
+    @apply relative inline-block cursor-pointer;
+    .tooltiptext {
+        @apply invisible w-56 lg:w-72 bg-white text-black text-center rounded-md p-1.5 border border-[#000d40] absolute z-[1] left-[-60px] text-sm;
+    }
+    &:hover {
+        .tooltiptext {
+            @apply visible;
+        }
+    }
+}
+.product-main-full-width {
+    @apply mt-7 mb-7;
+}
+.catalog-category-view #category-view-container {
+    @apply !pb-0 overflow-hidden;
+}

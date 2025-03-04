@@ -1,0 +1,25 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Magento\OfflinePayments\Model\Banktransfer;
+use ReliantDirect\Checkout\Block\TermAndCondition;
+
+/** @var Template $block */
+/** @var Banktransfer $method */
+/** @var TermAndCondition $termAndCondition */
+
+$termAndCondition = $block->getLayout()->createBlock(TermAndCondition::class);
+?>
+<div>
+    Apple pay
+    <?= $termAndCondition->toHtml() ?>
+    <?= $block->getChildHtml('hyva.checkout.navigation.placeorder.button.applypay') ?>
+</div>

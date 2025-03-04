@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <actuate_delivery>
+            <delivery>
+                <delivery_text>FREE Next Day Delivery (Order by 1pm)*</delivery_text>
+            </delivery>
+        </actuate_delivery>
+        <actuate_config_product>
+            <general>
+                <attributes>nc1000001716,nc1000001772,nc1000001728,nc1000001736,nc1000001732</attributes>
+            </general>
+        </actuate_config_product>
+        <flix_media>
+            <general>
+                <loadbee_api_key>WeswA8Un6KUw3HbPPF3Nt8WbBzB26ydS</loadbee_api_key>
+                <distributor_id>15157</distributor_id>
+            </general>
+        </flix_media>
+    </default>
+    <websites>
+        <base>
+            <flix_media>
+                <general>
+                    <distributor_id>15157</distributor_id>
+                </general>
+            </flix_media>
+        </base>
+        <beyond_website>
+            <flix_media>
+                <general>
+                    <distributor_id>15196</distributor_id>
+                </general>
+            </flix_media>
+        </beyond_website>
+    </websites>
+</config>

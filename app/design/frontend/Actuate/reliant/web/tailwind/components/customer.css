@@ -1,0 +1,62 @@
+#customer-login-container {
+    @apply flex flex-col justify-between py-8;
+
+    @screen md {
+        @apply flex-row;
+    }
+}
+.account {
+    .columns .sidebar {
+        @apply order-1;
+    }
+    .page-main {
+        @apply mt-2 lg:mt-10;
+    }
+    .main-title {
+        @apply !mt-0 !px-0 mb-5 lg:mb-10;
+        h1 {
+            @apply font-serif text-2xl leading-8 font-bold text-[#126366] lg:text-[44px] lg:leading-10;
+        }
+    }
+    .field {
+        .label {
+            @apply font-sans text-base font-bold leading-7 text-[#161A21];
+        }
+        .form-input, .form-email, .form-select, .form-multiselect, .form-textarea {
+           @apply font-sans text-base leading-5;
+        }
+    }
+    .actions-toolbar {
+        @apply border-t-0;
+    }
+}
+.account-nav-content {
+    .nav.items {
+        @apply bg-[#F2F6FA] mb-2.5 py-6 pb-2 px-0;
+        .item {
+            @apply mb-4 px-5 box-border;
+            a {
+                @apply transition font-sans text-base text-[#161A21];
+            }
+            strong {
+                @apply font-sans text-base text-[#161A21] font-bold no-underline;
+            }
+            &.current {
+                @apply border-l-4 border-[#126366] pl-4;
+            }
+            &:hover {
+                @apply border-l-4 border-[#126366] pl-4;
+                a {
+                    @apply font-bold no-underline;
+                }
+            }
+        }
+    }
+}
+.w-full {
+    .control {
+        .form-input, .form-email, .form-select, .form-multiselect, .form-textarea {
+            @apply w-full;
+        }
+    }
+}

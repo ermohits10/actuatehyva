@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Hyva\Checkout\Magewire\Checkout\AddressView\BillingDetails">
+        <plugin sortOrder="1" name="ActuateCheckoutPostcodeLookupBillingDetails"
+                type="ReliantDirect\Checkout\Plugin\BillingAsShippingTogglePlugin"/>
+    </type>
+    <type name="Hyva\Checkout\Model\Magewire\Payment\PlaceOrderServiceProcessor">
+        <plugin sortOrder="1" name="ActuateCheckoutPaypalExpressCheckout"
+                type="ReliantDirect\Checkout\Plugin\Model\Magewire\Payment\PaypalExpressPlaceOrderService"/>
+    </type>
+    <type name="Hyva\Checkout\Model\Magewire\Hydrator\Evaluation">
+        <plugin sortOrder="1" name="ActuateCheckoutPaypalExpressCheckoutTermAndConditionFix"
+                type="ReliantDirect\Checkout\Plugin\Model\Magewire\Hydrator\Evaluation"/>
+    </type>
+</config>

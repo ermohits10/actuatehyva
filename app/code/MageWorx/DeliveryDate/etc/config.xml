@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <delivery_date>
+            <main>
+                <enabled>1</enabled>
+                <include_delivery_dates_reserved_by_unaccomplished_orders>1</include_delivery_dates_reserved_by_unaccomplished_orders>
+                <quote_limitation_mode>1</quote_limitation_mode>
+                <general_queue>1</general_queue>
+                <comment_field_visible>1</comment_field_visible>
+                <comment_field_label><![CDATA[Comment for your delivery]]></comment_field_label>
+                <defaul_delivery_option_id>0</defaul_delivery_option_id>
+                <delivery_date_required>0</delivery_date_required>
+                <set_default_date_enabled>0</set_default_date_enabled>
+                <pre_select_delivery_date>0</pre_select_delivery_date>
+                <change_date_by_customer_enabled>0</change_date_by_customer_enabled>
+                <display_dates_with_extra_charge>0</display_dates_with_extra_charge>
+                <include_non_working_days_in_processing_order_period>0</include_non_working_days_in_processing_order_period>
+                <reload_shipping_rates_on_price_change>0</reload_shipping_rates_on_price_change>
+            </main>
+            <visualisation>
+                <date_template>default</date_template>
+                <delivery_date_placeholder><![CDATA[Select date]]></delivery_date_placeholder>
+                <replace_date_to_words>0</replace_date_to_words>
+                <date_format>yyyy-MM-dd</date_format>
+                <date_format_custom>yyyy-MM-dd</date_format_custom>
+                <time_template>default</time_template>
+                <time_label_template><![CDATA[{{from_time_12}} {{to_time_12}}]]></time_label_template>
+                <delivery_date_title>Date</delivery_date_title>
+                <delivery_time_title>Time</delivery_time_title>
+                <use_default_delivery_date_data_in_emails>1</use_default_delivery_date_data_in_emails>
+                <display_empty_delivery_date_block_in_order_view_page>0</display_empty_delivery_date_block_in_order_view_page>
+            </visualisation>
+            <product>
+                <use_min_time>1</use_min_time>
+                <use_stock>0</use_stock>
+                <limit_by_edt_to>0</limit_by_edt_to>
+                <block_if_on_any_disabled>0</block_if_on_any_disabled>
+                <message_format><![CDATA[{{days_from_number}}-day delivery]]></message_format>
+                <same_day_delivery_message_format><![CDATA[]]></same_day_delivery_message_format>
+                <next_day_delivery_message_format><![CDATA[]]></next_day_delivery_message_format>
+                <error_message><![CDATA[Delivery is unavailable right now]]></error_message>
+                <display_select_options_message>0</display_select_options_message>
+                <select_options_message><![CDATA[Please, select all required options to calculate the nearest delivery date.]]></select_options_message>
+            </product>
+        </delivery_date>
+    </default>
+</config>

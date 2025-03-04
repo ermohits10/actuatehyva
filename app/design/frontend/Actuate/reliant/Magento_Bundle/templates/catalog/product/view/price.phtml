@@ -1,0 +1,158 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Magento\Catalog\Block\Product\View;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Pricing\Price\BasePrice;
+use Magento\Catalog\Pricing\Price\RegularPrice;
+use Magento\Catalog\Pricing\Price\TierPrice;
+use Magento\Framework\Escaper;
+
+/** @var View $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Product $product */
+$product = $block->getProduct();
+
+/** @var ProductPrice $productPriceViewModel */
+$productPriceViewModel = $viewModels->require(ProductPrice::class);
+
+$regularPrice = $productPriceViewModel->getPriceValue(RegularPrice::PRICE_CODE, $product);
+$finalPrice = $productPriceViewModel->getPriceValue(BasePrice::PRICE_CODE, $product);
+$tierPrices = $productPriceViewModel->getTierPrices(TierPrice::PRICE_CODE, $product);
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+$displayTax = $productPriceViewModel->displayPriceIncludingTax();
+
+?>
+<script>
+    function initPrice<?= (int)$product->getId() ?>() {
+        return {
+            activeProductsPriceData: false,
+            initialFinalPrice: <?= (float)$finalPrice ?>,
+            initialTierPrices: <?= /** @noEscape */ json_encode($product->getTierPrice()) ?>,
+            calculatedFinalPrice: false,
+            calculatedFinalPriceWithCustomOptions: false,
+            customOptionPrices: [],
+            activeCustomOptions: [],
+            qty: 1,
+            updateCustomOptionActive(data) {
+
+                let activeCustomOptions = this.activeCustomOptions;
+                const customOptionId = data.customOptionId;
+
+                if (data.active) {
+                    if (!activeCustomOptions.includes(customOptionId)) {
+                        activeCustomOptions.push(data.customOptionId);
+                    }
+                } else {
+                    if (customOptionId && activeCustomOptions.includes(customOptionId)) {
+                        let index = activeCustomOptions.indexOf(customOptionId);
+                        activeCustomOptions.splice(index, 1);
+                    }
+                }
+                this.calculateFinalPriceWithCustomOptions()
+            },
+            updateCustomOptionPrices(prices) {
+
+                if (prices) {
+                    this.customOptionPrices = prices;
+                }
+
+                this.calculateFinalPriceWithCustomOptions();
+            },
+            calculateFinalPrice() {
+                let finalPrice = this.initialFinalPrice;
+
+                if (this.activeProductsPriceData) {
+                    finalPrice = this.activeProductsPriceData.finalPrice;
+
+                    finalPrice = this.initialTierPrices.reduce((finalValue, tierPrice) => {
+                        if (this.qty >= tierPrice.price_qty) {
+                            return (
+                                this.activeProductsPriceData.oldPrice * (1 + (tierPrice.percentage_value / 100)) <
+                                finalValue
+                            ) ?
+                                this.activeProductsPriceData.oldPrice * (1 + (tierPrice.percentage_value / 100)) :
+                                finalValue;
+                        }
+                        return finalValue;
+                    }, finalPrice);
+                }
+
+                this.calculatedFinalPrice = finalPrice;
+
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "update-product-final-price",
+                        {detail: this.calculatedFinalPrice}
+                    )
+                );
+            },
+            calculateFinalPriceWithCustomOptions() {
+                let finalPrice = this.calculatedFinalPrice ||
+                    this.initialFinalPrice;
+
+                this.calculatedFinalPriceWithCustomOptions =
+                    this.activeCustomOptions.reduce((priceAccumulator, activeCustomOptionId) => {
+                        const customOptionPrice = this.customOptionPrices[activeCustomOptionId];
+                        if (customOptionPrice) {
+                            return Number.parseFloat(priceAccumulator) + Number.parseFloat(customOptionPrice);
+                        }
+                        return finalPrice;
+                    }, finalPrice);
+
+            },
+            getFormattedFinalPrice() {
+                return hyva.formatPrice(
+                    this.calculatedFinalPriceWithCustomOptions ||
+                    this.calculatedFinalPrice ||
+                    this.initialFinalPrice
+                )
+            },
+            eventListeners: {
+                ['@update-bundle-option-prices.window'](event) {
+                    this.activeProductsPriceData = event.detail;
+
+                    this.calculateFinalPrice();
+                    this.calculateFinalPriceWithCustomOptions();
+                },
+                ['@update-qty-<?= (int)$product->getId() ?>.window'](event) {
+                    this.qty = event.detail;
+
+                    this.calculateFinalPrice();
+                    this.calculateFinalPriceWithCustomOptions();
+                },
+                ['@update-custom-option-active.window'](event) {
+                    this.updateCustomOptionActive(event.detail);
+                },
+                ['@update-custom-option-prices.window'](event) {
+                    this.updateCustomOptionPrices(event.detail);
+                }
+            }
+        }
+    }
+</script>
+<div x-data="initPrice<?= (int)$product->getId() ?>()"
+     x-spread="eventListeners"
+     class="price-box price-final_price my-4"
+>
+    <div class="final-price flex">
+        <span id="product-price-<?= (int)$product->getId() ?>"
+              class="price-wrapper title-font font-medium text-2xl text-gray-900">
+            <span class="price" x-html="getFormattedFinalPrice()"></span>
+        </span>
+    </div>
+</div>

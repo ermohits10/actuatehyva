@@ -1,0 +1,71 @@
+<?php
+/** @var SettingsModal $block */
+/** @var SecureHtmlRenderer $secureRenderer */
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Mirasvit\GdprCookie\Block\SettingsModal;
+
+?>
+
+<div style="display: none;" data-bind="mageInit: {
+        'Magento_Ui/js/modal/modal':{
+            'type': 'popup',
+            'title': '<?= $block->escapeHtml($block->getPopupTitle()); ?>',
+            'trigger': '[data-trigger-settings=trigger]',
+            'responsive': true,
+            'innerScroll': true,
+            'modalClass': 'mst-gdpr__cookie-settings--cookie-modal-settings',
+            'buttons': [{
+                text: jQuery.mage.__('Apply'),
+                class: 'action primary mst-gdpr__cookie-settings--success-btn'
+            }]
+        }}">
+    <div class="content">
+        <div class="modal-text">
+            <?= $block->escapeHtml($block->getPopupDescription()); ?>
+        </div>
+        <div class="mst-gdpr__cookie-settings--group-content">
+            <?php foreach ($block->getCookieGroups() as $group): ?>
+                <?= $block->getCookieGroupHtml($group); ?>
+            <?php endforeach; ?>
+
+            <?php if ($block->isGoogleConsentModeEnabled()): ?>
+                <div
+                    class="mst-gdpr__cookie-settings--cookie-group-container mst-gdpr__google-consent-settings--group-container">
+                    <div class="title-container">
+                        <h4 class="title">
+                            <?= $block->escapeHtml(__('Google Consent')); ?>
+                        </h4>
+                        <div class="content">
+                            <?php foreach ($block->getGoogleConsentTypes() as $type): ?>
+                                <div class="consent-type-row">
+                                    <div class="title"><?= /* @noEscape */ $type ?></div>
+                                    <label class="switch">
+                                        <input class="checkbox" type="checkbox" name="google_consent_<?= /* @noEscape */ $type ?>"
+                                               data-consent-type="<?= /* @noEscape */ $type ?>">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                </div>
+                <?php
+                    $scriptString = <<<script
+                    require([
+                        'jquery',
+                        'collapsible'
+                    ], function ($) {
+                        var elSelector = ".mst-gdpr__google-consent-settings--group-container";
+                        $(elSelector).collapsible(
+                            {header: $(elSelector + " .title"), content: $(elSelector + " .content")}
+                        );
+                    });
+script;
+                ?>
+                <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

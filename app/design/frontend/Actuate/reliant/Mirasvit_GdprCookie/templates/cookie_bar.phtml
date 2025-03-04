@@ -1,0 +1,162 @@
+<?php
+/** @var CookieBar $block */
+
+use Mirasvit\GdprCookie\Block\CookieBar;
+
+$isShowDeclineButton = $block->isShowDeclineButton();
+$jsonConfig = $block->getJsonConfig();
+
+$barEnabled = $googleConsentEnabled = 0;
+if (isset($jsonConfig['*']['Mirasvit_GdprCookie/js/cookieBar']['googleConsentEnabled'])
+    && $jsonConfig['*']['Mirasvit_GdprCookie/js/cookieBar']['googleConsentEnabled'] === true) {
+    $googleConsentEnabled = 1;
+}
+
+if (isset($jsonConfig['*']['Mirasvit_GdprCookie/js/cookieBar']['barEnabled'])
+    && $jsonConfig['*']['Mirasvit_GdprCookie/js/cookieBar']['barEnabled'] === true) {
+    $barEnabled = 1;
+}
+?>
+<div class="mst-gdpr__cookie-bar-wrapper block relative z-[99999]" id="gdprCookieBar" x-data="initMstGdprCookieBar()" x-init="initDisplay()" @handle-cookie-allow.window="handleAllow">
+    <div class="mst-gdpr__cookie-bar"
+         x-bind:class="{'opacity-70': isLoading}"
+         x-show="isBarVisible"
+         style="display: none">
+        <div class="consent-text md:text-sm lg:text-base md:pr-4">
+            <?= $block->getPolicyText() ?>
+        </div>
+
+        <div class="mst-gdpr__buttons flex flex-row justify-center mt-4 md:mt-0">
+            <button type="button"
+                    class="action btn justify-center md:mr-2 md:px-2 mr-auto px-4 text-sm w-auto xl:px-4"
+                    x-bind:class="{'opacity-0': isLoading}"
+                    @click="openSettings">
+                <span><?= __('Settings') ?></span>
+            </button>
+
+            <button class="action btn btn-primary justify-center md:mt-0 md:px-2 ml-4 mr-auto md:mx-auto px-4 text-sm w-auto xl:px-4"
+                    data-trigger-settings="agree"
+                    x-bind:class="{'opacity-0': isLoading}"
+                    @click="handleAllow"><span><?= __('Agree') ?></span></button>
+            <?php if ($isShowDeclineButton): ?>
+                <button
+                    class="action btn justify-center md:mt-0 md:px-2 mr-auto mt-4 mx-auto px-4 text-sm w-auto xl:px-4"
+                    data-trigger-settings="agree"
+                    x-bind:class="{'opacity-0': isLoading}"
+                    @click="handleDecline"><span><?= __('Decline') ?></span></button>
+            <?php endif; ?>
+        </div>
+    </div>
+    <div class="mst-gdpr__cookie-bar-overlay bg-black fixed h-full left-0 opacity-60 top-0 w-full z-40"
+         style="display: none"
+         id="gdprCookieBarOverlay" x-show="isScreenLocked"></div>
+</div>
+<script>
+    function initMstGdprCookieBar() {
+        'use strict';
+        const cookieGroupName = '<?= \Mirasvit\GdprCookie\Model\ConfigProvider::MST_COOKIE_GROUPS ?>';
+        const consentCookieName = '<?= \Mirasvit\GdprCookie\Model\ConfigProvider::CONSENT_COOKIE_NAME ?>'
+        <?php $isOverlayEnabled = $block->getJsonConfig()['*']['Mirasvit_GdprCookie/js/cookieBar']['lockScreen'] ?? false ?>
+
+        return {
+            isLoading: false,
+            isBarVisible: false,
+            isScreenLocked: false,
+            googleConsentTypes: ['ad_personalization', 'ad_user_data', 'ad_storage', 'analytics_storage', 'personalization_storage', 'functionality_storage', 'security_storage'],
+            googleConsentEnabled: <?= $googleConsentEnabled; ?>,
+            barEnabled: <?= $barEnabled; ?>,
+            initDisplay: function () {
+                !hyva.getCookie(cookieGroupName) || !hyva.getCookie(consentCookieName)
+                    ? this.show()
+                    : this.hide();
+            },
+            show: function () {
+                this.isBarVisible = true;
+                this.isScreenLocked = window.location.href.indexOf('cookie') === -1 && <?= (int) $isOverlayEnabled ?>;
+                if (this.isScreenLocked) {
+                    document.querySelector('body').style.overflow = 'hidden';
+                }
+            },
+            hide: function () {
+                this.isBarVisible = false;
+                this.isScreenLocked = false;
+                document.querySelector('body').style.overflow = 'auto';
+            },
+            handleAllow: function () {
+                this.isLoading = true;
+
+                if (this.barEnabled === 1 && this.googleConsentEnabled === 1) {
+                    this.handleGoogleConsentAllow();
+                }
+
+                const checkedGroups = document.querySelectorAll('.cookie-group-container .checkbox:checked');
+                const checked = Array.from(checkedGroups || []);
+                const body = checked.reduce((body, item) => {
+                    body.append('group_ids[]', item.dataset.groupId);
+                    return body;
+                }, new URLSearchParams({form_key: hyva.getFormKey()}))
+
+                fetch('<?= $block->getUrl('gdpr_cookie/cookie/allow') ?>', {
+                        method: 'post',
+                        body: body,
+                        headers: {contentType: 'application/x-www-form-urlencoded; charset=UTF-8'}
+                })
+                    .then(() => this.hide())
+                    .finally(() => this.isLoading = false)
+            },
+
+            handleDecline: function () {
+                this.isLoading = true;
+
+                if (this.barEnabled === 1 && this.googleConsentEnabled === 1) {
+                    this.handleGoogleConsentDecline();
+                }
+
+                const body = new URLSearchParams({form_key: hyva.getFormKey()});
+                fetch('<?= $block->getUrl('gdpr_cookie/cookie/decline') ?>', {
+                    method: 'post',
+                    body: body,
+                    headers: {contentType: 'application/x-www-form-urlencoded; charset=UTF-8'}
+                })
+                    .then(() => this.hide())
+                    .finally(() => this.isLoading = false)
+            },
+
+            handleGoogleConsentAllow: function () {
+                let consent = {};
+                this.googleConsentTypes.forEach(function (consentType) {
+                    consent[consentType] = 'granted';
+                });
+                this.saveGoogleConsent(consent);
+            },
+
+            handleGoogleConsentDecline: function () {
+                let consent = {};
+                this.googleConsentTypes.forEach(function (consentType) {
+                    consent[consentType] = 'denied';
+                });
+
+                this.saveGoogleConsent(consent);
+            },
+
+            saveGoogleConsent: function (consent) {
+                this.sendConsentUpdate(consent);
+                this.setLocalStorageGoogleConsent(consent);
+            },
+
+            sendConsentUpdate: function (consent) {
+                if (typeof gtag === "function") {
+                    gtag('consent', 'update', consent);
+                }
+            },
+
+            setLocalStorageGoogleConsent: function (consent) {
+                localStorage.setItem('mst-gdpr-google-consent-mode', JSON.stringify(consent));
+            },
+
+            openSettings: function () {
+                window.dispatchEvent(new CustomEvent('mst-gdpr-cookie-settings-open'));
+            }
+        };
+    }
+</script>

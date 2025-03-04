@@ -1,0 +1,64 @@
+<?php
+/**
+ * @var Button $block
+ */
+
+use Amazon\Pay\Block\Minicart\Button;
+
+?>
+<div id="minicart-amazon-pay-button" class="amazon-button-container" x-data="initAmazonPay()" x-init="checkoutConfig()">
+    <div class="amazon-button-column">
+        <div id="<?= $block->getAmazonId(); ?>"></div>
+    </div>
+</div>
+<script>
+    function initAmazonPay() {
+        return {
+            loadCheckoutComponent: function () {
+                if (!document.querySelector("script[src*='https://static-eu.payments-amazon.com/checkout.js']")) {
+                    let scriptEle = document.createElement("script");
+                    scriptEle.setAttribute("src", "https://static-eu.payments-amazon.com/checkout.js");
+                    scriptEle.setAttribute("type", "text/javascript");
+                    scriptEle.setAttribute("async", true);
+                    document.body.appendChild(scriptEle);
+                }
+            },
+            checkoutConfig: function(event) {
+                var self = this;
+                self.loadCheckoutComponent();
+                window.fetch('<?= $this->getUrl('amazon_pay/checkout/config') ?>', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }).then((response) => {
+                    response.json().then((result) => {
+                        var payload = result['checkout_payload'];
+                        var signature = result['checkout_signature'];
+
+                        if (result) {
+                            const amazonPayButton = amazon.Pay.renderButton('#<?= $block->getAmazonId(); ?>', {
+                                merchantId: result['merchant_id'],
+                                publicKeyId: result['public_key_id'],
+                                ledgerCurrency: result['currency'],
+                                sandbox: result['sandbox'],
+                                checkoutLanguage: result['language'],
+                                productType: result['pay_only'] ? 'PayOnly' : 'PayAndShip',
+                                placement: 'Cart',
+                                buttonColor: result['button_color'],
+                                createCheckoutSessionConfig: {
+                                    payloadJSON: payload,
+                                    signature: signature,
+                                    publicKeyId: result['public_key_id']
+                                }
+                            });
+                        }
+                    });
+                }).catch((error) => {
+                    console.error(error);
+                });
+            }
+        }
+    }
+</script>

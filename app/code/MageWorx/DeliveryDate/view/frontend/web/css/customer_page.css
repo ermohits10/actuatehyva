@@ -1,0 +1,13 @@
+.delivery-date-fieldset-wrapper .edit-link {
+    color: #006bb4;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.delivery-date-fieldset-wrapper ._hide {
+    display: none;
+}
+
+.delivery-date-fieldset-wrapper ._show {
+    display: block;
+}

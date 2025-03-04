@@ -1,0 +1,30 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+/**
+ * @Internal Prefer utilizing the "after" container for injecting additional code.
+ */
+?>
+<script>
+    'use strict';
+
+    (() => {
+        window.addEventListener('checkout:init:shipping', () => {
+            <?php /* Global listener for when the shipping method was updated. */ ?>
+            window.addEventListener('shipping:method:update', event => {
+                if ('method' in event.detail) {
+                    hyvaCheckout.shipping.activate(event.detail.method)
+                }
+            })
+        })
+    })()
+</script>
+
+<?= $this->getChildHtml('after') ?>

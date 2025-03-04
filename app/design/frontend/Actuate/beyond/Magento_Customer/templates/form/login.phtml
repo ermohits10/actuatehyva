@@ -1,0 +1,137 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Customer\Block\Form\Login;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\ReCaptcha;
+
+/** @var Escaper $escaper */
+/** @var Login $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var ReCaptcha $recaptcha */
+/** @var HeroiconsOutline $heroicons */
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+// Do not replace this with $viewModels->require(ReCaptcha::class); that might break the dependency
+// on the Magento_ReCaptchaCustomer module
+$recaptcha = $block->getData('viewModelRecaptcha');
+?>
+<div class="w-full md:w-2/5 mx-auto md:bg-[#F2F6FA] md:p-10 rounded-md">
+    <div aria-labelledby="block-customer-login-heading">
+        <form class="form form-login"
+              action="<?= $escaper->escapeUrl($block->getPostActionUrl()) ?>"
+              method="post"
+              x-data="initCustomerLoginForm()"
+              @submit.prevent="submitForm()"
+              id="customer-login-form">
+            <?= $block->getBlockHtml('formkey') ?>
+            <fieldset class="fieldset login">
+                <legend class="mb-3">
+                    <h2 class="text-xl font-medium title-font text-primary hidden">
+                        <?= $escaper->escapeHtml(__('Login')) ?>
+                    </h2>
+                </legend>
+                <div class="field email required mb-4">
+                    <label class="label text-base leading-5 text-[#161A21] font-sans mb-2 font-bold" for="email"><span><?= $escaper->escapeHtml(__('Email Address')) ?></span></label>
+                    <div class="control">
+                        <input name="login[username]"
+                               class="form-input w-full"
+                               required
+                               value="<?= $escaper->escapeHtmlAttr($block->getUsername()) ?>"
+                            <?php if ($block->isAutocompleteDisabled()): ?>
+                                autocomplete="off"
+                            <?php endif; ?>
+                               id="email"
+                               type="email"
+                               placeholder="<?= $escaper->escapeHtml(__('Email Address')) ?>"
+                               title="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"/>
+                    </div>
+                </div>
+                <div class="field password required">
+                    <label for="pass" class="label text-base leading-5 text-[#161A21] font-sans mb-2 font-bold"><span><?= $escaper->escapeHtml(__('Password')) ?></span></label>
+                    <div class="control">
+                        <input name="login[password]"
+                               class="form-input w-full"
+                               required
+                               :type="showPassword ? 'text' : 'password'"
+                            <?php if ($block->isAutocompleteDisabled()): ?>
+                                autocomplete="off"
+                            <?php endif; ?>
+                               id="pass"
+                               placeholder="<?= $escaper->escapeHtml(__('Password')) ?>"
+                               title="<?= $escaper->escapeHtmlAttr(__('Password')) ?>"/>
+                    </div>
+                </div>
+                <div class="flex justify-between pt-6 pb-2 items-center">
+                    <div class="field choice">
+                        <input name="show-password"
+                               class="checkbox"
+                               id="show-password"
+                               type="checkbox"
+                               x-model="showPassword"
+                               title="<?= $escaper->escapeHtmlAttr(__('Show Password')) ?>"/>
+                        <label for="show-password" class="label">
+                            <span><?= $escaper->escapeHtml(__('Show Password')) ?></span>
+                        </label>
+                    </div>
+                    <a class="text-base text-[#126366] font-sans font-bold py-2 px-6" href="<?= $escaper->escapeUrl($block->getForgotPasswordUrl()) ?>"><span><?= $escaper->escapeHtml(__('Forgot Your Password?')) ?></span></a>
+                </div>
+
+                <?= $recaptcha ? $recaptcha->getInputHtml('customer_login') : '' ?>
+                <?= $block->getChildHtml('form_additional_info') ?>
+                <div class="flex justify-between pt-6 pb-2 items-center text-center">
+                    <button type="submit" class="mx-auto w-full bg-[#126366] text-base leading-5 inline-block block text-white h-[36px] rounded-md" name="send"><span><?= $escaper->escapeHtml(__('Sign In')) ?></span></button>
+                </div>
+                <div>
+                    <template x-if="displayErrorMessage">
+                        <p class="text-red flex items-center">
+                            <span class="inline-block w-8 h-8 mr-3">
+                                <?= $heroicons->exclamationCircleHtml(); ?>
+                            </span>
+                            <template x-for="errorMessage in errorMessages">
+                                <span x-html="errorMessage"></span>
+                            </template>
+                        </p>
+                    </template>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="w-full">
+        <?= $recaptcha ? $recaptcha->getLegalNoticeHtml('customer_login') : '' ?>
+    </div>
+    <script>
+        function initCustomerLoginForm() {
+            return {
+                errors: 0,
+                hasCaptchaToken: 0,
+                showPassword: false,
+                displayErrorMessage: false,
+                errorMessages: [],
+                setErrorMessages(messages) {
+                    this.errorMessages = [messages]
+                    this.displayErrorMessage = this.errorMessages.length
+                },
+                submitForm() {
+                    // do not rename $form, the variable is the expected name in the recaptcha output
+                    const $form = document.querySelector('#customer-login-form');
+                    <?= $recaptcha ? $recaptcha->getValidationJsHtml('customer_login') : '' ?>
+
+                    if (this.errors === 0) {
+                        $form.submit();
+                    }
+                }
+            }
+        }
+    </script>
+</div>

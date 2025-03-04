@@ -1,0 +1,252 @@
+.hyva_checkout-index-index {
+	@apply font-serif text-[#212121];
+	.field-error {
+		input {
+			@apply !border-[#E30000];
+		}
+		.messages {
+			@apply !text-[#E30000] !text-base inline-flex;
+		}
+		.messages:before {
+			content: url("../images/error.svg");
+			@apply pr-2;
+		}
+	}
+	.columns {
+		@apply max-w-[1440px] px-[15px] md:px-5 text-[#363636];
+	}
+	.page-header {
+		.header {
+			@apply container max-w-[1440px] px-[15px] md:px-5 mx-auto mt-[22px];
+		}
+		.header.content > div {
+			@apply w-[160px] md:w-[240px];
+			img {
+				@apply w-full;
+			}
+		}
+	}
+	.page-main {
+		@apply mt-2.5 md:mt-5;
+	}
+	#quote-summary {
+		@apply md:sticky right-0 top-0 max767:hidden max767:mx-[-15px];
+	}
+	.checkout-sidebar.active {
+		#quote-summary {
+			@apply block;
+		}
+	}
+	form .field.field-reserved, fieldset .field.field-reserved {
+		@apply mb-5 mt-0;
+		ul:last-of-type {
+			@apply mt-[7px] mb-0 text-[12px] pb-0;
+		}
+	}
+	h1.title {
+		@apply text-[24px] md:text-[32px] font-semibold mt-0 mb-[11px] md:mb-[25px] leading-[1.1] max767:text-center;
+	}
+	label[for="newsletter-subscribe"], .billing-as-shipping {
+		@apply text-[13px] md:text-base text-[#4E4E48];
+	}
+	#guest-details {
+		@apply mb-5;
+	}
+	input[type="checkbox"], input[type="radio"] {
+		appearance: auto;
+		box-shadow: none !important;
+		@apply w-5 h-5 !shadow-none border-[#d9d9d9] mr-3 mt-0.5 align-top !ring-0 !border-0 focus:outline-none;
+	}
+	.field-is_approved {
+		@apply col-span-12;
+	}
+	button.action {
+		&:not(.action-show) {
+			@apply bg-[#145960] hover:bg-[#212121] transition-all duration-300 text-white px-9 rounded-[3px] text-sm font-semibold border-0;
+		}
+		&.action-save-continue {
+			@apply text-xl h-[38px] block max767:mx-auto md:ml-auto mt-5 disabled:bg-[#C7CACA] disabled:text-[#8B8B8B];
+		}
+	}
+	.btn{
+		@apply w-auto;
+		&.btn-place-order {
+			@apply bg-[#145860] hover:bg-[#212121] transition-all duration-300 text-xl md:text-2xl h-[46px] text-center rounded-[3px] font-sans justify-center;
+		}
+	}
+	section#payment-main {
+		@apply flex flex-wrap items-center mb-0;
+		.payment-group-logos {
+			@apply ml-auto max-w-[53%];
+			svg {
+				@apply max-w-full;
+			}
+		}
+	}
+	.method-option:hover {
+		box-shadow: 0 2px 8px rgba(56,77,108,0.4);
+	}
+	#hyva-checkout-main #quote-summary > .price-summary {
+		@apply bg-[#f9f9f9] p-5 max767:pt-0 rounded-none;
+	}
+	#quote-summary {
+		@apply max767:h-[calc(100vh-63px)] max767:overflow-auto;
+		.section-title {
+			@apply border-b border-[#c4c4c4] max767:hidden
+		}
+		.total-segments {
+			.item {
+				@apply text-xl font-medium py-7 last:py-0 leading-6 border-t last:border-t-0 border-[#c4c4c4] m-0;
+				> div {
+					@apply p-0 m-0 border-0;
+				}
+			}
+			.value {
+				@apply text-xl font-bold;
+			}
+			.grand_total {
+				@apply text-[#145960];
+				.label {
+					@apply font-normal
+				}
+				.value {
+					@apply text-[28px]
+				}
+			}
+		}
+	}
+	.address-item {
+		a {
+			@apply text-[#006bb4] hover:text-[#ff5501] hover:underline
+		}
+		&:hover {
+			box-shadow: 0 2px 8px rgba(56,77,108,0.4);
+		}
+	}
+	&.scrolled {
+		@screen max767 {
+			.column-right {
+				@apply h-[64px];
+				.column-right-wrap {
+					@apply fixed inset-x-0 top-auto bottom-0 px-[15px] flex flex-col-reverse;
+				}
+				&.checkout-sidebar.active #quote-summary {
+					@apply flex;
+					.price-summary {
+						@apply mt-auto;
+					}
+				}
+				.mobile-arrow {
+					@apply rotate-[225deg] mt-2.5;
+					&.active {
+						@apply rotate-45 !-mt-1;
+					}
+				}
+			}
+		}
+	}
+	.label-company {
+		span:after {
+			content: ' (Optional)';
+			font-weight: 400;
+		}
+	}
+	.field-postcode {
+		> div:first-child {
+			@apply w-[calc(65%-10px)] md:w-[calc(75.7%-10px)] mr-auto;
+		}
+		.lookup-result {
+			@apply w-full order-3 text-xs text-[#e02b27] mt-2 empty:hidden;
+			select {
+				@apply w-full text-[#212121] min-w-full max-w-full text-base !border !border-[#d9d9d9] px-[15px] rounded-[3px] h-[48px] !ring-0 shadow-none focus:outline-none;
+			}
+		}
+	}
+	#payment-method-option-braintree {
+		label {
+			@apply justify-start;
+			img {
+				@apply ml-2.5 even:ml-auto max-w-[50px] max-h-[30px];
+			}
+		}
+	}
+	#payment-method-option-paypal_express {
+		img {
+			@apply max-w-[70px] md:max-w-[100px]
+		}
+	}
+	#payment-method-option-amazon_payment_v2 {
+		img {
+			@apply max-h-5;
+		}
+	}
+	#payment-method-option-braintree_applepay {
+		img {
+			@apply max-h-9;
+		}
+	}
+	#payment-method-option-v12finance {
+		img {
+			@apply max-w-[86px] md:max-w-[110px] -my-1.5;
+		}
+	}
+	#payment-method-list {
+		.btn-place-order {
+			@apply w-full;
+		}
+        input[type="radio"] {
+            @apply mr-0;
+        }
+        #AmazonPayCheckoutButton {
+            @apply !w-full mb-5 !h-[50px];
+        }
+        .braintree-card {
+            @apply flex flex-wrap justify-between;
+            .field.field-reserved {
+                @apply mb-2.5;
+                .field__label {
+                    @apply text-lg text-[#4E4E48] font-bold;
+                }
+                @apply w-[49%];
+                .form-input {
+                    @apply px-[15px];
+                }
+                &:first-child {
+                    @apply w-full;
+                    .form-input {
+                        @apply pl-16;
+                    }
+                }
+            }
+        }
+	}
+	#hyva-checkout-container {
+		#paypal-button-paypal_express {
+			@apply py-0;
+		}
+		#payment-method-view-paypal_express {
+			margin-top: 0;
+		}
+		[id*="paypal-messages"], .payment-method-note {
+			@apply border-0 bg-transparent p-0 rounded-none mb-0;
+		}
+		.payment-method-note {
+			@apply text-xl text-[#4E4E48] mb-2.5;
+		}
+	}
+}
+#shipping-details-main, section#shipping-main, section#payment-main {
+	@apply border border-[#135E64] rounded p-2.5 mb-5;
+	> section {
+		@apply block md:mt-5 w-full;
+	}
+}
+section#shipping-main, section#payment-main > section {
+	@apply max767:mt-2.5;
+	a {
+		@apply text-[#0D6EFD];
+	}
+}
+div#hyva-checkout-main div.required > label > span:after {
+	@apply static text-[#e02b27] text-[12px] ml-[5px];
+}

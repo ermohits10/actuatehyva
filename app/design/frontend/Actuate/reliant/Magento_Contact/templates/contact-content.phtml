@@ -1,0 +1,106 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Customer;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Customer $customer */
+$customer = $viewModels->require(Customer::class);
+/** @var StoreConfig $storeConfig */
+$storeConfig = $viewModels->require(StoreConfig::class);
+$awesomeicons6Brands = $viewModels->require(\Jajuma\AwesomeHyva\ViewModel\Awesomeicons6Brands::class);
+?>
+<div class="container mx-auto flex px-0 py-4 pt-0 mt-10 flex-col items-center">
+    <div class="top-row flex w-full flex-col md:flex-row">
+        <div class="contact-info text-center w-full mb-12 lg:w-2/5 lg:pl-[5%] lg:text-left">
+            <h1 class="text-4xl leading-10 font-bold text-[#126366] mb-4"><?= $escaper->escapeHtml(__('Get in touch')) ?></h1>
+            <p class="text-sm font-sans mb-5 lg:text-base lg:mb-6">There are a number of options if you'd like to contact us. You can either call us or email us at our head office in Blackpool or come and see us in one of our showrooms. However you choose to get in touch, you'll receive a warm welcome.</p>
+            <ul>
+                <li><strong>Call us:</strong> 0330 057 7142</li>
+                <li><strong>Email us:</strong> customer.service@reliantdirect.co.uk</li>
+            </ul>
+            <?php $contact_page_update = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('contact-page-update')->toHtml();
+                if ($contact_page_update != ''):
+                    echo $contact_page_update;
+                endif;
+            ?>
+        </div>
+        <div class="customer-helper w-full mb-8 lg:w-[42%] lg:ml-auto lg:mb-14 lg:mr-[4%]">
+            <div class="grid grid-cols-1 lg:grid-cols-2 lg:gap-12">
+                <div class="my-account bg-gradient-to-r from-[#1D3654] to-[#126366] p-8 mb-6 text-white text-center rounded-md">
+                    <h3 class="font-serif text-2xl mb-2 leading-8"><?= $escaper->escapeHtml(__('Manage an order')) ?></h3>
+                    <p class="font-sans text-base mb-6">We've made it easy to manage your orders using  <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>" class="font-bold">My Account</a></p>
+                    <a href="/customer/account" class="inline-block rounded-md bg-white px-8 py-3 text-base leading-5 font-sans text-[#126366] font-bold">Visit My Account</a>
+                </div>
+                <div class="my-questions bg-gradient-to-r from-[#126366] to-[#1D3654] p-8 mb-6 text-white text-center rounded-md">
+                    <h3 class="font-serif text-2xl mb-2 leading-8"><?= $escaper->escapeHtml(__('Got a question')) ?></h3>
+                    <p class="font-sans text-base mb-6">Have you checked out <a href="#" class="font-bold">Frequently Asked Questions?*</a></p>
+                    <a href="/faqs" class="inline-block rounded-md bg-white px-8 py-3 text-base leading-5 font-sans text-[#126366] font-bold">Visit Our FAQ's</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="locations flex w-full flex-col">
+        <h3 class="text-4xl leading-10 w-full font-bold text-[#1D3654] mb-4"><?= $escaper->escapeHtml(__('Our Showrooms')) ?></h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 mb-5">
+            <div class="map flex flex-col w-full rounded-md overflow-hidden mb-5">
+                <div class="address w-full py-12 px-8 rounded-md bg-[#F2F6FA]" style="flex: 1 0 auto;">
+                    <h3 class="max-w-[456px] mx-auto font-serif text-2xl leading-9 font-extrabold mb-2 text-[#1D3654]">Visit us in Blackpool</h3>
+                    <address class="max-w-[456px] mx-auto text-sm lg:text-base font-sans not-italic mb-6">Blackpool Showroom<br>
+                    The Granary Buildings,<br>
+                    Weeton,<br>
+                    Blackpool,<br>
+                    Lancashire,<br>
+                    FY4 4XB</address>
+                    <ul class="max-w-[456px] mx-auto text-sm lg:text-base font-sans">
+                        <li><strong>Tel:</strong> 0330 057142</li>
+                        <li><strong>Tel:</strong> 01253 440272</li>
+                        <li><strong>Email:</strong> customer.service@reliantdirect.co.uk</li>
+                    </ul>
+                </div>
+                <div class="opening-times w-full px-8 py-4 bg-[#126366] text-center text-white">
+                    <h4 class="text-lg leading-6 font-sans font-semibold mb-2.5">Opening Times</h4>
+                    <ul class="text-sm lg:text-base font-sans">
+                        <li class="inline-block mr-6 w-full lg:w-auto mb-2 lg:mb-0"><strong>Monday – Saturday:</strong> 9:00am to 5:30pm</li>
+                        <li class="inline-block w-full lg:w-auto"><strong>Sunday:</strong> Closed</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="map flex flex-col w-full rounded-md overflow-hidden mb-5">
+                <div class="address w-full py-12 px-8 rounded-md bg-[#F2F6FA]" style="flex: 1 0 auto;">
+                    <h3 class="max-w-[456px] mx-auto font-serif text-2xl leading-9 font-extrabold mb-2 text-[#1D3654]">Visit us in Thornton Cleveleys</h3>
+                    <address class="max-w-[456px] mx-auto text-sm lg:text-base font-sans not-italic mb-6">Cleveleys Showroom<br>
+                    2 Rossall Road,<br>
+                    Thornton Cleveleys,<br>
+                    Lancashire,<br>
+                    FY5 1AP</address>
+                    <ul class="max-w-[456px] mx-auto text-sm lg:text-base font-sans">
+                        <li><strong>Tel:</strong> 01253 828828</li>
+                        <li><strong>Email:</strong> customer.service@reliantdirect.co.uk</li>
+                    </ul>
+                </div>
+                <div class="opening-times w-full px-8 py-4 bg-[#126366] text-center text-white">
+                    <h4 class="text-lg leading-6 font-sans font-semibold mb-2.5">Opening Times</h4>
+                    <ul class="text-sm lg:text-base font-sans">
+                        <li class="inline-block mr-6 w-full lg:w-auto mb-2 lg:mb-0"><strong>Monday – Saturday:</strong> 9:00am to 5:30pm</li>
+                        <li class="inline-block w-full lg:w-auto"><strong>Sunday:</strong> Closed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

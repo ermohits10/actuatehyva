@@ -1,0 +1,146 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Catalog\Block\Product\ProductList\Toolbar;
+use Magento\Framework\Escaper;
+
+// phpcs:disable Magento2.Security.IncludeFile.FoundIncludeFile
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Escaper $escaper */
+/** @var Toolbar $block */
+
+$uniqueId = '_' . uniqid();
+$additionalOptions = ['page' => 'p'];
+?>
+<script>
+    function initToolbar<?= /** @noEscape */  $uniqueId ?>() {
+        return {
+            options: <?= /* @noEscape */ $block->getWidgetOptionsJson($additionalOptions) ?>.productListToolbarForm || {},
+            getUrlParams: function () {
+                let decode = window.decodeURIComponent,
+                    urlPaths = this.options.url.split('?'),
+                    urlParams = urlPaths[1] ? urlPaths[1].split('&') : [],
+                    params = {},
+                    parameters, i;
+
+                for (i = 0; i < urlParams.length; i++) {
+                    parameters = urlParams[i].split('=');
+                    params[decode(parameters[0])] = parameters[1] !== undefined ?
+                        decode(parameters[1].replace(/\+/g, '%20')) :
+                        '';
+                }
+
+                return params;
+            },
+            getCurrentLimit: function () {
+                return this.getUrlParams()[this.options.limit] || this.options.limitDefault;
+            },
+            getCurrentPage: function () {
+                return this.getUrlParams()[this.options.page] || 1;
+            },
+            changeUrl(paramName, paramValue, defaultValue) {
+                let urlPaths = this.options.url.split('?'),
+                    baseUrl = urlPaths[0],
+                    paramData = this.getUrlParams(),
+                    currentPage = this.getCurrentPage(),
+                    newPage;
+
+                /**
+                 * calculates the page on which the first item of the current page will
+                 * be with the new limit and sets that number as the new page
+                 */
+                if (currentPage > 1 && paramName === this.options.limit) {
+                    newPage = Math.floor(this.getCurrentLimit() * (currentPage - 1) / paramValue) + 1;
+
+                    if (newPage > 1) {
+                        paramData[this.options.page] = newPage;
+                    } else {
+                        delete paramData[this.options.page];
+                    }
+                }
+
+                paramData[paramName] = paramValue;
+
+                if (this.options.post) {
+                    hyva.postForm({action: baseUrl, data: paramData});
+                } else {
+                    if (paramValue === defaultValue.toString()) {
+                        delete paramData[paramName];
+                    }
+                    paramData = Object.keys(paramData).length === 0
+                        ? ''
+                        : '?' + (new URLSearchParams(paramData));
+                    location.href = baseUrl + paramData
+                }
+            }
+        }
+    }
+</script>
+<script>
+    function setSorterPosition() {
+        if (document.querySelector('.sidebar.sidebar-main')) {
+            let mobile = window.matchMedia('(min-width: 0px) and (max-width: 767px)');
+            let tablet = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
+            let desktop = window.matchMedia('(min-width: 1024px)');
+            if(mobile.matches) {
+                document.querySelector('.sidebar.sidebar-main').appendChild(document.querySelector('.toolbar-sorter.sorter'));
+                document.querySelector('.sidebar.sidebar-main').classList.add('sticky-filter');
+            } else if(desktop.matches || tablet.matches) {
+                document.querySelector('.sidebar.sidebar-main').classList.remove('sticky-filter');
+                if (document.querySelector('.sidebar.sidebar-main').querySelector('.toolbar-sorter.sorter')) {
+                    document.querySelector('.toolbar.toolbar-products').prepend(document.querySelector('.toolbar-sorter.sorter'));
+                }
+            }
+        }
+    }
+
+    function handleScroll() {
+        if (document.querySelector('.sidebar.sidebar-main')) {
+            let mobile = window.matchMedia('(min-width: 0px) and (max-width: 767px)');
+            if (mobile.matches) {
+                if (document.querySelector('[x-data="initHeader()"]').classList.contains('header-top')
+                    || document.querySelector('[x-data="initHeader()"]').classList.contains('header-scrollup')) {
+                    document.querySelector('.sidebar.sidebar-main.sticky-filter').classList.remove('filter-top');
+                } else {
+                    document.querySelector('.sidebar.sidebar-main.sticky-filter').classList.add('filter-top');
+                }
+            }
+        }
+    }
+
+    window.addEventListener('load', function() {
+        setSorterPosition();
+    });
+    window.addEventListener('resize', function() {
+        setSorterPosition();
+    });
+
+    window.addEventListener('scroll', handleScroll);
+</script>
+<?php if ($block->getCollection()->getSize()): ?>
+    <div x-data="initToolbar<?= /** @noEscape */ $uniqueId ?>()" class="toolbar toolbar-products grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid-flow-row gap-2 items-center">
+        <?php if ($this->getHidePager()) : ?>
+            <?php if ($block->isExpanded()): ?>
+                <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/sorter.phtml') ?>
+            <?php endif; ?>
+            <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/limiter.phtml') ?>
+        <?php endif;?>
+        <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/amount.phtml') ?>
+        <?php if ($this->getHidePager()) : ?>
+            <?php if ($block->isExpanded()): ?>
+                <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/viewmode.phtml') ?>
+            <?php endif; ?>
+        <?php endif;?>
+        <?php if (!$this->getHidePager()) : ?>
+            <?= $block->getPagerHtml() ?>
+        <?php endif;?>
+    </div>
+<?php endif ?>

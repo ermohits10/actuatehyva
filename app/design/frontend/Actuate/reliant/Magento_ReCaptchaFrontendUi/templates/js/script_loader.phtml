@@ -1,0 +1,64 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+// This is the reCaptcha script loader (for v2 and v3)
+
+/** @var $storeConfig StoreConfig */
+$storeConfig = $viewModels->require(StoreConfig::class);
+$siteKeyV3   = (string) $storeConfig->getStoreConfig('recaptcha_frontend/type_recaptcha_v3/public_key');
+
+?>
+<script>
+    'use strict';
+
+    const grecaptchaV2LoadCallbacks = [];
+
+    function executeRecaptchaLoadCallbacks () {
+        while (window.grecaptcha && grecaptchaV2LoadCallbacks.length > 0) {
+            const callback = grecaptchaV2LoadCallbacks.pop();
+            typeof callback === 'string' ? window[callback]() : callback();
+        }
+    }
+
+    (function() {
+        const loadRecaptchaScript = (event) => {
+
+            if (window.grecaptcha || !event.target.form) {
+                return;
+            }
+
+            const url = 'https://www.google.com/recaptcha/api.js?onload=executeRecaptchaLoadCallbacks';
+            const siteKey = '<?= $escaper->escapeJs($siteKeyV3) ?>';
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = siteKey ? `${url}&render=${siteKey}` : `${url}&render=explicit`;
+            script.async = true;
+            document.head.appendChild(script);
+        }
+
+        window.forceLoadRecaptchaScript = () => {
+            loadRecaptchaScript({target: {form: 'dummy'}});
+            executeRecaptchaLoadCallbacks();
+        };
+
+        document.body.addEventListener("input", loadRecaptchaScript, { once: true });
+        document.body.addEventListener("focus", loadRecaptchaScript, { once: true });
+
+    }());
+
+</script>

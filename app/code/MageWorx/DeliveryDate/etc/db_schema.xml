@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="mageworx_dd_delivery_option" resource="default" engine="innodb" comment="Delivery Options">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="varchar" name="name" length="128" nullable="false" comment="Delivery Option Name"/>
+        <column xsi:type="text" name="methods" nullable="true" comment="Shipping Methods Affected (with Carrier)"/>
+        <column xsi:type="boolean" name="is_active" nullable="false" default="0" comment="Is Active flag"/>
+        <column xsi:type="int" name="sort_order" padding="10" unsigned="true" nullable="false" default="0" comment="Sort Order of Delivery option"/>
+        <column xsi:type="int" name="future_days_limit" padding="10" unsigned="true" nullable="false" default="0" comment="Days Limitation"/>
+        <column xsi:type="int" name="start_days_limit" padding="10" unsigned="true" nullable="false" default="0" comment="Start from day index"/>
+        <column xsi:type="datetime" name="active_from" nullable="true" default="NULL" comment="Active From"/>
+        <column xsi:type="datetime" name="active_to" nullable="true" default="NULL" comment="Active To"/>
+        <column xsi:type="text" name="limits_serialized" nullable="true" comment="Day Limits Serialized"/>
+        <column xsi:type="text" name="holidays_serialized" nullable="true" comment="Holidays Serialized"/>
+        <column xsi:type="smallint" name="shipping_methods_choice_limiter" nullable="false" default="0" comment="Shipping Methods Choice Limiter"/>
+        <column xsi:type="varchar" name="working_days" nullable="true" length="128" comment="Working Days List"/>
+        <column xsi:type="varchar" name="cut_off_time" nullable="true" length="5" comment="Time from which the Nearest Day Delivery will be disabled"/>
+        <column xsi:type="smallint" name="quotes_scope" nullable="true" comment="Quotes Scope"/>
+        <column xsi:type="text" name="delivery_date_required_error_message" nullable="true" comment="Error Messages per store"/>
+        <column xsi:type="boolean" name="disable_selection" nullable="true" comment="Disable Delivery Date Selection option"/>
+        <column xsi:type="boolean" name="use_conditions" nullable="false" default="false" comment="Use Custom Conditions to filter Delivery Option availability"/>
+        <column xsi:type="text" name="conditions_serialized" nullable="true" comment="Conditions Serialized"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="mageworx_dd_delivery_option_store_group" resource="default" engine="innodb" comment="Delivery Option by Store">
+        <column xsi:type="int" name="delivery_option_id" padding="10" unsigned="true" nullable="false"/>
+        <column xsi:type="int" name="customer_group_id" padding="10" unsigned="true" nullable="true"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false"/>
+        <constraint xsi:type="foreign" referenceId="STR_GRP_DO_ID_DO_ID" table="mageworx_dd_delivery_option_store_group" column="delivery_option_id" referenceTable="mageworx_dd_delivery_option" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="STR_GRP_DO_CUST_GRP_ID_CUST_GRP_ID" table="mageworx_dd_delivery_option_store_group" column="customer_group_id" referenceTable="customer_group" referenceColumn="customer_group_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="MAGEWORX_DD_DELIVERY_OPTION_STORE_GROUP_STORE_ID_STORE_STORE_ID" table="mageworx_dd_delivery_option_store_group" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <index referenceId="DO_STR_GRP_CUST_GRP_ID" indexType="btree">
+            <column name="customer_group_id"/>
+        </index>
+        <index referenceId="DO_STR_GRP_STR_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+        <constraint xsi:type="unique" referenceId="DO_STR_GRP_DO_ID_CUST_GRP_STR_ID">
+            <column name="delivery_option_id"/>
+            <column name="customer_group_id"/>
+            <column name="store_id"/>
+        </constraint>
+    </table>
+    <table name="mageworx_dd_queue" resource="default" engine="innodb" comment="Delivery Date Queue">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="int" name="quote_address_id" unsigned="true" nullable="true" comment="Quote Address ID"/>
+        <column xsi:type="int" name="order_address_id" unsigned="true" nullable="true" comment="Order Address ID"/>
+        <column xsi:type="date" name="delivery_day" nullable="true" comment="Delivery Date"/>
+        <column xsi:type="smallint" name="delivery_hours_from" nullable="true" comment="Delivery Hours From"/>
+        <column xsi:type="smallint" name="delivery_hours_to" nullable="true" comment="Delivery Hours To"/>
+        <column xsi:type="smallint" name="delivery_minutes_from" nullable="true" comment="Delivery Minutes From"/>
+        <column xsi:type="smallint" name="delivery_minutes_to" nullable="true" comment="Delivery Minutes To"/>
+        <column xsi:type="varchar" name="shipping_method" nullable="true" length="130" comment="Shipping method code"/>
+        <column xsi:type="varchar" name="carrier" nullable="true" length="64" comment="Carrier code (for grouping purposes)"/>
+        <column xsi:type="int" name="delivery_option" padding="10" nullable="true" unsigned="true" comment="Delivery Option Id"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" comment="Store Id"/>
+        <column xsi:type="text" name="delivery_comment" nullable="true" comment="Comment for Delivery"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="DD_QUEUE_STORE_ID_STORE_STORE_ID" table="mageworx_dd_queue" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="DD_QUEUE_DELIVERY_OPTION_DELIVERY_OPTION_ENTITY_ID" table="mageworx_dd_queue" column="delivery_option" referenceTable="mageworx_dd_delivery_option" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="DD_QUEUE_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+        <index referenceId="DD_QUEUE_DELIVERY_DAY" indexType="btree">
+            <column name="delivery_day"/>
+        </index>
+        <index referenceId="DD_QUEUE_DELIVERY_HOURS_FROM" indexType="btree">
+            <column name="delivery_hours_from"/>
+        </index>
+        <index referenceId="DD_QUEUE_DELIVERY_HOURS_TO" indexType="btree">
+            <column name="delivery_hours_to"/>
+        </index>
+        <index referenceId="DD_QUEUE_DELIVERY_OPTION" indexType="btree">
+            <column name="delivery_option"/>
+        </index>
+        <index referenceId="DD_QUEUE_ORDER_ADDRESS_ID_DELIVERY_DAY" indexType="btree">
+            <column name="order_address_id"/>
+            <column name="delivery_day"/>
+        </index>
+        <constraint xsi:type="unique" referenceId="DD_QUEUE_QUOTE_ADDRESS_ID">
+            <column name="quote_address_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="DD_QUEUE_ORDER_ADDRESS_ID">
+            <column name="order_address_id"/>
+        </constraint>
+    </table>
+</schema>

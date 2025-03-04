@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright © MageWorx. All rights reserved.
+See LICENSE.txt for license details.
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <listingToolbar name="listing_top">
+        <filters name="listing_filters">
+            <filterInput name="delivery_comment">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="provider" xsi:type="string">${ $.parentName }</item>
+                        <item name="dataScope" xsi:type="string">delivery_comment</item>
+                        <item name="label" xsi:type="string" translate="true">Delivery Comment</item>
+                        <item name="template" xsi:type="string">ui/grid/filters/field</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">componentType = column.text, index = delivery_comment:visible</item>
+                        </item>
+                    </item>
+                </argument>
+            </filterInput>
+        </filters>
+    </listingToolbar>
+    <columns name="sales_order_columns">
+        <column name="delivery_day" class="MageWorx\DeliveryDate\Ui\Component\Listing\Columns\DeliveryDateInOrderGrid">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/grid/columns/date</item>
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="label" xsi:type="string" translate="true">Delivery Date</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
+                    <item name="align" xsi:type="string">left</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                </item>
+            </argument>
+        </column>
+        <column name="delivery_comment">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/column</item>
+                    <item name="label" xsi:type="string" translate="true">Delivery Comment</item>
+                    <item name="sortOrder" xsi:type="number">60</item>
+                    <item name="align" xsi:type="string">left</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                </item>
+            </argument>
+        </column>
+    </columns>
+</listing>

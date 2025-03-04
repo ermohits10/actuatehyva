@@ -1,0 +1,102 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+?>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        hyvaCheckout.main.init(
+            'hyva-checkout-main',
+            'hyva-checkout-container',
+
+            exception => {
+                window.dispatchMessages([{
+                    type: 'error',
+                    text: '<?= $escaper->escapeJs(__('Something went wrong while during checkout initialization. Please refresh the page.')) ?>'
+                }])
+
+                <?php /* Checkout initialization threw an exception. */ ?>
+                console.error(exception)
+            }
+        )
+    })
+
+    window.addEventListener('magewire:available', () => {
+        let promise,
+            resolve,
+            magewireMessageCounter = 0,
+            pendingEmits = {}
+
+        function isNothingPending() {
+            return magewireMessageCounter + Object.keys(pendingEmits).length === 0
+        }
+
+        function resetPromise() {
+            promise = new Promise(r => resolve = r)
+        }
+
+        function resetResolvedPromise() {
+            resetPromise()
+            resolve(true)
+        }
+
+        Magewire.hook('message.sent', message => {
+            if (isNothingPending()) {
+                resetPromise()
+            }
+            magewireMessageCounter++
+            <?php /* phpcs:disable Generic.Files.LineLength.TooLong
+            console.log(`message.sent: ${message.component.id} [msgs=${magewireMessageCounter} | emits=${Object.keys(pendingEmits).length}] ${Object.keys(pendingEmits).length ? "\n(" + Object.keys(pendingEmits).join(', ') + ')' : ''}`)
+            */ ?>
+        })
+
+        Magewire.hook('message.processed', message => {
+            if (pendingEmits[message.component.id]) {
+                delete pendingEmits[message.component.id]
+            }
+
+            magewireMessageCounter--
+
+            (message.response.effects.emits || []).forEach(emit => {
+                Magewire.components.componentsListeningForEvent(emit.event).forEach(component => {
+                    if (typeof emit.to === "undefined" || emit.to === component.id) {
+                        pendingEmits[component.id] = true;
+                    }
+                })
+            })
+            <?php /* phpcs:disable Generic.Files.LineLength.TooLong
+            console.log(`message.processed: ${message.component.id} [msgs=${magewireMessageCounter} | emits=${Object.keys(pendingEmits).length}] ${Object.keys(pendingEmits).length ? "\n(" + Object.keys(pendingEmits).join(', ') + ')' : ''}`)
+            */ ?>
+
+            if (isNothingPending()) {
+                resolve(true)
+            }
+        })
+
+        hyvaCheckout.isIdle = () => {
+            if (! promise) {
+                resetResolvedPromise()
+            }
+            return promise;
+        }
+
+        hyvaCheckout.isIdle.now = isNothingPending
+    }, { once: true })
+
+    window.addEventListener('private-content-loaded', event => {
+        hyvaCheckout.main.activeNamespace = event.detail.data.hyva_checkout && event.detail.data.hyva_checkout.active_namespace
+    }, { once: true })
+</script>

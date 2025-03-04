@@ -1,0 +1,87 @@
+<?php
+/** @var Attributes $block */
+
+use Actuate\ProductAttribute\ViewModel\ProductAttributeMappingViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Catalog\Block\Product\View\Attributes;
+use Magento\Catalog\Model\Product;
+
+/** @var ProductAttributeMappingViewModel $attributeMappingViewModels */
+/** @var Product $product */
+/** @var ViewModelRegistry $viewModels */
+
+$attributes = $block->getAdditionalData();
+$product = $block->getProduct();
+
+$attributeMappingViewModels = $viewModels->require(ProductAttributeMappingViewModel::class);
+$attributeData = $attributeMappingViewModels->getSpecificationByAttributeMapping($attributes);
+
+?>
+<div x-data="initializeSpecification()" x-spread="eventListeners">
+    <div class="!max-w-none" id="product-attributes">
+        <template x-for="[group, attributes] of Object.entries(currentSpecification)">
+            <div>
+                <p x-text="group" class="text-center text-lg text-[#1D3654] font-medium px-0 leading-[29px] clear-both bg-[#ECECEC] my-1.5 font-serif"></p>
+                <ul class="additional-attributes w-full font-serif flex flex-wrap justify-between">
+                    <template x-for="(attribute, code) in attributes" :key="attribute.code">
+                        <li class="w-full items-center lg:w-[calc(50%-25px)] flex border border-[#F5F5F5] mx-0 my-[5px]">
+                            <strong x-text="attribute.label" class="text-sm flex md:text-lg font-medium px-[15px] bg-[#F5F5F5] text-[#1D3654] py-2.5 inline-block h-full items-center !leading-[normal] label w-1/2 text-left font-serif text-lg leading-5 product-attribute-label lg:float-left lg:pr-6" scope="row"></strong>
+                            <span x-html="getAttributeValue(attribute.code, attribute.value)" class="inline-block text-[#1D3654] font-medium data w-1/2 py-2.5 px-2 text-left font-serif text-sm break-all md:break-words md:text-lg !leading-[normal] leading-5 product-attribute-value lg:float-right"></span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </template>
+    </div>
+</div>
+<script>
+    function initializeSpecification() {
+        return {
+            currentSpecification: <?= json_encode($attributeData); ?>,
+            defaultSpecification: <?= json_encode($attributeData); ?>,
+            energyRatingLink: '<?= $product->getAttributeText('energyrating_link'); ?>',
+            configurableOptions: <?= json_encode($attributeMappingViewModels->getAllConfigurableOptionAttributes($product, $attributes));?>,
+
+            getAttributeValue: function (code, value) {
+                if (code === 'manfgteelabour' || code === 'manfgteeparts') {
+                    return (parseFloat(value)/12) > 1 ? parseFloat(value)/12 + ' Years' : parseFloat(value)/12 + ' Year';
+                } else if (code === 'energyrating_rating') {
+                    let energyHtml = '<span class="text-sm md:text-lg pl-2">';
+                    if (this.energyRatingLink !== '' && this.energyRatingLink !== null) {
+                        energyHtml += '<a href="' + this.energyRatingLink + '" title="View Energy Rating" target="_blank">';
+                    }
+                    energyHtml += '<img src="<?= $this->getUrl('media/energy-ratings/')?>' + value + '.webp" width="63" height="35" alt="View Energy Rating" class="w-[40px] inline-block">';
+                    if (this.energyRatingLink !== '' && this.energyRatingLink !== 'null') {
+                        energyHtml += '</a>';
+                    }
+                    energyHtml += '</span>';
+                    return energyHtml;
+                } else {
+                    if (value === 'Yes') {
+                        return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 26 20" fill="none" class="w-8 h-4"><path d="M3 11.4L8.6 17L22.6 3" stroke="#06DE35" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                    } else if (value === 'No') {
+                        return 'No';
+                    }
+                }
+
+                return value;
+            },
+
+            updateCurrentSpecification: function (value) {
+                this.currentSpecification = this.defaultSpecification;
+                if (value !== undefined && value !== '' && value !== null) {
+                    if (this.configurableOptions[value]) {
+                        console.log(this.configurableOptions[value])
+                        this.currentSpecification = this.configurableOptions[value];
+                    }
+                }
+            },
+
+            eventListeners:  {
+                ['@update-current-specification.window'](event) {
+                    this.updateCurrentSpecification(event.detail);
+                }
+            }
+        }
+    }
+</script>

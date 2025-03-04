@@ -1,0 +1,8 @@
+<template x-if="segment.code === 'subtotal'">
+    <div class="flex pb-2 my-2 btext-md lg:text-sm md:grid md:grid-cols-2 md:w-full border-container">
+        <div class="w-7/12 text-left font-sans text-base leading-6 font-bold md:w-auto" x-html="Subtotal">Subtotal</div>
+        <div class="w-5/12 text-right md:w-auto"
+             x-text="hyva.formatPrice(segment.value)"
+        ></div>
+    </div>
+</template>

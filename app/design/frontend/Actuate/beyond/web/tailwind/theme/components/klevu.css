@@ -1,0 +1,327 @@
+.klevuQuickSearchingArea {
+	@apply top-[130px] lg:top-[68px] text-lg leading-normal transition appearance-none inset-x-0 lg:inset-x-6 md:left-auto lg:text-xl absolute bg-white z-[999];
+}
+#klevuSearchResults {
+	&.kuSearchBoxWithTerm {
+		.klevuQuickSearchingArea {
+			@apply border-solid border border-[#135E64] p-2 bg-white h-[500px] md:h-auto overflow-y-scroll md:overflow-auto;
+		}
+	}
+}
+.klevuSuggestionHeading {
+	@apply !text-base !leading-5 !transition !appearance-none !font-semibold !normal-case lg:!text-xl lg:!leading-6;
+}
+.kuPopularSearchTerms {
+	ul {
+		@apply !m-0 !p-0 !list-none;
+		li {
+			@apply !bg-transparent !mr-2.5 !py-0 !px-[5px] !cursor-pointer !w-auto lg:!w-full lg:!mr-0;
+			a {
+				@apply !bg-transparent !block !p-0 !font-semibold !text-sm !leading-loose !cursor-pointer !underline;
+			}
+		}
+	}
+}
+.klevuResultsBlock .klevuQuickSearchResults ul li .klevuQuickProductName {
+	@apply !text-xs !font-medium !min-h-[48px] lg:!text-sm lg:!min-h-[60px] !mb-2.5;
+	-webkit-line-clamp: 3!important;
+}
+.klevuQuickProductPrice {
+	@apply !flex !items-end;
+}
+.klevuResultsBlock .klevuQuickSearchResults ul li .klevuQuickProductPrice {
+	@apply !flex !items-end !flex-wrap;
+}
+.klevuResultsBlock .klevuQuickSearchResults ul li .klevuQuickOrigPrice {
+	@apply !line-through !font-semibold !text-base lg:!text-xl	lg:!leading-5 order-1 ml-1;
+}
+.klevuResultsBlock .klevuQuickSearchResults ul li .klevuQuickSalePrice {
+	@apply !font-bold !text-xl !leading-5 !font-sans lg:!text-2xl lg:!leading-7 !text-[#D30202] !mb-[2px] lg:!-mb-1;
+}
+
+.klevuAutoSuggestionsWrap ul {
+	@apply !my-3 !flex !flex-wrap;
+}
+.klevuAutoSuggestionsWrap ul li {
+	@apply !bg-transparent !mr-2.5 !py-0 !px-[5px] !cursor-pointer !w-auto lg:!w-full lg:!mr-0;
+}
+.klevuAutoSuggestionsWrap ul li a {
+	@apply !bg-transparent !block !p-0 !font-semibold !text-sm !leading-loose !cursor-pointer !underline;
+}
+.klevu-desc-l2 {
+	@apply !hidden;
+}
+[ku-container][data-container-role="main"] {
+	@apply !container !px-0;
+}
+.kuContainer {
+	@apply !container !px-0;
+}
+.kuFilters {
+	@apply !pl-0;
+}
+.kuFilterBox .kuFilterHead {
+	@apply !font-sans !text-base !leading-6 !font-medium !capitalize;
+}
+.kuFilterBox .kuFilterHead .title {
+	@apply !font-sans !text-base !leading-6 !font-medium !normal-case mb-4;
+}
+.kuFilterBox .kuShowOpt {
+	bottom: 2px!important;
+}
+.kuFilterBox .kuFilterNames:not(.optional) {
+    @apply !h-auto min-h-[100px];
+}
+.kuFilterBox .kuFilterNames.kuFilterCollapse {
+    @apply !h-0 min-h-0;
+}
+.kuFilterBox .kuFilterNames ul li {
+	@apply !pb-4;
+}
+.kuFilterBox.kuMulticheck .kuFilterIcon:before {
+	@apply !rounded;
+}
+.kuQuickSearchFacetedLayout .kuFilterBox .kuFilterNames ul li a span.kufacet-text, .kuSearchResultsPageContainer .kuFilterBox .kuFilterNames ul li a span.kufacet-text {
+	margin-left: .5rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-grow: 1;
+	font-family: DM Sans, Arial, sans-serif !important;
+	font-size: 0.875rem !important;
+	line-height: 1.25rem !important;
+	font-weight: 500 !important;
+	padding-right: 1rem;
+}
+.kuFilterNames ul li a span.kuFilterTotal {
+	font-family: DM Sans, Arial, sans-serif !important;
+	font-size: 0.875rem !important;
+	line-height: 1.25rem !important;
+	font-weight: 500 !important;
+}
+.kuSearchResultsPageContainer .kuDropdown .kuDropdownLabel {
+	@apply !font-serif !text-sm !leading-5 !font-medium !border-gray-500 !max-w-[166px] !rounded;
+}
+.kuResultsHeadingTitleContainer {
+	@apply !text-sm !leading-5 !text-gray-700
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuProdWrap {
+	@apply !border-none;
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuName {
+	@apply !text-sans-serif !text-lg !leading-7 !font-bold !text-gray-900 !min-h-[84px];
+	-webkit-line-clamp: 3!important;
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuName a {
+	@apply !text-sans-serif !text-lg !leading-7 !font-bold !text-gray-900;
+}
+.kuProdBottom .kuPrice {
+	@apply !pt-1 !font-sans !text-gray-900 flex !items-end;
+}
+.klevuNoResultsRecs-itemPrice .kuSalePrice.kuSpecialPrice, .productQuick-Price .kuSalePrice.kuSpecialPrice, .kuPrice .kuSalePrice.kuSpecialPrice {
+	@apply !font-sans !text-2xl !font-bold !order-[0];
+}
+.klevuNoResultsRecs-itemPrice .kuOrigPrice, .productQuick-Price .kuOrigPrice, .kuPrice .kuOrigPrice {
+	@apply !font-sans !leading-6 !text-base !order-[1] !pb-[1px];
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuProdWrap .kuProdBottom {
+	height: auto!important;
+}
+
+[ku-container][data-container-role="main"] {
+	@apply lg:flex;
+}
+[ku-container][data-container-role="header"] {
+	@apply lg:w-4/12 lg:!pl-2.5;
+}
+[ku-container][data-container-role="content"] {
+	@apply lg:w-8/12;
+}
+.klevuAutoSuggestionsWrap {
+	@apply lg:!pl-0 !border-none;
+	.klevuSuggestionHeading {
+		@apply lg:!pl-0 lg:!pt-0;
+	}
+	ul {
+		li {
+			@apply lg:!pl-0;
+			a {
+				@apply lg:!p-0;
+			}
+		}
+	}
+}
+.kuQuickResultsListContainer {
+	ul {
+		@apply !grid !grid-cols-2 !gap-5 lg:!grid-cols-4 xl:!grid-cols-5 before:!hidden;
+	}
+}
+.klevuResultsBlock {
+	@apply flex flex-col;
+	.klevuProductsViewAll {
+		@apply !relative !flex !order-[3] !right-0 !top-0 !mb-2.5 !mt-3.5;
+	}
+}
+.klevuResultsBlock .klevuQuickSearchResults ul li {
+	@apply !border-none;
+}
+.klevuResultsBlock .klevuQuickSearchResults .klevuProductItemTop {
+	@apply !w-full;
+}
+.klevuResultsBlock .klevuQuickSearchResults .klevuProductItemBottom {
+	@apply !w-full;
+}
+.klevuResultsBlock .klevuQuickSearchResults .klevuQuickImgWrap {
+	@apply md:!h-[122px]
+}
+#klevuSearchingArea .klevuResultsBlock .klevuQuickSearchResults .klevuQuickImgWrap {
+    @apply !h-[122px]
+}
+.klevuResultsBlock .klevuSuggestionHeading {
+	@apply lg:!pt-[5px];
+}
+.klevuResultsBlock .klevuQuickSearchResults .klevuProductItemBottom .klevu-desc-l2 {
+	@apply !hidden;
+}
+.klevuResultsBlock .klevuProductsViewAll a {
+	@apply !font-serif !block !bg-[#000d40] !px-2.5 !text-sm lg:!text-lg !text-white !border-none !normal-case;
+}
+.kuSearchResultsPageContainer .kuResults ul li {
+	@apply lg:!w-4/12 lg:!min-h-[425px];
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuProdWrap .kuProdTop .klevuImgWrap {
+	@apply lg:!min-h-[230px];
+}
+.kuSearchResultsPageContainer .ku-numberOfResults {
+	margin: 5px;
+	position: relative;
+	display: inline-block;
+	width: auto;
+	max-width: 100%;
+	z-index: 11;
+	padding: 9px 0px;
+}
+.kuSearchResultsPageContainer .kuLandingResultsViewSwitchContainer {
+	float:right;
+	margin: 5px;
+	position: relative;
+	display: inline-block;
+	width: auto;
+	max-width: 100%;
+	z-index: 11;
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuProdWrap .kuProdAdditional {
+	position: relative!important;
+	visibility: visible!important;
+	border: none!important;
+	padding: 0px!important;
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuProdWrap .kuProdAdditional:hover {
+	border: none!important;
+	box-shadow: none!important;
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuProdWrap:hover .kuProdAdditional {
+	border: none!important;
+	box-shadow: none!important;
+}
+.kuSearchResultsPageContainer .kuResults ul li:hover .kuProdWrap .kuProdAdditional {
+	border: none!important;
+	box-shadow: none!important;
+}
+.kuSearchResultsPageContainer .kuResults ul li .kuProdWrap .kuProdAdditional .kuProdAdditionalData {
+	@apply !pt-0;
+}
+.kuSearchResultsPageContainer .kuAddtocart {
+	@apply !mt-0;
+}
+.kuSearchResultsPageContainer .kuAddtocart .kuBtn {
+	 @apply !bg-[#000d40] !text-white !text-base !font-semibold !leading-5 !w-full !h-11 !border-none !border-0 !normal-case !pt-[11px] !rounded-lg;
+    &:hover {
+        @apply text-white !bg-gray-600;
+    }
+}
+.kuSearchResultsPageContainer .kuPagination a {
+	@apply !relative !inline-flex !items-center !font-sans !text-base !leading-6 !font-medium !text-[#000d40] ml-1.5 !transition !duration-150 !ease-in-out hover:!border-[#000d40] focus:z-10 focus:!outline-none focus:!border-[#000d40] active:bg-white active:border-[#000d40] !px-4 !py-2 rounded-md !border-2 !border-[#F2F6FA] !shadow-none;
+}
+.kuSearchResultsPageContainer .kuPagination a:last-child {
+	@apply !border-2 !border-[#F2F6FA] !border-r-2;
+	border-right: 2px solid #F2F6FA!important;
+}
+
+.kuSearchResultsPageContainer .kuPagination a.kuCurrent {
+	@apply !bg-white !border-[#000d40];
+}
+.kuFilters .filter-content {
+	@apply md:!block;
+}
+.klevuResultsBlock .klevuQuickSearchResults ul li a.klevuQuickProductInnerBlock {
+	@apply !p-0;
+}
+[ku-container][data-container-role="main"] {
+	@apply flex flex-col lg:flex-row;
+}
+[ku-container][data-container-role="header"] {
+	@apply order-[2] lg:order-[1];
+}
+[ku-container][data-container-role="content"] {
+	@apply order-[1] lg:order-[2];
+}
+.klevuResultsBlock .klevuSuggestionHeading {
+	@apply !pb-2 lg:!pb-3;
+}
+.kuFilters .filter-content {
+  @apply md:!flex;
+  flex-direction: column;
+}
+
+.kuFilterBox {
+  order: 10;
+}
+
+.kuFilters [data-filter="klevu_price"] {
+  order: 3;
+}
+
+.kuFilters [data-filter="category"] {
+  order: 1;
+}
+
+.kuFilters [data-filter="manufacturer"] {
+  order: 2;
+}
+
+.kuFilterBox .kuFilterHead.kuExpand::after, .kuFilterBox .kuFilterHead.kuCollapse::after {
+    right: 8px !important;
+}
+[ku-container] a {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+@media screen and (max-width: 767px){
+    .klevuQuickSearchingArea {
+        width: 90% !important;
+        margin: 0 auto !important;
+    }
+    .kuSearchResultsPageContainer .kuDropdown:first-child {
+        margin-left: 0 !important;
+    }
+    .kuSearchResultsPageContainer .kuDropdown {
+        margin-left: 0 !important;
+    }
+    .kuSearchResultsPageContainer [ku-container] {
+        > div {
+            width: 100% !important;
+        }
+        [data-container-role="left"] {
+            width: 100% !important;
+            display: flex !important;
+            max-width: unset !important;
+        }
+    }
+    .kuSearchResultsPageContainer .kuDropdown .kuDropdownLabel {
+        display: inline-flex !important;
+    }
+    .kuSearchResultsPageContainer .ku-numberOfResults {
+        z-index: unset !important;
+    }
+}

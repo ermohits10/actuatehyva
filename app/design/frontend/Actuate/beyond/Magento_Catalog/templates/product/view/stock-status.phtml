@@ -1,0 +1,73 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Actuate\ReliantDirectTheme\ViewModel\CommonViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Hyva\Theme\ViewModel\SvgIcons;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+
+
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var CurrentProduct $currentProduct */
+$currentProduct = $viewModels->require(CurrentProduct::class);
+$hyvaicons = $viewModels->require(SvgIcons::class);
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var CommonViewModel $commonViewModel */
+$commonViewModel = $viewModels->require(CommonViewModel::class);
+
+/** @var Product $product */
+$product = $this->hasData('product')
+    ? $this->getData('product')
+    : $currentProduct->get();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+$branchesList = [];
+$depotslist = [];
+$depotAvailabilityArr = [];
+$ProductStockAvailabilityScheduleArr = [];
+
+$_outofstockallowbackorder = $product->getAttributeText('outofstockallowbackorder');
+
+$availabilityType = '';
+$isExistingPO = '';
+$psaQuantity = '';
+$trueStock = '';
+
+$xmlArray = [];
+?>
+<?php if (null !== $product->getStockanalysis()):
+    $stockAnalysis = $commonViewModel->getStockAnalysisData($product->getStockanalysis());
+    $trueStock = $stockAnalysis['localStock'];
+    $buyOnline = $stockAnalysis['buyOnline'];
+    if ($buyOnline !== '') {
+        $depotsList = $stockAnalysis['depotList'];
+    }
+    $availabilityType = $stockAnalysis['availabilityType'];
+    $isExistingPO = $stockAnalysis['isExistingPO'];
+    $psaQuantity = $stockAnalysis['psaQuantity'];
+endif; ?>
+<div class="flex flex-row items-center text-[#000d40] text-base leading-6">
+    <?php if ($product->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $trueStock >= 1): ?>
+    <?php elseif ($availabilityType == 'CurrentPO' && $isExistingPO == true && $psaQuantity >= 1 && $_outofstockallowbackorder != ''): ?>
+        <?= $hyvaicons->renderHtml('icon-check', 'w-5 h-4 mr-2 flex text-[#06DE35]') ?> <span class="underline flex font-medium" title="<?= $escaper->escapeHtmlAttr(__('Availability')) ?>"><?= $_outofstockallowbackorder ?></span>
+    <?php else: ?>
+    <?php endif; ?>
+</div>

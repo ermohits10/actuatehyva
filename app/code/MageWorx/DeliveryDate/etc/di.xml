@@ -1,0 +1,302 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Regular models -->
+    <preference for="MageWorx\DeliveryDate\Api\DeliveryManagerInterface" type="MageWorx\DeliveryDate\Model\DeliveryManager" />
+    <preference for="MageWorx\DeliveryDate\Api\DeliveryOptionInterface" type="MageWorx\DeliveryDate\Model\DeliveryOption" />
+    <preference for="MageWorx\DeliveryDate\Api\Data\QueueDataInterface" type="MageWorx\DeliveryDate\Model\Queue" />
+    <preference for="MageWorx\DeliveryDate\Api\QueueManagerInterface" type="MageWorx\DeliveryDate\Model\QueueManager" />
+    <preference for="MageWorx\DeliveryDate\Api\DefaultDeliveryDateManagerInterface" type="MageWorx\DeliveryDate\Model\DefaultDeliveryDateManager" />
+    <preference for="MageWorx\DeliveryDate\Api\Data\DateDiapasonInterface" type="MageWorx\DeliveryDate\Model\DateDiapason" />
+    <preference for="MageWorx\DeliveryDate\Api\QuoteMinMaxDateInterface" type="MageWorx\DeliveryDate\Model\QuoteMinMaxDate" />
+    <preference for="MageWorx\DeliveryDate\Api\DateDiapasonCacheInterface" type="MageWorx\DeliveryDate\Model\DateDiapason\ProcessCache" />
+    <preference for="MageWorx\DeliveryDate\Api\Data\DeliveryDateDataInterface" type="MageWorx\DeliveryDate\Model\DeliveryDateData" />
+    <preference for="MageWorx\DeliveryDate\Api\DeliveryLimitsConverterInterface" type="MageWorx\DeliveryDate\Model\Utils\DeliveryLimitsConverter" />
+    <preference for="MageWorx\DeliveryDate\Api\DeliveryOptionConditionsInterface" type="MageWorx\DeliveryDate\Model\DeliveryOption\Conditions" />
+    <preference for="MageWorx\DeliveryDate\Api\Data\DeliveryOptionConditionsDataInterface" type="MageWorx\DeliveryDate\Model\DeliveryOption\Conditions" />
+    <preference for="MageWorx\DeliveryDate\Api\QuoteToConditionsConverterInterface" type="MageWorx\DeliveryDate\Model\DeliveryOption\ConvertQuoteToCondition" />
+    <!-- Api objects -->
+    <preference for="MageWorx\DeliveryDate\Api\Data\LimitsInterface" type="MageWorx\DeliveryDate\Model\Limits" />
+    <preference for="MageWorx\DeliveryDate\Api\Data\DayLimitInterface" type="MageWorx\DeliveryDate\Model\Limits\DayLimit" />
+    <preference for="MageWorx\DeliveryDate\Api\Data\TimeLimitInterface" type="MageWorx\DeliveryDate\Model\Limits\TimeLimit" />
+    <!-- Validators -->
+    <preference for="MageWorx\DeliveryDate\Api\QuoteAddressValidatorInterface" type="MageWorx\DeliveryDate\Model\Validator\RestrictionMode\QuoteAddressValidator" />
+    <preference for="MageWorx\DeliveryDate\Api\DeliveryDateValidatorPoolInterface" type="MageWorx\DeliveryDate\Model\Validator\DeliveryDateValidatorPool" />
+    <!-- Repositories -->
+    <preference for="MageWorx\DeliveryDate\Api\Repository\QueueRepositoryInterface" type="MageWorx\DeliveryDate\Model\Repository\QueueRepository" />
+    <preference for="MageWorx\DeliveryDate\Api\Repository\DeliveryOptionRepositoryInterface" type="MageWorx\DeliveryDate\Model\Repository\DeliveryOptionRepository" />
+    <!-- Plugins -->
+    <!-- Adds default delivery date if enabled -->
+    <type name="Magento\Quote\Model\QuoteManagement">
+        <plugin name="mageworx_dd_add_default_delivery_date"
+                type="MageWorx\DeliveryDate\Plugin\AddDefaultDeliveryDate"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <!-- Fixes magento's core bug -->
+    <type name="Magento\Framework\Api\DataObjectHelper">
+        <plugin name="mageworx_delivery_date_extension_attributes_core_bug_fix"
+                type="MageWorx\DeliveryDate\Plugin\CoreBugFixWithExtensionAttributes"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <type name="Magento\Quote\Api\Data\AddressInterface">
+        <plugin name="mageworx_delivery_date_extension_attributes_check"
+                type="MageWorx\DeliveryDate\Plugin\AddressAttributesLoad"
+                sortOrder="10"
+                disabled="false"/>
+        <plugin name="mageworx_delivery_date_extension_attributes_merger"
+                type="MageWorx\DeliveryDate\Plugin\AddressExtensionAttributesMerger"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <!-- Add Extension Attributes to each Quote Address Item -->
+    <type name="Magento\Quote\Model\ResourceModel\Quote\Address\Collection">
+        <plugin name="mageworx_delivery_date_add_extension_attributes_to_each_item"
+                type="MageWorx\DeliveryDate\Plugin\AddExtensionAttributesToQuoteAddress"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <!-- Add Extension Attributes to each Order Address Item -->
+    <type name="Magento\Sales\Model\ResourceModel\Order\Address\Collection">
+        <plugin name="mageworx_delivery_date_add_extension_attributes_to_each_item"
+                type="MageWorx\DeliveryDate\Plugin\AddExtensionAttributesToOrderAddress"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <!-- Adds extra charge for the shipping method according selected delivery date -->
+    <type name="Magento\Shipping\Model\Carrier\CarrierInterface">
+        <plugin name="mageworx_delivery_date_add_extra_charge"
+                type="MageWorx\DeliveryDate\Plugin\AddExtraChargeForTheShippingMethods"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <!-- Adds delivery date to the shipping information block of the invoice (print pdf) -->
+    <type name="Magento\Sales\Model\Order\Pdf\Invoice">
+        <plugin name="mageworx_delivery_date_add_date_to_shipping_description_check_flag"
+                type="MageWorx\DeliveryDate\Plugin\AddDeliveryDateToPrintInvoice"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <type name="Magento\Sales\Api\Data\OrderInterface">
+        <plugin name="mageworx_delivery_date_add_date_to_shipping_description"
+                type="MageWorx\DeliveryDate\Plugin\AddDeliveryDateToPrintInvoice"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <!-- Additional Arguments -->
+    <type name="MageWorx\DeliveryDate\Api\Data\DeliveryDateDataInterface">
+        <arguments>
+            <argument name="helper" xsi:type="object">MageWorx\DeliveryDate\Helper\Data\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageWorx\DeliveryDate\Plugin\AddDeliveryDateToPrintInvoice">
+        <arguments>
+            <argument name="helper" xsi:type="object">MageWorx\DeliveryDate\Helper\Data\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="MageWorx\DeliveryDate\Observer\TransferInfoFromQuoteAddressToOrderAddress">
+        <arguments>
+            <argument name="dataKeys" xsi:type="array">
+                <item name="0" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::DELIVERY_DAY_KEY</item>
+                <item name="1" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::DELIVERY_HOURS_FROM_KEY</item>
+                <item name="2" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::DELIVERY_MINUTES_FROM_KEY</item>
+                <item name="3" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::DELIVERY_HOURS_TO_KEY</item>
+                <item name="4" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::DELIVERY_MINUTES_TO_KEY</item>
+                <item name="5" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::DELIVERY_TIME_KEY</item>
+                <item name="6" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::DELIVERY_COMMENT_KEY</item>
+                <item name="7" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::DELIVERY_OPTION_ID_KEY</item>
+                <item name="8" xsi:type="const">MageWorx\DeliveryDate\Api\Data\QueueDataInterface::QUOTE_ADDRESS_ID_KEY</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageWorx\DeliveryDate\Model\Validator\DeliveryDateValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="validatePassDate" xsi:type="object">MageWorx\DeliveryDate\Model\Validator\ValidatePassDate</item>
+                <item name="validateTimeLimits" xsi:type="object">MageWorx\DeliveryDate\Model\Validator\ValidateDayLimits</item>
+                <item name="validateCutOffTime" xsi:type="object">MageWorx\DeliveryDate\Model\Validator\ValidateCutOffTime</item>
+                <item name="validateHoliday" xsi:type="object">MageWorx\DeliveryDate\Model\Validator\ValidateHoliday</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageWorx\DeliveryDate\Observer\ValidateDeliveryDateAvailability">
+        <arguments>
+            <argument name="validatorPool" xsi:type="object">MageWorx\DeliveryDate\Model\Validator\DeliveryDateValidatorPool</argument>
+        </arguments>
+    </type>
+    <type name="MageWorx\DeliveryDate\Api\QueueManagerInterface">
+        <arguments>
+            <argument name="validatorPool" xsi:type="object">MageWorx\DeliveryDate\Model\Validator\DeliveryDateValidatorPool</argument>
+        </arguments>
+    </type>
+    <!-- Delivery Date Templates (used on checkout) -->
+    <!-- Day Templates: -->
+    <virtualType name="MageWorx\DeliveryDate\Model\Source\DeliveryDateTemplates"
+                 shared="true"
+                 type="MageWorx\DeliveryDate\Model\Source\TemplatesSource">
+        <arguments>
+            <argument name="templates" xsi:type="array">
+                <item name="default" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/date/calendar</item>
+                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/date</item>
+                    </item>
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/date/date</item>
+                    <item name="backend_label" xsi:type="string" translatable="true">Calendar</item>
+                </item>
+                <item name="dropdown" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/date/dropdown</item>
+                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/date</item>
+                    </item>
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/date/dropdown</item>
+                </item>
+                <item name="radio" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/date/radio</item>
+                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/date</item>
+                    </item>
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/date/radio</item>
+                </item>
+                <item name="buttons" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/date/buttons</item>
+                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/date</item>
+                    </item>
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/date/buttons</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- Time Templates: -->
+    <virtualType name="MageWorx\DeliveryDate\Model\Source\DeliveryTimeTemplates"
+                 shared="true"
+                 type="MageWorx\DeliveryDate\Model\Source\TemplatesSource">
+        <arguments>
+            <argument name="templates" xsi:type="array">
+                <item name="default" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/time/dropdown</item>
+                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/time</item>
+                    </item>
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/time/time_range</item>
+                </item>
+                <item name="radio" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/time/radio</item>
+                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/time</item>
+                    </item>
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/time/time_range</item>
+                </item>
+                <item name="dropdown" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/time/dropdown</item>
+                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/time</item>
+                    </item>
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/time/time_range</item>
+                </item>
+                <item name="buttons" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/time/buttons</item>
+                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/time</item>
+                    </item>
+                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/time/time_range</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- Injection -->
+    <type name="MageWorx\DeliveryDate\Helper\Data">
+        <arguments>
+            <argument name="deliveryDateTemplates" xsi:type="object">MageWorx\DeliveryDate\Model\Source\DeliveryDateTemplates</argument>
+            <argument name="deliveryTimeTemplates" xsi:type="object">MageWorx\DeliveryDate\Model\Source\DeliveryTimeTemplates</argument>
+        </arguments>
+    </type>
+    <!-- Predefined date formats -->
+    <type name="MageWorx\DeliveryDate\Model\Source\DateFormat">
+        <arguments>
+            <argument name="formats" xsi:type="array">
+                <item name="1" xsi:type="string">M/d/yyyy</item>
+                <item name="2" xsi:type="string">d/M/yyyy</item>
+                <item name="5" xsi:type="string">M.d.yy</item>
+                <item name="8" xsi:type="string">d.MM.yyyy</item>
+                <item name="9" xsi:type="string">MM-d-yyyy</item>
+                <item name="11" xsi:type="string">d-MM-yyyy</item>
+                <item name="13" xsi:type="string">MMMM.d.yyyy</item>
+                <item name="17" xsi:type="string">MMMM d, yyyy</item>
+                <item name="18" xsi:type="string">MMMM d.</item>
+                <item name="19" xsi:type="string">EEEE d, yyyy</item>
+                <item name="20" xsi:type="string">EEEE d</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Custom Logger Handlers -->
+    <virtualType name="MageworxDeliveryDateLoggerDb" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">MageWorx\DeliveryDate\Logger\DbHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- Loggers Injection -->
+    <type name="MageWorx\DeliveryDate\Plugin\AddDeliveryDateDataToOrdersGrid">
+        <arguments>
+            <argument name="customLogger" xsi:type="object">MageworxDeliveryDateLoggerDb</argument>
+        </arguments>
+    </type>
+
+    <!-- Add default empty argument data to avoid magento bug "Missing required argument $data"-->
+    <type name="Magento\Ups\Model\Carrier">
+        <arguments>
+            <argument name="data" xsi:type="array">
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Field map for quote to conditions converter (getters and setters) -->
+    <type name="MageWorx\DeliveryDate\Api\QuoteToConditionsConverterInterface">
+        <arguments>
+            <argument name="allowedDataTypes" xsi:type="array">
+                <item name="bool" xsi:type="string">bool</item>
+                <item name="boolean" xsi:type="string">boolean</item>
+                <item name="int" xsi:type="string">int</item>
+                <item name="integer" xsi:type="string">integer</item>
+                <item name="float" xsi:type="string">float</item>
+                <item name="double" xsi:type="string">double</item>
+                <item name="string" xsi:type="string">string</item>
+                <item name="null" xsi:type="string">null</item>
+            </argument>
+            <argument name="map" xsi:type="array">
+                <item name="cart_id" xsi:type="array">
+                    <item name="getter" xsi:type="string">getEntityId</item>
+                    <item name="setter" xsi:type="string">setCartId</item>
+                    <item name="forced_simple_type" xsi:type="string">int</item>
+                </item>
+                <item name="shipping_method" xsi:type="array">
+                    <item name="getter" xsi:type="string">getShippingMethod</item>
+                    <item name="setter" xsi:type="string">setShippingMethod</item>
+                </item>
+                <item name="address" xsi:type="array">
+                    <item name="getter" xsi:type="string">getShippingAddress</item>
+                    <item name="setter" xsi:type="string">setAddress</item>
+                </item>
+                <item name="store_id" xsi:type="array">
+                    <item name="getter" xsi:type="string">getStoreId</item>
+                    <item name="setter" xsi:type="string">setStoreId</item>
+                    <item name="forced_simple_type" xsi:type="string">int</item>
+                </item>
+                <item name="customer_group_id" xsi:type="array">
+                    <item name="getter" xsi:type="string">getCustomerGroupId</item>
+                    <item name="setter" xsi:type="string">setCustomerGroupId</item>
+                    <item name="forced_simple_type" xsi:type="string">int</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

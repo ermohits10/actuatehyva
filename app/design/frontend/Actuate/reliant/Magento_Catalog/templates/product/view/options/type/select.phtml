@@ -1,0 +1,39 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CustomOption;
+use Magento\Catalog\Block\Product\View\Options\Type\Select;
+use Magento\Framework\Escaper;
+
+/** @var Select $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$option = $block->getOption();
+$product = $block->getProduct();
+
+/** @var CustomOption $customOptionsViewModel */
+$customOptionsViewModel = $viewModels->require(CustomOption::class);
+
+?>
+<div class="flex flex-col sm:flex-row w-full items-center">
+    <label class="label text-black font-medium text-left w-full sm:w-1/2 hidden"
+           for="select_<?= $escaper->escapeHtmlAttr($option->getId()) ?>"
+    >
+        <span><?= $escaper->escapeHtml($option->getTitle()) ?></span>
+        <?php if ($option->getIsRequire()): ?>
+            <span class="sup text-sm">*</span>
+        <?php endif; ?>
+    </label>
+    <div class="text-black font-medium font-sans text-left w-full font-serif text-sm lg:text-base !leading-[22px]">
+        <?= $customOptionsViewModel->getOptionHtml($option, $product); ?>
+    </div>
+</div>

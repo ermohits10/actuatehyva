@@ -1,0 +1,33 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\OfflinePayments\Model\Banktransfer;
+use ReliantDirect\Checkout\Block\TermAndCondition;
+
+/** @var Template $block */
+/** @var Banktransfer $method */
+/** @var Escaper $escaper */
+/** @var TermAndCondition $termAndCondition */
+
+$method = $block->getMethod();
+$termAndCondition = $block->getLayout()->createBlock(TermAndCondition::class);
+?>
+<?php /* The wire Payment Method directive is required to sit in the root DOM element. */ ?>
+<div>
+    <?php if (! empty($method->getInstructions())): ?>
+        <p class="p-4 bg-gray-100 rounded-lg">
+            <?= /* @noEscape */ nl2br($escaper->escapeHtml($method->getInstructions())) ?>
+        </p>
+    <?php endif ?>
+    <?= $termAndCondition->toHtml() ?>
+    <?= $block->getChildHtml('hyva.checkout.navigation.placeorder.button.banktransfer') ?>
+</div>

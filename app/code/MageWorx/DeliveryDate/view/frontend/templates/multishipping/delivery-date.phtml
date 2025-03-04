@@ -1,0 +1,82 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+?>
+<?php
+/** @var \MageWorx\DeliveryDate\Block\MultiShipping\DeliveryDate $block */
+?>
+<?php
+$entityId = (int)$block->getEntity()->getId();
+?>
+<fieldset id="delivery-date-<?= $entityId ?>" class="fieldset delivery-date-option">
+    <legend class="legend">
+        <span><?= $block->escapeHtml(__('Select Delivery Date')) ?></span>
+    </legend>
+    <br>
+
+    <span id="delivery-date-please-wait" class="please-wait load indicator" style="display: none;"
+          data-text="<?= $block->escapeHtml(__('This won\'t take long . . .')) ?>">
+            <span><?= $block->escapeHtml(__('This won\'t take long . . .')) ?></span>
+        </span>
+
+    <div class="fieldset">
+        <input type="hidden" id="delivery-option-id-input-<?= $entityId ?>" name="delivery_date[<?= $entityId ?>][delivery_option_id]"/>
+        <div class="field">
+            <label class="label" for="delivery-day-input-<?= $entityId ?>">
+                <span><?= $block->escapeHtml(__('Select Day')) ?></span>
+            </label>
+            <div class="control">
+                <select class="input-dropdown"
+                        id="delivery-day-input-<?= $entityId ?>"
+                        name="delivery_date[<?= $entityId ?>][delivery_day]"
+                        data-validate="{'required-entry':true}">
+                </select>
+            </div>
+        </div>
+        <div class="field" id="delivery-time-input-container-<?= $entityId ?>">
+            <label class="label" for="delivery-time-input-<?= $entityId ?>">
+                <span><?= $block->escapeHtml(__('Select Time')) ?></span>
+            </label>
+            <div class="control">
+                <select class="input-dropdown"
+                        id="delivery-time-input-<?= $entityId ?>"
+                        name="delivery_date[<?= $entityId ?>][delivery_time]"
+                        data-validate="{'required-entry':true}">
+                </select>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label" for="delivery-comment-input-<?= $entityId ?>">
+                <span><?= $block->escapeHtml(__('Comment')) ?></span>
+            </label>
+            <div class="control">
+                            <textarea class="input-textarea"
+                                      id="delivery-comment-input-<?= $entityId ?>"
+                                      name="delivery_date[<?= $entityId ?>][delivery_comment]"
+                                      data-validate="{'required-entry':false}"></textarea>
+            </div>
+        </div>
+    </div>
+</fieldset>
+<script type="text/x-magento-init">
+        {
+            "#delivery-date-<?= $entityId ?>": {
+                "deliveryDateMultishippingWidget": {
+                    "deliveryDaySelector": "#delivery-day-input-<?= $entityId ?>",
+                    "deliveryTimeSelector": "#delivery-time-input-<?= $entityId ?>",
+                    "deliveryOptionIdSelector": "#delivery-option-id-input-<?= $entityId ?>",
+                    "deliveryCommentSelector": "#delivery-comment-input-<?= $entityId ?>",
+                    "deliveryTimeContainerSelector": "#delivery-time-input-container-<?= $entityId ?>",
+                    "containerSelector": "#delivery-date-<?= $entityId ?>",
+                    "deliveryDateSpinnerId": "#delivery-date-please-wait",
+                    "addressId": "<?= $entityId ?>",
+                    "messages": ".page.messages .messages",
+                    "deliveryDateSubmitButton": "#dd-submit-button-<?= $entityId ?>",
+                    "submitUrl": "<?= $block->escapeUrl($block->getUrl('mageworx_deliverydate/queue/reserve')); ?>",
+                    "config": <?= json_encode($block->getDeliveryDataConfig(), true); ?>
+                }
+            }
+        }
+</script>

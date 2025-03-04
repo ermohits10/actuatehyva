@@ -1,0 +1,45 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+
+<div class="block <?= $escaper->escapeHtmlAttr($block->getBlockCss()) ?> card filter-option mb-2" x-data="{ open: false }">
+    <div class="title <?= $escaper->escapeHtmlAttr($block->getBlockCss()) ?>-title flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container border-b pb-4 -mx-6 px-6 lg:hidden" @click="open = !open" :class="{ 'border-0 pb-4': open, 'border-b pb-2': !open }"
+    >
+        <span class="font-sans text-sm leading-5 font-bold title">
+            <?= $escaper->escapeHtml(__($block->getData('block_title'))) ?>
+        </span>
+        <span class="px-1 py-1">
+            <?= $heroicons->chevronDownHtml(
+                'transition-transform duration-300 ease-in-out transform rotate-180',
+                24,
+                24,
+                [":class" => "{ 'rotate-180': open, 'rotate-0': !open }"]
+            ); ?>
+        </span>
+    </div>
+    <div class="content <?= $escaper->escapeHtmlAttr($block->getBlockCss()) ?>-content block lg:block"
+         :class="{ 'hidden': !open , 'block': open }"
+         id="<?= $escaper->escapeHtmlAttr($block->getBlockCss()) ?>">
+        <?= $block->getChildHtml() ?>
+        <p class="pl-5 mt-4 font-sans text-base leading-6 font-bold"><a href="<?php echo $this->getUrl("customer/account/logout");?>"><?= $heroicons->loginHtml('w-4 h-4 inline-block -mt-0.5', 16, 24) ?> <span class="inline-block">Log Out</span></a></p>
+    </div>
+</div> 

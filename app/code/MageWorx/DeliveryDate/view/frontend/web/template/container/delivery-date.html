@@ -1,0 +1,12 @@
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<div data-bind="visible: isVisible, blockLoader: isLoading" id="delivery-date-container">
+    <h3 data-bind="i18n: 'Delivery date:'"></h3>
+    <each args="data: elems, as: 'element'">
+        <render if="hasTemplate()"></render>
+    </each>
+</div>

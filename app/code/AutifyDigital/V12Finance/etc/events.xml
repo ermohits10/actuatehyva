@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_order_item_cancel">
+        <observer name="inventory" disabled="true"/>
+        <observer instance="AutifyDigital\V12Finance\Observer\Sales\Api\OrderManagement\CancelOrderItems" name="autifydigital_v12finance_observer_sales_api_ordermanagement_cancelorderitems"/>
+    </event>
+	<event name="sales_order_place_after">
+		<observer instance="AutifyDigital\V12Finance\Observer\Sales\OrderPlaceAfter" name="autifydigital_v12finance_observer_sales_orderplaceafter_sales_order_place_after"/>
+	</event>
+	<event name="sales_order_shipment_save_after">
+		<observer instance="AutifyDigital\V12Finance\Observer\Sales\OrderShipmentSaveAfter" name="autifydigital_v12finance_observer_sales_ordershipmentsaveafter_sales_order_shipment_save_after"/>
+	</event>
+<!--	<event name="sales_order_creditmemo_save_after">-->
+<!--		<observer instance="AutifyDigital\V12Finance\Observer\Sales\OrderCreditmemoSaveAfter" name="autifydigital_v12finance_observer_sales_ordercreditmemosaveafter_sales_order_creditmemo_save_after"/>-->
+<!--	</event>-->
+	<event name="admin_system_config_changed_section_autifydigitaldesign">
+		<observer name="autifydigital_admin_system_config_changed_section_autifydigitaldesign" instance="AutifyDigital\V12Finance\Observer\SaveCssObserver"/>
+	</event>
+</config>

@@ -1,0 +1,28 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+?>
+<?php
+/** @var \MageWorx\DeliveryDate\Block\Adminhtml\Widget\TimeInput $block */
+/** @var \Magento\Framework\Data\Form\Element\Text $_element */
+$_element = $block->getElement();
+?>
+<div class="admin__field field">
+    <?= $_element->getLabelHtml() ?>
+    <?= $_element->getElementHtml() ?>
+    <script>
+        require(['customTimePicker'], function () {
+            var $element = jQuery('<?= '#' . $_element->getHtmlId(); ?>');
+            $element.customTimePicker({
+                timeFormat: 'HH:mm',
+                interval: 60,
+                dynamic: false,
+                dropdown: false,
+                scrollbar: false,
+                zindex: 9001
+            });
+        });
+    </script>
+</div>

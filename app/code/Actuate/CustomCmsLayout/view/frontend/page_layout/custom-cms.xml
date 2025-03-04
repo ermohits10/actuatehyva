@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_layout.xsd">
+    <update handle="2columns-left"/>
+    <referenceContainer name="div.sidebar.additional">
+        <referenceBlock name="catalog.compare.link" remove="true"/>
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        <referenceBlock name="category.product.addto.compare" remove="true"/>
+        <referenceBlock name="catalogsearch.product.addto.compare" remove="true"/>
+        <referenceBlock name="crosssell.product.addto.compare" remove="true"/>
+        <referenceBlock name="related.product.addto.compare" remove="true"/>
+        <referenceBlock name="upsell.product.addto.compare" remove="true"/>
+        <referenceBlock name="view.addto.compare" remove="true"/>
+        <referenceBlock name="product.info.overview" remove="true"/>
+    </referenceContainer>  
+     <referenceContainer name="sidebar.additional">
+           <block class="Magento\Cms\Block\Block" name="Sidebar_Links">
+               <arguments>
+                   <argument name="block_id" xsi:type="string">sidebar-links</argument>
+               </arguments>
+           </block>
+       </referenceContainer>
+        <move element="page.main.title" destination="content" before="column.main"/>
+</layout>

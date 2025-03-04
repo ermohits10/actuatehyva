@@ -1,0 +1,49 @@
+<?php
+/** @var Mirasvit\GdprCookie\Block\CookieGroupBlock $block */
+/** @var \Hyva\Theme\Model\ViewModelRegistry $viewModels */
+/** @var \Hyva\Theme\ViewModel\HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(\Hyva\Theme\ViewModel\HeroiconsOutline::class);
+
+$group   = $block->getCookieGroup();
+$groupId = $group->getId();
+
+$disabled = $group->isRequired() ? 'disabled' : '';
+
+?>
+<div class="cookie-group-container cookie-group-container-<?= $groupId; ?> border border-gray-300 mt-4 px-6 py-4 rounded-2xl shadow-sm"
+     x-data="{open<?= $groupId; ?>: false}">
+    <div class="flex flex justify-between">
+        <h4 class="title text-lg cursor-pointer"
+            x-on:click="open<?= $groupId; ?> = !open<?= $groupId; ?>">
+            <span x-show="! open<?= $groupId; ?>"><?= $heroicons->chevronUpHtml('h-6 inline mr-2 w-6', 6, 6); ?></span>
+            <span x-show="open<?= $groupId; ?>" style="display: none"><?= $heroicons->chevronDownHtml('h-6 inline mr-2 w-6', 6, 6); ?></span>
+            <?= $block->escapeHtml(__($group->getName())); ?>
+        </h4>
+
+        <input class="checkbox disabled:opacity-40" type="checkbox" value="1" <?= $disabled; ?> checked data-group-id="<?= $groupId; ?>" name="allowed-group-<?= $groupId; ?>">
+    </div>
+
+    <div class="content mt-4 pl-5" x-show.transition.origin.top="open<?= $groupId; ?>" style="display: none">
+        <div>
+            <?= $block->escapeHtml(__($group->getDescription())); ?>
+        </div>
+        <div class="cookie-list">
+            <strong><?= __('Cookie list:') ?></strong>
+            <?php foreach ($block->getCookies() as $cookie): ?>
+                <?= $cookie->getName(); ?>
+            <?php endforeach ?>
+        </div>
+    </div>
+
+</div>
+<?php /* <script>
+    require([
+        'jquery',
+        'collapsible'
+    ], function ($) {
+        var elSelector = ".cookie-group-container-<?= $groupId; ?>";
+        $(elSelector).collapsible(
+            {header: $(elSelector + " .title"), content: $(elSelector + " .content")}
+        );
+    });
+</script> */ ?>

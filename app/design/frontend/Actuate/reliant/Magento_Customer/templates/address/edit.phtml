@@ -1,0 +1,343 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Customer\Block\Address\Edit;
+use Magento\Customer\ViewModel\Address;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+
+/** @var Edit $block */
+/** @var Address $viewModel */
+/** @var Escaper $escaper */
+/** @var SecureHtmlRenderer $secureRenderer */
+
+$viewModel = $block->getViewModel();
+?>
+<?php $company = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Company::class) ?>
+<?php $telephone = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Telephone::class) ?>
+<?php $fax = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Fax::class) ?>
+<?php $country_id = $block->getAttributeData()->getFrontendLabel('country_id'); ?>
+<?php $street = $block->getAttributeData()->getFrontendLabel('street'); ?>
+<?php $city = $block->getAttributeData()->getFrontendLabel('city'); ?>
+<?php $region = $block->getAttributeData()->getFrontendLabel('region'); ?>
+<?php $selectRegion = 'Please select a region, state or province.'; ?>
+<?php $displayAll = $block->getConfig('general/region/display_all'); ?>
+
+<div class="font-serif text-xl leading-7 font-normal pb-2 border-b border-gray-200 mb-6 lg:text-2xl lg:leading-10 block-title">
+    <?= $escaper->escapeHtml(__('Customer Address')) ?>
+</div>
+<form class="form-address-edit lg:flex lg:grid lg:grid-cols-2 lg:gap-x-6 w-full"
+      x-data="initCustomerAddressEdit()"
+      @private-content-loaded.window="onPrivateContentLoaded(event.detail.data)"
+      action="<?= $escaper->escapeUrl($block->getSaveUrl()) ?>"
+      method="post"
+      id="form-validate"
+      enctype="multipart/form-data"
+      data-hasrequired="<?= $escaper->escapeHtmlAttr(__('* Required Fields')) ?>"
+>
+    <fieldset class="fieldset">
+        <legend class="legend font-serif text-xl leading-7 font-normal pb-2 border-b border-gray-200 mb-6 lg:text-2xl lg:leading-10 block-title w-full"><span><?= $escaper->escapeHtml(__('Contact Information')) ?></span></legend>
+        <?= $block->getBlockHtml('formkey') ?>
+        <input type="hidden" name="success_url" value="<?= $escaper->escapeUrl($block->getSuccessUrl()) ?>">
+        <input type="hidden" name="error_url" value="<?= $escaper->escapeUrl($block->getErrorUrl()) ?>">
+
+        <div class="md:grid grid-cols-1 gap-x-0 gap-y-4">
+            <?= $block->getNameBlockHtml() ?>
+
+            <?php if ($company->isEnabled()): ?>
+                <div class="field w-full">
+                    <?= $company->setCompany($block->getAddress()->getCompany())->toHtml() ?>
+                </div>
+            <?php endif ?>
+
+            <?php if ($telephone->isEnabled()): ?>
+                <div class="field w-full">
+                    <?= $telephone->setTelephone($block->getAddress()->getTelephone())->toHtml() ?>
+                </div>
+            <?php endif ?>
+
+            <?php if ($fax->isEnabled()): ?>
+                <div class="field w-full">
+                    <?= $fax->setFax($block->getAddress()->getFax())->toHtml() ?>
+                </div>
+            <?php endif ?>
+        </div>
+    </fieldset>
+    <fieldset class="fieldset mt-0">
+        <legend class="legend w-full font-serif text-xl leading-7 font-normal pb-2 border-b border-gray-200 mb-6 lg:text-2xl lg:leading-10 block-title"><span><?= $escaper->escapeHtml(__('Address')) ?></span></legend>
+        <div class="md:grid grid-cols-1 gap-x-0 gap-y-4">
+            <div class="field zip w-full">
+                <label class="label" for="zip">
+                    <span>
+                        <?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('postcode') ?>
+                    </span>
+                </label>
+                <div class="control">
+                    <input type="text"
+                           name="postcode"
+                           value="<?= $escaper->escapeHtmlAttr($block->getAddress()->getPostcode()) ?>"
+                           title="<?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('postcode') ?>"
+                           id="zip"
+                           :required="isZipRequired"
+                           class="form-input validate-zip-international">
+                </div>
+            </div>
+            <div class="field street w-full">
+                <label for="street_1" class="label">
+                    <span>
+                        <?= /* @noEscape */ $street ?>
+                    </span>
+                </label>
+                <div class="control">
+                    <input type="text"
+                           name="street[]"
+                           required
+                           value="<?= $escaper->escapeHtmlAttr($block->getStreetLine(1)) ?>"
+                           title="<?= /* @noEscape */ $street ?>"
+                           id="street_1"
+                           class="form-input"
+                    />
+                    <div class="nested">
+                        <?php for ($i = 1, $n = $viewModel->addressGetStreetLines(); $i < $n; $i++): ?>
+                            <div class="field additional">
+                                <label class="label" for="street_<?= /* @noEscape */ $i + 1 ?>">
+                                    <span><?= $escaper->escapeHtml(__('Street Address %1', $i + 1)) ?></span>
+                                </label>
+                                <div class="control">
+                                    <input type="text" name="street[]"
+                                           value="<?= $escaper->escapeHtmlAttr($block->getStreetLine($i + 1)) ?>"
+                                           title="<?= $escaper->escapeHtmlAttr(__('Street Address %1', $i + 1)) ?>"
+                                           id="street_<?= /* @noEscape */ $i + 1 ?>"
+                                           class="form-input"
+                                    >
+                                </div>
+                            </div>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+            </div>
+
+            <?php if ($viewModel->addressIsVatAttributeVisible()): ?>
+                <div class="field taxvat w-full">
+                    <label class="label" for="vat_id">
+                    <span><?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('vat_id') ?></span>
+                    </label>
+                    <div class="control">
+                        <input type="text"
+                               name="vat_id"
+                               value="<?= $escaper->escapeHtmlAttr($block->getAddress()->getVatId()) ?>"
+                               title="<?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('vat_id') ?>"
+                               class="form-input"
+                               id="vat_id">
+                    </div>
+                </div>
+            <?php endif; ?>
+            <div class="field city w-full">
+                <label class="label" for="city">
+                <span><?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('city') ?></span>
+                </label>
+                <div class="control">
+                    <input type="text"
+                           name="city"
+                           required
+                           value="<?= $escaper->escapeHtmlAttr($block->getAddress()->getCity()) ?>"
+                           title="<?= $escaper->escapeHtmlAttr(__('City')) ?>"
+                           class="form-input"
+                           id="city">
+                </div>
+            </div>
+
+            <div class="field country w-full">
+                <label class="label" for="country">
+                    <span>
+                        <?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('country_id') ?>
+                    </span>
+                </label>
+                <div class="control">
+                    <?php $countries = $block
+                        ->getCountryCollection()
+                        ->setForegroundCountries($block->getTopDestinations())
+                        ->toOptionArray();
+                    ?>
+                    <select name="country_id"
+                            id="country"
+                            title="Country"
+                            required="required"
+                            class="form-select"
+                            x-ref="country_id"
+                            @change="changeCountry($event.target)"
+                    >
+                        <?php foreach ($countries as $country): ?>
+                            <option name="<?= /** @noEscape */ $country['label'] ?>"
+                                    value="<?= /** @noEscape */ $country['value'] ?>"
+                                    data-is-zip-required="<?= (isset($country['is_zipcode_optional'])) ? '0' : '1' ?>"
+                                    data-is-region-required="<?= (isset($country['is_region_required'])) ? '1' : '0' ?>"
+                                    <?= ($block->getCountryId() ===  $country['value']) ? 'selected="selected"' : '' ?>
+                            >
+                                <?= /** @noEscape */ $country['label'] ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field region w-full"
+                 x-cloak
+                 x-show="(hasAvailableRegions() && isRegionRequired) || showOptionalRegion"
+            >
+                <label class="label" for="region_id">
+                    <span><?= /* @noEscape */ $region ?></span>
+                </label>
+                <div class="control">
+                    <template x-if="hasAvailableRegions() && isRegionRequired">
+                        <select id="region_id" name="region_id"
+                                title="<?= /* @noEscape */ $region ?>"
+                                class="form-select validate-select region_id"
+                                :required="isRegionRequired"
+                                x-ref="region_id"
+                                x-model="selectedRegion"
+                        >
+                            <option value=""><?= $escaper->escapeHtml(__($selectRegion)) ?></option>
+                            <template x-for="regionId in Object.keys(availableRegions)">
+                                <option :value="regionId"
+                                        :name="availableRegions[regionId].name"
+                                        x-text="availableRegions[regionId].name"
+                                        :selected="selectedRegion === regionId"
+                                >
+                                </option>
+                            </template>
+                        </select>
+                    </template>
+                    <template x-if="!hasAvailableRegions()">
+                        <input type="text"
+                               id="region"
+                               name="region"
+                               x-ref="region"
+                               value="<?= $escaper->escapeHtmlAttr($block->getRegion()) ?>"
+                               title="<?= /* @noEscape */ $region ?>"
+                               class="form-input"
+                               :required="isRegionRequired"
+                        />
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <?php if ($block->isDefaultBilling()): ?>
+            <div class="message info">
+                <span><?= $escaper->escapeHtml(__("It's a default billing address.")) ?></span>
+            </div>
+        <?php elseif ($block->canSetAsDefaultBilling()): ?>
+            <div class="field choice set billing">
+                <input type="checkbox" id="primary_billing" name="default_billing" value="1" class="checkbox">
+                <label class="label" for="primary_billing">
+                    <span><?= $escaper->escapeHtml(__('Use as my default billing address')) ?></span>
+                </label>
+            </div>
+        <?php else: ?>
+            <input type="hidden" name="default_billing" value="1"/>
+        <?php endif; ?>
+
+        <?php if ($block->isDefaultShipping()): ?>
+            <div class="message info">
+                <span><?= $escaper->escapeHtml(__("It's a default shipping address.")) ?></span>
+            </div>
+        <?php elseif ($block->canSetAsDefaultShipping()): ?>
+            <div class="field choice set shipping">
+                <input type="checkbox" id="primary_shipping" name="default_shipping" value="1" class="checkbox">
+                <label class="label" for="primary_shipping">
+                    <span><?= $escaper->escapeHtml(__('Use as my default shipping address')) ?></span>
+                </label>
+            </div>
+        <?php else: ?>
+            <input type="hidden" name="default_shipping" value="1">
+        <?php endif; ?>
+    </fieldset>
+    <div class="actions-toolbar lg:w-full lg:col-span-2">
+        <div class="primary">
+            <button type="submit"
+                    class="action save primary"
+                    data-action="save-address"
+                    title="<?= $escaper->escapeHtmlAttr(__('Save Address')) ?>">
+                <span><?= $escaper->escapeHtml(__('Save Address')) ?></span>
+            </button>
+        </div>
+        <div class="secondary">
+            <a class="action back" href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>">
+                <span><?= $escaper->escapeHtml(__('Go back')) ?></span>
+            </a>
+        </div>
+    </div>
+</form>
+
+<script>
+function initCustomerAddressEdit() {
+    return {
+        directoryData: {},
+        availableRegions: {},
+        selectedRegion: '<?= $escaper->escapeJs($block->getRegion() ?: 0) ?>',
+        isZipRequired: true,
+        isRegionRequired: true,
+        showOptionalRegion: <?= $displayAll ? 'true': 'false' ?>,
+        onPrivateContentLoaded(data) {
+            this.directoryData = data['directory-data'] || {};
+
+            <?php if ($block->getCountryId()): ?>
+                this.changeCountry(this.$refs['country_id']);
+            <?php endif; ?>
+
+            this.setInitialRegionSelectValue();
+            this.setRegionInputValue('<?= $escaper->escapeHtmlAttr($block->getRegion()) ?>');
+
+        },
+        setInitialRegionSelectValue(value) {
+            this.$nextTick(() => {
+                const regionSelectorElement = this.$refs['region_id'];
+                if (regionSelectorElement) {
+
+                    const regionOptionByValue = regionSelectorElement
+                        .querySelector("[name='<?= /** @noEscape */ $block->getRegion() ?>']");
+
+                    if (regionOptionByValue) {
+                        this.$refs['region_id'].value = regionOptionByValue.value;
+                    }
+                }
+            })
+        },
+        setRegionInputValue(value) {
+            this.$nextTick(() => {
+                const regionInputElement = this.$refs['region'];
+                if (regionInputElement) {
+                    regionInputElement.value = value;
+                }
+            })
+        },
+        changeCountry(countrySelectElement) {
+            const selectedOption = countrySelectElement.options[countrySelectElement.selectedIndex];
+            const countryCode = countrySelectElement.value;
+            const countryData = this.directoryData[countryCode] || false;
+
+            this.setRegionInputValue('');
+
+            if (!countryData) {
+                return;
+            }
+
+            this.isZipRequired = selectedOption.dataset.isZipRequired === "1";
+            this.isRegionRequired = selectedOption.dataset.isRegionRequired === "1";
+
+            this.availableRegions = countryData.regions || {};
+        },
+        hasAvailableRegions() {
+            return Object.keys(this.availableRegions).length > 0;
+        }
+    }
+}
+</script>

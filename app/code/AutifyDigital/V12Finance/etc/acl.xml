@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+	<acl>
+		<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="AutifyDigital_V12Finance::Menu_view" sortOrder="10" title="V12 Menu">
+					<resource id="AutifyDigital_V12Finance::Application_view" sortOrder="10" title="View V12 Application"/>
+					<resource id="AutifyDigital_V12Finance::FinanceOptions_menu" sortOrder="20" title="V12 Finance Options">
+    					<resource id="AutifyDigital_V12Finance::FinanceOptions_save" sortOrder="10" title="Save V12 Finance Options"/>
+    					<resource id="AutifyDigital_V12Finance::FinanceOptions_delete" sortOrder="20" title="Delete V12 Finance Options"/>
+    					<resource id="AutifyDigital_V12Finance::FinanceOptions_view" sortOrder="40" title="View V12 Finance Options"/>
+    				</resource>
+    				<resource id="AutifyDigital_V12Finance::PriceOptions_menu" sortOrder="30" title="V12 Price Options">
+    					<resource id="AutifyDigital_V12Finance::PriceOptions_save" sortOrder="10" title="Save V12 Price Options"/>
+    					<resource id="AutifyDigital_V12Finance::PriceOptions_delete" sortOrder="20" title="Delete V12 Price Options"/>
+    					<resource id="AutifyDigital_V12Finance::PriceOptions_view" sortOrder="40" title="View V12 Price Options"/>
+    				</resource>
+    				<resource id="AutifyDigital_V12Finance::config_autifydigital_v12finance" sortOrder="40" title="V12 Finance Configuration"/>
+				</resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

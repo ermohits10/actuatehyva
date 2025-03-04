@@ -1,0 +1,125 @@
+<script>
+    function renderRangeSlider(params) {
+        return {
+            ...params,
+
+            initSlider: function () {
+                this.from = this.toFixed(this.from * this.rate, 2);
+                this.to   = this.toFixed(this.to * this.rate, 2);
+                this.min  = Math.floor(this.min * this.rate);
+                this.max  = Math.ceil(this.max * this.rate);
+
+                this.updateFromTo();
+
+                if (this.getSliderNode()) {
+                    noUiSlider.create(this.getSliderNode(), {
+                        start: [this.from, this.to],
+                        connect: true,
+                        range: {
+                            'min': this.min,
+                            'max': this.max
+                        },
+                        step: 1
+                    });
+
+                    this.getSliderNode().noUiSlider.on('update', function (values) {
+                        this.from = this.toFixed(parseFloat(values[0]), 2);
+                        this.to   = this.toFixed(parseFloat(values[1]), 2);
+
+                        this.updateFromTo();
+                    }.bind(this));
+
+                    this.getSliderNode().noUiSlider.on('change', function () {
+                        this.applyFilter();
+                    }.bind(this));
+                }
+
+                if (this.getFromToNode()) {
+                    this.getFromToNode().querySelectorAll('input').forEach(function (inputNode) {
+                        ['keyup', 'change'].forEach(function (eventName) {
+                            inputNode.addEventListener(eventName, function (e) {
+                                let from = this.from;
+                                let to   = this.to;
+
+                                let value = this.toFixed(parseFloat(e.target.value), 2);
+
+                                if (e.target.dataset.element === 'from') {
+                                    from = value;
+                                } else {
+                                    to = value;
+                                }
+
+                                this.from = from;
+                                this.to   = to;
+                            }.bind(this));
+                        }.bind(this));
+
+                        if (this.getSliderNode()) {
+                            inputNode.addEventListener('blur', function () {
+                                this.getSliderNode().noUiSlider.set([this.from, this.to]);
+                            }.bind(this));
+                        }
+                    }.bind(this));
+                }
+            },
+
+            getSliderNode: function () {
+                return this.$el.querySelector("[data-element=slider]");
+            },
+
+            getTextNode: function () {
+                return this.$el.querySelector('[data-element=text]');
+            },
+
+            getFromToNode: function () {
+                return this.$el.querySelector('.mst-nav__slider-from-to');
+            },
+
+            updateFromTo: function () {
+                if (this.getTextNode()) {
+                    this.getTextNode().innerHTML = this.getTextValue(this.from) + '  ' + this.getTextValue(this.to);
+                }
+
+                if (this.getFromToNode()) {
+                    this.getFromToNode().querySelector('[data-element=from]').value = this.toFixed(this.from);
+                    this.getFromToNode().querySelector('[data-element=to]').value   = this.toFixed(this.to);
+                }
+            },
+
+            applyFilter: function () {
+                this.from = this.from < this.min ? this.min : this.from;
+                this.to   = this.to > this.max ? this.max : this.to;
+
+                if (parseFloat(this.to) < parseFloat(this.from)) {
+                    this.from = this.to;
+                }
+
+                const value = this.toFixed(this.from / this.rate, 2) + this.separator + this.toFixed(this.to / this.rate, 2);
+
+                let url = this.urlTemplate.replace(this.paramTemplate, value);
+
+                initApplier().applyForced(url);
+            },
+
+            getTextValue: function (value) {
+                let tmpl = this.valueTemplate;
+
+                tmpl = tmpl.replace('{value}', this.toFixed(value, 0));
+                tmpl = tmpl.replace('{value.0}', this.toFixed(value, 0));
+                tmpl = tmpl.replace('{value.1}', this.toFixed(value, 1));
+                tmpl = tmpl.replace('{value.2}', this.toFixed(value, 2));
+
+                return tmpl;
+            },
+
+            toFixed: function (value, precision) {
+                //1.00 === 1
+                if (parseFloat(parseFloat(value).toFixed(0)) === parseFloat(parseFloat(value).toFixed(precision))) {
+                    return parseFloat(value).toFixed(0);
+                }
+
+                return parseFloat(value).toFixed(precision);
+            }
+        }
+    }
+</script>

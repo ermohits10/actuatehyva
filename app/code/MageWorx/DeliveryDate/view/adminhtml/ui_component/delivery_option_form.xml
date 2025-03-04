@@ -1,0 +1,1780 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">delivery_option_form.delivery_option_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">General Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save_and_continue" class="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryOption\Edit\SaveAndContinueButton"/>
+            <button name="save" class="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryOption\Edit\SaveButton"/>
+            <button name="reset" class="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryOption\Edit\ResetButton"/>
+            <button name="delete" class="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryOption\Edit\DeleteButton"/>
+            <button name="back" class="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryOption\Edit\BackButton"/>
+            <button name="view_queue_calendar" class="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryOption\Edit\ViewQueueCalendarButton"/>
+        </buttons>
+        <namespace>delivery_option_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>delivery_option_form.delivery_option_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="delivery_option_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="mageworx_deliverydate/deliveryoption/save"/>
+        </settings>
+        <dataProvider class="MageWorx\DeliveryDate\Ui\DataProvider\DeliveryOption\DeliveryOptionDataProvider" name="delivery_option_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label>General</label>
+            <collapsible>false</collapsible>
+        </settings>
+        <field name="entity_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>general.entity_id</dataScope>
+            </settings>
+        </field>
+        <field name="is_active" sortOrder="10" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Enable Delivery Option</label>
+                <dataScope>general.is_active</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="name" formElement="input" sortOrder="70">
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Delivery Option Title</label>
+                <dataScope>general.name</dataScope>
+            </settings>
+        </field>
+        <field name="store_ids" formElement="multiselect" sortOrder="80">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>int</dataType>
+                <label translate="true">Store View</label>
+                <dataScope>general.store_ids</dataScope>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Cms\Ui\Component\Listing\Column\Cms\Options"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="customer_group_ids" formElement="multiselect" sortOrder="90">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="null" />
+                </item>
+            </argument>
+            <settings>
+                <dataType>int</dataType>
+                <label translate="true">Customer Groups</label>
+                <dataScope>general.customer_group_ids</dataScope>
+                <tooltip>
+                    <description translate="true">Leave blank for all groups</description>
+                </tooltip>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="MageWorx\DeliveryDate\Model\Source\CustomerGroup"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="working_days"
+               formElement="multiselect"
+               component="MageWorx_DeliveryDate/js/form/element/working_days_multiselect"
+               sortOrder="95">
+            <settings>
+                <label translate="true">Working Days</label>
+                <dataScope>general.working_days</dataScope>
+                <tooltip>
+                    <description translate="true">Leave blank for all days</description>
+                </tooltip>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="MageWorx\DeliveryDate\Model\Source\WorkingDays"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <!-- Disable "Same Day Delivery" After -->
+        <field name="cut_off_time"
+               formElement="input"
+               component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time"
+               sortOrder="97">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Cutoff Time</label>
+                <notice><![CDATA[This setting defines the time, when the delivery of the next available delivery day is disabled. If you offer the same day delivery ("Processing Order Period" is set to 0), then if the customers place the orders after this time, they won't be able to choose today as the delivery day. If you offer the next day delivery ("Processing Order Period" is set to 1), then if the customers place the orders after this time, they won't be able to choose tomorrow as the delivery day.]]></notice>
+                <dataScope>general.cut_off_time</dataScope>
+            </settings>
+        </field>
+
+        <!-- Shipping Methods Limitation -->
+        <field name="shipping_methods_choice_limiter"
+               formElement="select"
+               component="MageWorx_DeliveryDate/js/form/element/shipping_choicer_limiter"
+               sortOrder="100">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shipping Methods Limit</label>
+                <dataScope>general.shipping_methods_choice_limiter</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MageWorx\DeliveryDate\Model\Source\ShippingMethodsChoiceLimiter"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="methods"
+               formElement="multiselect"
+               component="MageWorx_DeliveryDate/js/form/element/shipping_multiselect"
+               sortOrder="110">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Shipping Methods</label>
+                <dataScope>general.methods</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <imports>
+                    <link name="visible">${$.provider}:data.general.methods</link>
+                </imports>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="MageWorx\DeliveryDate\Model\Source\ShippingMethods"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <field name="start_days_limit" formElement="input" sortOrder="120">
+            <settings>
+                <dataType>text</dataType>
+                <visible>true</visible>
+                <dataScope>general.start_days_limit</dataScope>
+                <dataType>number</dataType>
+                <label translate="true">Processing Order Period</label>
+                <tooltip>
+                    <description translate="true">This setting defines a number of days you need to process the order and prepare it for shipment. Leave blank if you can ship the same day.</description>
+                </tooltip>
+                <validation>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="future_days_limit" formElement="input" sortOrder="130">
+            <settings>
+                <dataType>text</dataType>
+                <visible>true</visible>
+                <dataScope>general.future_days_limit</dataScope>
+                <dataType>number</dataType>
+                <label translate="true">Max Delivery Period</label>
+                <tooltip>
+                    <description translate="true">This setting defines a number of days you restrict for the customers to choose as a delivery date starting from current date.</description>
+                </tooltip>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+                <notice><![CDATA[Value cannot be more than 365 days.]]></notice>
+            </settings>
+        </field>
+        <field name="disable_selection" sortOrder="135" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Disable Delivery Date Selection by Customer</label>
+                <tooltip>
+                    <description translate="true">The global setting "Pre-select Delivery Date" must be enabled to correct work of this feature.</description>
+                </tooltip>
+                <dataScope>general.disable_selection</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="active_from" formElement="date" sortOrder="140">
+            <settings>
+                <validation>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Active From</label>
+                <dataScope>general.active_from</dataScope>
+            </settings>
+        </field>
+        <field name="active_to" formElement="date" sortOrder="150">
+            <settings>
+                <validation>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Active To</label>
+                <dataScope>general.active_to</dataScope>
+            </settings>
+        </field>
+        <field name="sort_order" formElement="input" sortOrder="160">
+            <settings>
+                <visible>true</visible>
+                <dataScope>general.sort_order</dataScope>
+                <dataType>number</dataType>
+                <label translate="true">Sort Order</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="conditions">
+        <settings>
+            <label>Additional Conditions</label>
+            <collapsible>true</collapsible>
+        </settings>
+
+        <field name="plain"
+               formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>general.conditions_serialized.zips.plain</dataScope>
+                <label translate="true">Zip/Postal Codes List</label>
+                <notice translate="true">Please specify Zip/Postal codes separated by commas.</notice>
+            </settings>
+        </field>
+
+        <dynamicRows name="diapason" sortOrder="30">
+            <settings>
+                <label translate="true">Zip/Postal Codes Ranges</label>
+                <notice translate="true">If you specify any Zip/Postal codes or ranges delivery option will be available only for these Zip/Postal codes.</notice>
+                <dataScope>general.conditions_serialized.zips</dataScope>
+                <addButtonLabel translate="true">Add</addButtonLabel>
+                <componentType>dynamicRows</componentType>
+            </settings>
+            <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="isTemplate" xsi:type="boolean">true</item>
+                        <item name="is_collection" xsi:type="boolean">true</item>
+                        <item name="componentType" xsi:type="string">container</item>
+                    </item>
+                </argument>
+                <field name="from"
+                       formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">From</label>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="to"
+                       formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">To</label>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="position" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <visible>false</visible>
+                    </settings>
+                </field>
+                <actionDelete name="action_delete">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                        <dataType>text</dataType>
+                        <componentType>actionDelete</componentType>
+                    </settings>
+                </actionDelete>
+            </container>
+        </dynamicRows>
+
+    </fieldset>
+
+    <fieldset name="limits">
+        <settings>
+            <label>Limits &amp; Time Intervals</label>
+            <collapsible>true</collapsible>
+        </settings>
+
+        <!-- Delivery Quotes & Time Intervals Scope -->
+        <field name="quotes_scope"
+               formElement="select"
+               component="MageWorx_DeliveryDate/js/form/element/quotes_scope_select">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Delivery Quotes &amp; Time Intervals Scope</label>
+                <dataScope>general.quotes_scope</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MageWorx\DeliveryDate\Model\Source\QuotesScope"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <!-- Default values for time limits -->
+        <fieldset name="default" component="MageWorx_DeliveryDate/js/form/components/fieldset">
+            <settings>
+                <label><![CDATA[]]></label>
+                <collapsible>false</collapsible>
+                <level>1</level>
+            </settings>
+            <field name="active" formElement="checkbox" component="MageWorx_DeliveryDate/js/form/element/checkbox">
+                <settings>
+                    <label translate="true">Active</label>
+                    <dataScope>general.limits_serialized.default.active</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <visible>false</visible>
+                    <imports>
+                        <link name="checked">${ $.parentName }:visible</link>
+                    </imports>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                            <prefer>toggle</prefer>
+                            <checked>true</checked>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="daily_quotes" formElement="input" sortOrder="20">
+                <settings>
+                    <dataType>number</dataType>
+                    <dataScope>general.limits_serialized.default.daily_quotes</dataScope>
+                    <label translate="true">Daily Quote</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <notice translate="true">Leave blank if unlimited</notice>
+                </settings>
+            </field>
+            <field name="extra_charge" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.default.extra_charge</dataScope>
+                    <label translate="true">Extra Charge</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <dynamicRows name="time_limits" sortOrder="30">
+                <settings>
+                    <dataScope>general.limits_serialized.default</dataScope>
+                    <addButtonLabel translate="true">Add Time Interval</addButtonLabel>
+                    <additionalClasses>
+                        <class name="has-dynamic-rows">true</class>
+                    </additionalClasses>
+                    <componentType>dynamicRows</componentType>
+                </settings>
+                <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="isTemplate" xsi:type="boolean">true</item>
+                            <item name="is_collection" xsi:type="boolean">true</item>
+                            <item name="componentType" xsi:type="string">container</item>
+                        </item>
+                    </argument>
+                    <field name="from"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">From Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="to"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">To Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="cut_off_time"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Cutoff Time</label>
+                            <validation>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="quote_limit" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Quote Limit</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            </validation>
+                            <imports>
+                                <link name="visible">delivery_option_form.delivery_option_form.limits.default:limitedQuotes</link>
+                            </imports>
+                            <notice translate="true">Leave blank if unlimited</notice>
+                        </settings>
+                    </field>
+                    <field name="extra_charge" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Extra Charge</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-number" xsi:type="boolean">true</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="position" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <visible>false</visible>
+                        </settings>
+                    </field>
+                    <actionDelete name="action_delete">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="fit" xsi:type="boolean">true</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                            <dataType>text</dataType>
+                            <componentType>actionDelete</componentType>
+                        </settings>
+                    </actionDelete>
+                </container>
+            </dynamicRows>
+        </fieldset>
+
+        <!-- Day-specific values for time limits -->
+        <fieldset name="sunday" component="MageWorx_DeliveryDate/js/form/components/day_fieldset">
+            <settings>
+                <label>Sunday</label>
+                <collapsible>true</collapsible>
+                <level>1</level>
+            </settings>
+            <field name="active" formElement="checkbox" component="MageWorx_DeliveryDate/js/form/element/checkbox">
+                <settings>
+                    <label translate="true">Active</label>
+                    <dataScope>general.limits_serialized.sunday.active</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <visible>false</visible>
+                    <imports>
+                        <link name="checked">${ $.parentName }:visible</link>
+                    </imports>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                            <prefer>toggle</prefer>
+                            <checked>true</checked>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="daily_quotes" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.sunday.daily_quotes</dataScope>
+                    <dataType>number</dataType>
+                    <label translate="true">Daily Quotes</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <notice translate="true">Leave blank if unlimited</notice>
+                </settings>
+            </field>
+            <field name="extra_charge" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <label translate="true">Extra Charge</label>
+                    <dataScope>general.limits_serialized.sunday.extra_charge</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <dynamicRows name="time_limits">
+                <settings>
+                    <addButtonLabel translate="true">Add Time Interval</addButtonLabel>
+                    <additionalClasses>
+                        <class name="admin__field-wide">true</class>
+                        <class name="has-dynamic-rows">true</class>
+                    </additionalClasses>
+                    <componentType>dynamicRows</componentType>
+                    <dataScope>general.limits_serialized.sunday</dataScope>
+                </settings>
+                <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="isTemplate" xsi:type="boolean">true</item>
+                            <item name="is_collection" xsi:type="boolean">true</item>
+                            <item name="componentType" xsi:type="string">container</item>
+                        </item>
+                    </argument>
+                    <field name="from"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">From Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="to"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">To Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="cut_off_time"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Cutoff Time</label>
+                            <validation>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="quote_limit" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Quote Limit</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            </validation>
+                            <notice translate="true">Leave blank if unlimited</notice>
+                        </settings>
+                    </field>
+                    <field name="extra_charge" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Extra Charge</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-number" xsi:type="boolean">true</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="position" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <visible>false</visible>
+                        </settings>
+                    </field>
+                    <actionDelete name="action_delete">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="fit" xsi:type="boolean">true</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                            <dataType>text</dataType>
+                            <componentType>actionDelete</componentType>
+                        </settings>
+                    </actionDelete>
+                </container>
+            </dynamicRows>
+        </fieldset>
+        <fieldset name="monday" component="MageWorx_DeliveryDate/js/form/components/day_fieldset">
+            <settings>
+                <label>Monday</label>
+                <collapsible>true</collapsible>
+                <level>1</level>
+            </settings>
+            <field name="active" formElement="checkbox" component="MageWorx_DeliveryDate/js/form/element/checkbox">
+                <settings>
+                    <label translate="true">Active</label>
+                    <dataScope>general.limits_serialized.monday.active</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <visible>false</visible>
+                    <imports>
+                        <link name="checked">${ $.parentName }:visible</link>
+                    </imports>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                            <checked>true</checked>
+                            <prefer>toggle</prefer>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="daily_quotes" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.monday.daily_quotes</dataScope>
+                    <dataType>number</dataType>
+                    <label translate="true">Daily Quotes</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <notice translate="true">Leave blank if unlimited</notice>
+                </settings>
+            </field>
+            <field name="extra_charge" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.monday.extra_charge</dataScope>
+                    <label translate="true">Extra Charge</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <dynamicRows name="time_limits">
+                <settings>
+                    <addButtonLabel translate="true">Add Time Interval</addButtonLabel>
+                    <additionalClasses>
+                        <class name="admin__field-wide">true</class>
+                        <class name="has-dynamic-rows">true</class>
+                    </additionalClasses>
+                    <componentType>dynamicRows</componentType>
+                    <dataScope>general.limits_serialized.monday</dataScope>
+                </settings>
+                <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="isTemplate" xsi:type="boolean">true</item>
+                            <item name="is_collection" xsi:type="boolean">true</item>
+                            <item name="componentType" xsi:type="string">container</item>
+                        </item>
+                    </argument>
+                    <field name="from"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">From Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="to"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">To Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="cut_off_time"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Cutoff Time</label>
+                            <validation>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="quote_limit" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Quote Limit</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            </validation>
+                            <notice translate="true">Leave blank if unlimited</notice>
+                        </settings>
+                    </field>
+                    <field name="extra_charge" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Extra Charge</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-number" xsi:type="boolean">true</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="position" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <visible>false</visible>
+                        </settings>
+                    </field>
+                    <actionDelete name="action_delete">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="fit" xsi:type="boolean">true</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                            <dataType>text</dataType>
+                            <componentType>actionDelete</componentType>
+                        </settings>
+                    </actionDelete>
+                </container>
+            </dynamicRows>
+        </fieldset>
+        <fieldset name="tuesday" component="MageWorx_DeliveryDate/js/form/components/day_fieldset">
+            <settings>
+                <label>Tuesday</label>
+                <collapsible>true</collapsible>
+                <level>1</level>
+            </settings>
+            <field name="active" formElement="checkbox" component="MageWorx_DeliveryDate/js/form/element/checkbox">
+                <settings>
+                    <label translate="true">Active</label>
+                    <dataScope>general.limits_serialized.tuesday.active</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <visible>false</visible>
+                    <imports>
+                        <link name="checked">${ $.parentName }:visible</link>
+                    </imports>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                            <checked>true</checked>
+                            <prefer>toggle</prefer>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="daily_quotes" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.tuesday.daily_quotes</dataScope>
+                    <dataType>number</dataType>
+                    <label translate="true">Daily Quotes</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <notice translate="true">Leave blank if unlimited</notice>
+                </settings>
+            </field>
+            <field name="extra_charge" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.tuesday.extra_charge</dataScope>
+                    <label translate="true">Extra Charge</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <dynamicRows name="time_limits">
+                <settings>
+                    <addButtonLabel translate="true">Add Time Interval</addButtonLabel>
+                    <additionalClasses>
+                        <class name="admin__field-wide">true</class>
+                        <class name="has-dynamic-rows">true</class>
+                    </additionalClasses>
+                    <componentType>dynamicRows</componentType>
+                    <dataScope>general.limits_serialized.tuesday</dataScope>
+                </settings>
+                <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="isTemplate" xsi:type="boolean">true</item>
+                            <item name="is_collection" xsi:type="boolean">true</item>
+                            <item name="componentType" xsi:type="string">container</item>
+                        </item>
+                    </argument>
+                    <field name="from"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">From Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="to"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">To Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="cut_off_time"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Cutoff Time</label>
+                            <validation>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="quote_limit" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Quote Limit</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            </validation>
+                            <notice translate="true">Leave blank if unlimited</notice>
+                        </settings>
+                    </field>
+                    <field name="extra_charge" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Extra Charge</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-number" xsi:type="boolean">true</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="position" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <visible>false</visible>
+                        </settings>
+                    </field>
+                    <actionDelete name="action_delete">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="fit" xsi:type="boolean">true</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                            <dataType>text</dataType>
+                            <componentType>actionDelete</componentType>
+                        </settings>
+                    </actionDelete>
+                </container>
+            </dynamicRows>
+        </fieldset>
+        <fieldset name="wednesday" component="MageWorx_DeliveryDate/js/form/components/day_fieldset">
+            <settings>
+                <label>Wednesday</label>
+                <collapsible>true</collapsible>
+                <level>1</level>
+            </settings>
+            <field name="active" formElement="checkbox" component="MageWorx_DeliveryDate/js/form/element/checkbox">
+                <settings>
+                    <label translate="true">Active</label>
+                    <dataScope>general.limits_serialized.wednesday.active</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <visible>false</visible>
+                    <imports>
+                        <link name="checked">${ $.parentName }:visible</link>
+                    </imports>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                            <checked>true</checked>
+                            <prefer>toggle</prefer>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="daily_quotes" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.wednesday.daily_quotes</dataScope>
+                    <dataType>number</dataType>
+                    <label translate="true">Daily Quotes</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <notice translate="true">Leave blank if unlimited</notice>
+                </settings>
+            </field>
+            <field name="extra_charge" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.wednesday.extra_charge</dataScope>
+                    <label translate="true">Extra Charge</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <dynamicRows name="time_limits">
+                <settings>
+                    <addButtonLabel translate="true">Add Time Interval</addButtonLabel>
+                    <additionalClasses>
+                        <class name="admin__field-wide">true</class>
+                        <class name="has-dynamic-rows">true</class>
+                    </additionalClasses>
+                    <componentType>dynamicRows</componentType>
+                    <dataScope>general.limits_serialized.wednesday</dataScope>
+                </settings>
+                <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="isTemplate" xsi:type="boolean">true</item>
+                            <item name="is_collection" xsi:type="boolean">true</item>
+                            <item name="componentType" xsi:type="string">container</item>
+                        </item>
+                    </argument>
+                    <field name="from"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">From Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="to"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">To Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="cut_off_time"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Cutoff Time</label>
+                            <validation>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="quote_limit" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Quote Limit</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            </validation>
+                            <notice translate="true">Leave blank if unlimited</notice>
+                        </settings>
+                    </field>
+                    <field name="extra_charge" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Extra Charge</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-number" xsi:type="boolean">true</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="position" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <visible>false</visible>
+                        </settings>
+                    </field>
+                    <actionDelete name="action_delete">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="fit" xsi:type="boolean">true</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                            <dataType>text</dataType>
+                            <componentType>actionDelete</componentType>
+                        </settings>
+                    </actionDelete>
+                </container>
+            </dynamicRows>
+        </fieldset>
+        <fieldset name="thursday" component="MageWorx_DeliveryDate/js/form/components/day_fieldset">
+            <settings>
+                <label>Thursday</label>
+                <collapsible>true</collapsible>
+                <level>1</level>
+            </settings>
+            <field name="active" formElement="checkbox" component="MageWorx_DeliveryDate/js/form/element/checkbox">
+                <settings>
+                    <label translate="true">Active</label>
+                    <dataScope>general.limits_serialized.thursday.active</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <visible>false</visible>
+                    <imports>
+                        <link name="checked">${ $.parentName }:visible</link>
+                    </imports>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                            <checked>true</checked>
+                            <prefer>toggle</prefer>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="daily_quotes" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.thursday.daily_quotes</dataScope>
+                    <dataType>number</dataType>
+                    <label translate="true">Daily Quotes</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <notice translate="true">Leave blank if unlimited</notice>
+                </settings>
+            </field>
+            <field name="extra_charge" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.thursday.extra_charge</dataScope>
+                    <label translate="true">Extra Charge</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <dynamicRows name="time_limits">
+                <settings>
+                    <addButtonLabel translate="true">Add Time Interval</addButtonLabel>
+                    <additionalClasses>
+                        <class name="admin__field-wide">true</class>
+                        <class name="has-dynamic-rows">true</class>
+                    </additionalClasses>
+                    <componentType>dynamicRows</componentType>
+                    <dataScope>general.limits_serialized.thursday</dataScope>
+                </settings>
+                <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="isTemplate" xsi:type="boolean">true</item>
+                            <item name="is_collection" xsi:type="boolean">true</item>
+                            <item name="componentType" xsi:type="string">container</item>
+                        </item>
+                    </argument>
+                    <field name="from"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">From Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="to"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">To Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="cut_off_time"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Cutoff Time</label>
+                            <validation>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="quote_limit" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Quote Limit</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            </validation>
+                            <notice translate="true">Leave blank if unlimited</notice>
+                        </settings>
+                    </field>
+                    <field name="extra_charge" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Extra Charge</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-number" xsi:type="boolean">true</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="position" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <visible>false</visible>
+                        </settings>
+                    </field>
+                    <actionDelete name="action_delete">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="fit" xsi:type="boolean">true</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                            <dataType>text</dataType>
+                            <componentType>actionDelete</componentType>
+                        </settings>
+                    </actionDelete>
+                </container>
+            </dynamicRows>
+        </fieldset>
+        <fieldset name="friday" component="MageWorx_DeliveryDate/js/form/components/day_fieldset">
+            <settings>
+                <label>Friday</label>
+                <collapsible>true</collapsible>
+                <level>1</level>
+            </settings>
+            <field name="active" formElement="checkbox" component="MageWorx_DeliveryDate/js/form/element/checkbox">
+                <settings>
+                    <label translate="true">Active</label>
+                    <dataScope>general.limits_serialized.friday.active</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <visible>false</visible>
+                    <imports>
+                        <link name="checked">${ $.parentName }:visible</link>
+                    </imports>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                            <checked>true</checked>
+                            <prefer>toggle</prefer>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="daily_quotes" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.friday.daily_quotes</dataScope>
+                    <dataType>number</dataType>
+                    <label translate="true">Daily Quotes</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <notice translate="true">Leave blank if unlimited</notice>
+                </settings>
+            </field>
+            <field name="extra_charge" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.friday.extra_charge</dataScope>
+                    <label translate="true">Extra Charge</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <dynamicRows name="time_limits">
+                <settings>
+                    <addButtonLabel translate="true">Add Time Interval</addButtonLabel>
+                    <additionalClasses>
+                        <class name="admin__field-wide">true</class>
+                        <class name="has-dynamic-rows">true</class>
+                    </additionalClasses>
+                    <componentType>dynamicRows</componentType>
+                    <dataScope>general.limits_serialized.friday</dataScope>
+                </settings>
+                <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="isTemplate" xsi:type="boolean">true</item>
+                            <item name="is_collection" xsi:type="boolean">true</item>
+                            <item name="componentType" xsi:type="string">container</item>
+                        </item>
+                    </argument>
+                    <field name="from"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">From Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="to"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">To Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="cut_off_time"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Cutoff Time</label>
+                            <validation>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="quote_limit" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Quote Limit</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            </validation>
+                            <notice translate="true">Leave blank if unlimited</notice>
+                        </settings>
+                    </field>
+                    <field name="extra_charge" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Extra Charge</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-number" xsi:type="boolean">true</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="position" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <visible>false</visible>
+                        </settings>
+                    </field>
+                    <actionDelete name="action_delete">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="fit" xsi:type="boolean">true</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                            <dataType>text</dataType>
+                            <componentType>actionDelete</componentType>
+                        </settings>
+                    </actionDelete>
+                </container>
+            </dynamicRows>
+        </fieldset>
+        <fieldset name="saturday" component="MageWorx_DeliveryDate/js/form/components/day_fieldset">
+            <settings>
+                <label>Saturday</label>
+                <collapsible>true</collapsible>
+                <level>1</level>
+            </settings>
+            <field name="active" formElement="checkbox" component="MageWorx_DeliveryDate/js/form/element/checkbox">
+                <settings>
+                    <label translate="true">Active</label>
+                    <dataScope>general.limits_serialized.saturday.active</dataScope>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                    </validation>
+                    <dataType>boolean</dataType>
+                    <visible>false</visible>
+                    <imports>
+                        <link name="checked">${ $.parentName }:visible</link>
+                    </imports>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="string">0</map>
+                                <map name="true" xsi:type="string">1</map>
+                            </valueMap>
+                            <checked>true</checked>
+                            <prefer>toggle</prefer>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="daily_quotes" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.saturday.daily_quotes</dataScope>
+                    <dataType>number</dataType>
+                    <label translate="true">Daily Quotes</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <notice translate="true">Leave blank if unlimited</notice>
+                </settings>
+            </field>
+            <field name="extra_charge" formElement="input">
+                <settings>
+                    <dataType>text</dataType>
+                    <dataScope>general.limits_serialized.saturday.extra_charge</dataScope>
+                    <label translate="true">Extra Charge</label>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">false</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <dynamicRows name="time_limits">
+                <settings>
+                    <addButtonLabel translate="true">Add Time Interval</addButtonLabel>
+                    <additionalClasses>
+                        <class name="admin__field-wide">true</class>
+                        <class name="has-dynamic-rows">true</class>
+                    </additionalClasses>
+                    <componentType>dynamicRows</componentType>
+                    <dataScope>general.limits_serialized.saturday</dataScope>
+                </settings>
+                <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="isTemplate" xsi:type="boolean">true</item>
+                            <item name="is_collection" xsi:type="boolean">true</item>
+                            <item name="componentType" xsi:type="string">container</item>
+                        </item>
+                    </argument>
+                    <field name="from"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">From Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="to"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">To Time</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="cut_off_time"
+                           formElement="input"
+                           component="MageWorx_DeliveryDate/js/form/element/same_day_delivery_time">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Cutoff Time</label>
+                            <validation>
+                                <rule name="validate-digits-range" xsi:type="string">0-24</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="quote_limit" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Quote Limit</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-digits" xsi:type="boolean">true</rule>
+                            </validation>
+                            <notice translate="true">Leave blank if unlimited</notice>
+                        </settings>
+                    </field>
+                    <field name="extra_charge" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <label translate="true">Extra Charge</label>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">false</rule>
+                                <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                                <rule name="validate-number" xsi:type="boolean">true</rule>
+                            </validation>
+                        </settings>
+                    </field>
+                    <field name="position" formElement="input">
+                        <settings>
+                            <dataType>text</dataType>
+                            <visible>false</visible>
+                        </settings>
+                    </field>
+                    <actionDelete name="action_delete">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="fit" xsi:type="boolean">true</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                            <dataType>text</dataType>
+                            <componentType>actionDelete</componentType>
+                        </settings>
+                    </actionDelete>
+                </container>
+            </dynamicRows>
+        </fieldset>
+    </fieldset>
+    <fieldset name="holidays">
+        <settings>
+            <label>Holidays</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <dynamicRows name="holidays_serialized">
+            <settings>
+                <addButtonLabel translate="true">Add New Holiday</addButtonLabel>
+                <additionalClasses>
+                    <class name="admin__field-wide">true</class>
+                </additionalClasses>
+                <componentType>dynamicRows</componentType>
+                <dataScope>general</dataScope>
+            </settings>
+            <container name="record" component="Magento_Ui/js/dynamic-rows/record">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="isTemplate" xsi:type="boolean">true</item>
+                        <item name="is_collection" xsi:type="boolean">true</item>
+                        <item name="componentType" xsi:type="string">container</item>
+                    </item>
+                </argument>
+                <field name="title" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Title</label>
+                    </settings>
+                </field>
+                <field name="day" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Day</label>
+                        <validation>
+                            <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                            <rule name="validate-number" xsi:type="boolean">true</rule>
+                            <rule name="validate-digits-range" xsi:type="string">0-31</rule>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="month" formElement="select">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Month</label>
+                    </settings>
+                    <formElements>
+                        <select>
+                            <settings>
+                                <options class="MageWorx\DeliveryDate\Model\Source\Month"/>
+                            </settings>
+                        </select>
+                    </formElements>
+                </field>
+                <field name="year" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <label translate="true">Year</label>
+                        <validation>
+                            <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                            <rule name="validate-number" xsi:type="boolean">true</rule>
+                        </validation>
+                    </settings>
+                </field>
+                <field name="recurring" formElement="checkbox">
+                    <settings>
+                        <label translate="true">Annual</label>
+                        <dataType>boolean</dataType>
+                    </settings>
+                    <formElements>
+                        <checkbox>
+                            <settings>
+                                <valueMap>
+                                    <map name="false" xsi:type="string">0</map>
+                                    <map name="true" xsi:type="string">1</map>
+                                </valueMap>
+                                <checked>true</checked>
+                                <prefer>toggle</prefer>
+                            </settings>
+                        </checkbox>
+                    </formElements>
+                </field>
+                <field name="position" formElement="input">
+                    <settings>
+                        <dataType>text</dataType>
+                        <visible>false</visible>
+                    </settings>
+                </field>
+                <actionDelete name="action_delete">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="fit" xsi:type="boolean">true</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <elementTmpl>Magento_Catalog/form/element/action-delete</elementTmpl>
+                        <dataType>text</dataType>
+                        <componentType>actionDelete</componentType>
+                    </settings>
+                </actionDelete>
+            </container>
+        </dynamicRows>
+    </fieldset>
+    <fieldset name="error_message">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Labels</item>
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="sortOrder" xsi:type="string">40</item>
+                <item name="imports" xsi:type="array">
+                    <item name="visible" xsi:type="string">!${ $.provider }:data.general.single_store</item>
+                </item>
+            </item>
+        </argument>
+        <container name="delivery_date_required_error_message" >
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+            </argument>
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">MageWorx\DeliveryDate\Block\Adminhtml\DeliveryOption\Edit\Tab\ErrorMessage</argument>
+            </htmlContent>
+        </container>
+    </fieldset>
+</form>

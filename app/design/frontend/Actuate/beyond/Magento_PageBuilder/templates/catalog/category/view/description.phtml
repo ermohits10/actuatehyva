@@ -1,0 +1,101 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/**
+ * Category view template
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ */
+?>
+<?php if ($description = $block->getCurrentCategory()->getDescription()):?>
+    <div x-data="initReadMoreDesc()" x-init="initReadMore()">
+        <div class="category-description" :class="{'max-h-[150px] overflow-hidden': isReadMoreVisible && isReadMore && isMobile === true}">
+            <?php $descriptionHtml = $this->helper(Magento\Catalog\Helper\Output::class)->categoryAttribute(
+    $block->getCurrentCategory(),
+    $description,
+    'description'
+);?>
+            <?php if (stripos($description, 'data-appearance') === false):?>
+                <div data-content-type="row" data-appearance="contained" data-element="main">
+                    <div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}" data-element="inner"
+                         style="justify-content: flex-start; display: flex; flex-direction: column;
+                         background-position: left top; background-size: cover; background-repeat: no-repeat;
+                         background-attachment: scroll; border-style: none; border-width: 1px; border-radius: 0px;
+                         margin: 0px 0px 10px; padding: 10px;">
+                        <div data-content-type="html" data-appearance="default" data-element="main"
+                             style="border-style: none; border-width: 1px; border-radius: 0px; margin: 0px; padding: 0px;">
+                            <?= /* @noEscape */$descriptionHtml; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <?= /* @noEscape */$descriptionHtml; ?>
+            <?php endif; ?>
+        </div>
+        <template x-if="isReadMoreVisible && isMobile === true">
+            <template x-if="isReadMore">
+                <div class="w-100 flex justify-center items-center cursor-pointer py-2.5" @click="isReadMore=!isReadMore">
+                    <span class="text-[#000d40] px-2.5 font-medium"><?= __('Read more');?></span>
+                    <svg width="14" height="9" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 1.00006L7 7.00006L13 1.00006" stroke="#000d40" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </template>
+            <template x-if="!isReadMore">
+                <div class="w-100 flex justify-center items-center cursor-pointer py-2.5" @click="isReadMore=!isReadMore">
+                    <span class="text-[#000d40] px-2.5 font-medium"><?= __('Read less');?></span>
+                    <svg width="14" height="9" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 7L7 0.999999L1 7" stroke="#000d40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </template>
+        </template>
+    </div>
+    <script>
+        function initReadMoreDesc () {
+            return {
+                "isReadMoreVisible": false,
+                "isReadMore": true,
+                "isMobile": false,
+                initReadMore: function () {
+                    let mobile = window.matchMedia('(min-width: 0px) and (max-width: 768px)');
+                    if (mobile.matches) {
+                        this.isMobile = true;
+                    }
+                    this.isReadMoreVisible = document.querySelector('.category-description').offsetHeight >= 150;
+                }
+            }
+        }
+    </script>
+    <script>
+       function moveBanner() {
+            const mastDescription = document.querySelector('.mast-description');
+            const mastDescriptionFigure = mastDescription.querySelector('figure');
+            const mastHeading = document.querySelector('.mast-heading');
+            const mastHeadingFigure = mastHeading.querySelector('figure');
+            const small = window.matchMedia('(max-width: 767px)');
+            const tabletOrDesktop = window.matchMedia('(min-width: 768px)');
+            if (small.matches) {
+                // Move figure to mast-heading for small screens
+                if (!mastHeadingFigure && mastDescriptionFigure) { // Only move if it's not already there
+                    console.log("Moving image to mast-heading");
+                    mastHeading.prepend(mastDescriptionFigure);
+                }
+            } else if (tabletOrDesktop.matches) {
+                // Move figure back to mast-description for tablet and desktop
+                if (!mastDescriptionFigure && mastHeadingFigure) { // Check if no figure in mast-description
+                    console.log("Moving image back to mast-description");
+                    mastDescription.prepend(mastHeadingFigure);
+                }
+            }
+        }
+        window.addEventListener('load', moveBanner);
+        window.addEventListener('resize', moveBanner);
+    </script>
+<?php endif; ?>

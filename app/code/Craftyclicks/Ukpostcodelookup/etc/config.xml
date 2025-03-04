@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+		<cc_uk>
+			<main_options>
+				<frontend_enabled>0</frontend_enabled>
+				<backend_enabled>0</backend_enabled>
+				<frontend_accesstoken backend_model="Magento\Config\Model\Config\Backend\Encrypted">xxxxx-xxxxx-xxxxx-xxxxx</frontend_accesstoken>
+				<backend_accesstoken backend_model="Magento\Config\Model\Config\Backend\Encrypted">xxxxx-xxxxx-xxxxx-xxxxx</backend_accesstoken>
+			</main_options>
+			<gfx_options>
+				<hide_fields>0</hide_fields>
+			</gfx_options>
+			<txt_options>
+				<search_placeholder>Type your postcode here</search_placeholder>
+				<search_buttontext>Find Address</search_buttontext>
+				<error_msg_1>This postcode could not be found, please try again or enter your address manually.</error_msg_1>
+				<error_msg_2>This postcode is not valid.</error_msg_2>
+				<error_msg_3>Unable to connect to address lookup server.</error_msg_3>
+				<error_msg_4>An unexpected error occurred.</error_msg_4>
+			</txt_options>
+			<advanced>
+				<county_data>none</county_data>
+			</advanced>
+		</cc_uk>
+	</default>
+</config>

@@ -1,0 +1,78 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\LayeredNavigation\Block\Navigation;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Navigation $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<?php if ($block->canShowBlock()): ?>
+    <div class="relative b-left block border border-[#126366] rounded-md p-3 md:border-0 md:roudned-none md:w-full md:bg-transparent md:pt-4 md:py-0 md:px-0 md:mb-6"
+         x-data="initLayeredNavigation()"
+         x-init="checkIsMobileResolution()"
+         @resize.window.debounce="checkIsMobileResolution()"
+         @visibilitychange.window.debounce="checkIsMobileResolution()"
+    >
+        <div class="block-title h-5 md:h-10 flex items-center justify-center md:justify-between md:border-b md:border-gray-200 md:pb-5"
+             @click="blockOpen = !blockOpen">
+            <span class="text-sm leading-5 md:text-xl md:leading-7 font-sans md:font-mono font-medium lg:font-semibold md:mb-2">
+                <?= $escaper->escapeHtml(__('Filters')) ?>
+            </span>
+            <span class="py-1 px-1 hidden" :class="{ 'block' : isMobile, 'hidden': !isMobile }">
+                <?= $heroicons->chevronDownHtml('w-4 h-4 text-gray-600 transition-transform transform duration-300 ease-in-out',32,16,[":class" => "{ 'rotate-180': blockOpen }"]); ?>
+            </span>
+        </div>
+        <div class="block-content filter-content hidden md:block" :class="{ 'hidden' : isMobile && !blockOpen, 'active' : isMobile && blockOpen }">
+            <?= $block->getChildHtml('state') ?>
+            <?php foreach ($block->getFilters() as $filter): ?>
+                <?php if ($filter->getItemsCount()): ?>
+                    <div class="filter-option card mt-4 border-b border-gray-200" x-data="{ open: false }">
+                        <div
+                            class="filter-options-title flex justify-between items-center cursor-pointer hover:text-secondary-darker border-container"
+                            :class="{ 'pb-4': open }"
+                            @click="open = !open">
+                            <span class="title font-sans text-base leading-6 font-medium mb-4">
+                                <?= $escaper->escapeHtml(__($filter->getName())) ?>
+                            </span>
+                            <span class="mb-4">
+                                <?= $heroicons->chevronDownHtml('w-8 h-4 text-gray-600 transition-transform transform duration-300 ease-in-out', 32,16,[":class" => "{ 'rotate-180': open }"]); ?>
+                            </span>
+                        </div>
+                        <template x-if="open">
+                            <div class="filter-options-content mb-6">
+                                <?= /* @noEscape */ $block->getChildBlock('renderer')->render($filter) ?>
+                            </div>
+                        </template>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <script>
+        function initLayeredNavigation() {
+            return {
+                isMobile: false,
+                blockOpen: false,
+                checkIsMobileResolution() {
+                    this.isMobile = window.matchMedia('(max-width: 768px)').matches;
+                }
+            }
+        }
+    </script>
+<?php endif; ?>

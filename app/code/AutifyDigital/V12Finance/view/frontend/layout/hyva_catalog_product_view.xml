@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+~ Copyright (c) 2020 Autify digital Ltd.
+~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+~ ALL RIGHTS RESERVED.
+~
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_modal"/>
+    <body>
+        <referenceBlock name="product.info">
+            <action method="setTemplate" ifconfig="v12finance/product_page/enable_v12_finance">
+                <argument name="template" xsi:type="string">AutifyDigital_V12Finance::product/view/product-info.phtml</argument>
+            </action>
+            <block class="Magento\Catalog\Block\Product\View" name="product.info.finance.calculator" template="AutifyDigital_V12Finance::product/view/financecalculator.phtml" />
+        </referenceBlock>
+
+        <referenceBlock name="related">
+            <action method="setTemplate" ifconfig="v12finance/product_page/enable_v12_finance_related">
+                <argument name="template" xsi:type="string">AutifyDigital_V12Finance::product/slider/product-slider.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="type" xsi:type="string">related</argument>
+                <argument name="title" xsi:type="string" translate="true">Related Products</argument>
+            </arguments>
+        </referenceBlock>
+        
+        <referenceBlock name="upsell">
+            <action method="setTemplate" ifconfig="v12finance/product_page/enable_v12_finance_upsell">
+                <argument name="template" xsi:type="string">AutifyDigital_V12Finance::product/slider/product-slider.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="type" xsi:type="string">upsell</argument>
+                <argument name="title" xsi:type="string" translate="true">We found other products you might like!</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

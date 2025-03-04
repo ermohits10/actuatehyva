@@ -1,0 +1,40 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
+ * @package GDPR Cookie Hyva Compatibility (System)
+ */
+?>
+<?php
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+$jsModel = $block->getJsModel();
+?>
+
+<section x-data="{...new Amasty.Cookie.class.DefaultView(
+                    {id: 'default_view', $el: $el, settings: <?= $escaper->escapeHtmlAttr($jsModel)?>}
+                 )}"
+         x-cloak x-init="init()"
+         :class="additionalClasses"
+         class="z-40 flex justify-center text-gray-700 text-xs bg-container-darker"
+         :style="`background: ${ styles.bar_background }`">
+    <template x-if="isShowNotificationBar">
+        <div role="alertdialog"
+             tabindex="-1"
+             class="pt-6 px-4 pb-4 border-t border-b shadow w-full">
+            <div class="max-w-[680px] mx-auto">
+                <p class="amgdprcookie-policy-text text-center"
+                   x-html="settings.policyText"
+                   :style="`color: ${ styles.policy_text_color }`"></p>
+                <?= $block->getLayout()
+                    ->createBlock(Template::class)
+                    ->setTemplate("Amasty_GdprCookieHyva::components/buttons/buttons.phtml")
+                    ->toHtml(); ?>
+            </div>
+        </div>
+    </template>
+</section>

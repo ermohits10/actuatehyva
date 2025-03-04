@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<!--
+~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+~ Copyright (c) 2020-2022 Autify digital Ltd.
+~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+~ ALL RIGHTS RESERVED.
+~
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template area="frontend" file="declinedemail_template.html" id="v12finance_finance_normal_declinedemail_template" label="V12Finance Declined Order Email Template" module="AutifyDigital_V12Finance" type="html"/>
+    <template area="frontend" file="errormail_template.html" id="v12finance_finance_normal_erroremail_template" label="V12Finance Error Order Email Template" module="AutifyDigital_V12Finance" type="html"/>
+    <template area="frontend" file="cancelledemail_template.html" id="v12finance_finance_normal_cancelledemail_template" label="V12Finance Canceled Order Email Template" module="AutifyDigital_V12Finance" type="html"/>
+    <template area="frontend" file="pendingemail_template.html" id="v12finance_finance_normal_email_template" label="V12Finance Pending Order Email Template" module="AutifyDigital_V12Finance" type="html"/>
+    <template area="frontend" file="awaitingcontract_template.html" id="v12finance_finance_normal_awaitingcontract_template" label="V12Finance Awaiting Contract Email Template" module="AutifyDigital_V12Finance" type="html"/>
+</config>

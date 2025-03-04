@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <actuate_options>
+            <general>
+                <tooltip>{"_1726660883177_177":{"short_title":"Disposal","identifier":"disposal-tooltip"},"_1726660884914_914":{"short_title":"Installation","identifier":"installation-tooltip"},"_1726660885458_458":{"short_title":"Unpack","identifier":"unpack-tooltip"},"_1726662178524_524":{"short_title":"Door Removal","identifier":"door-removal-tooltip"}}</tooltip>
+            </general>
+        </actuate_options>
+    </default>
+</config>

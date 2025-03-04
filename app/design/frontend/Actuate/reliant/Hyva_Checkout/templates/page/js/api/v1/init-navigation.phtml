@@ -1,0 +1,70 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Hyva\Checkout\Model\Magewire\Component\Evaluation\Blocking as EvaluationBatchBlocking;
+use Hyva\Checkout\Model\Magewire\Component\Evaluation\NavigationTask as EvaluationNavigationTaskResult;
+
+/** @var Escaper $escaper */
+
+/**
+ * @Internal Prefer utilizing the "after" container for injecting additional code.
+ */
+?>
+<script>
+    'use strict';
+
+    <?php /* @api */ ?>
+    <?php /* @see EvaluationNavigationTaskResult */ ?>
+    hyvaCheckout.evaluation.registerProcessor(
+        '<?= $escaper->escapeJs(EvaluationNavigationTaskResult::TYPE) ?>',
+        (component, el, result) => {
+            hyvaCheckout.navigation.addTask(async () => {
+                const task = result.arguments.task
+
+                if (task && hyvaCheckout.evaluation.hasProcessor(task.type)) {
+                    await hyvaCheckout.evaluation.process(el, component, task)
+                }
+            }, {
+                name: result.arguments.name,
+                stackPosition: result.arguments.stack.position || 500,
+                executeAfter: (result.arguments['execution_sequence'] || 'before') === '<?= $escaper->escapeJs(EvaluationNavigationTaskResult::EXECUTION_SEQUENCE_AFTER) ?>'
+            })
+        }
+    )
+
+    <?php /* @api */ ?>
+    <?php /* @see EvaluationBatchBlocking */ ?>
+    hyvaCheckout.evaluation.registerProcessor(
+        '<?= $escaper->escapeJs(EvaluationBatchBlocking::TYPE) ?>',
+        (component, el, result) => hyvaCheckout.validation.block(`evaluate_${ result.id }`, el)
+    )
+
+    <?php /* Dispatch a navigation transcending event for the current step after page load/refresh. */ ?>
+    window.addEventListener('checkout:init:after', () => {
+        let previous = hyvaCheckout.navigation.getPrevious() || { route: null }
+        let current = hyvaCheckout.navigation.getCurrent()
+
+        if (current && current.route !== previous.route) {
+            window.dispatchEvent(
+                new CustomEvent('checkout:step:loaded', { detail: Object.assign({}, current, { subsequent: false }) })
+            )
+        }
+    })
+
+    <?php /* Dispatch a navigation transcending event for the current step on navigation success. */ ?>
+    window.addEventListener('checkout:navigation:success', (event) => {
+        window.dispatchEvent(
+            new CustomEvent('checkout:step:loaded', { detail: Object.assign({}, event.detail, { subsequent: true }) })
+        )
+    })
+</script>
+
+<?= $this->getChildHtml('after') ?>

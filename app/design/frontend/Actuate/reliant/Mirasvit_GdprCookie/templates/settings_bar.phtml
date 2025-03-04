@@ -1,0 +1,56 @@
+<?php
+/** @var SettingsModal $block */
+
+use Mirasvit\GdprCookie\Block\SettingsModal;
+
+/** @var \Hyva\Theme\Model\ViewModelRegistry $viewModels */
+/** @var \Hyva\Theme\ViewModel\HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(\Hyva\Theme\ViewModel\HeroiconsOutline::class);
+
+?>
+
+<div class="relative z-[99999]"
+     x-data="initGdprSettingsModal()" x-init="init()">
+    <div class="fixed w-full h-full flex items-center justify-center" x-show="open">
+        <div class="absolute bg-black h-full opacity-50 w-full" x-on:click="close"
+             style="display: none"
+             x-show="open"></div>
+        <div class="bg-white border border-gray-200 max-h-[95vh] content h-full lg:max-w-4xl max-w-sm md:h-4/6 md:max-w-md overflow-auto overscroll-contain p-12 rounded-md z-20"
+             style="display: none"
+             x-show.transition.origin.top="open">
+            <div class="flex justify-between mb-3 pb-4">
+                <h3 class="text-2xl"><?= $block->escapeHtml($block->getPopupTitle()) ?></h3>
+                <div class="cursor-pointer pt-1"
+                x-on:click="close"><?= $heroicons->xHtml('w-6 h-6', 6, 6); ?></div>
+            </div>
+            <?= $block->getPopupDescription(); ?>
+            <div class="group-content mb-8 mt-4">
+                <?php foreach ($block->getCookieGroups() as $group): ?>
+                    <?= $block->getCookieGroupHtml($group); ?>
+                <?php endforeach; ?>
+            </div>
+            <button class="btn btn-primary ml-auto mt-4 text-base py-4 text-center cursor-pointer"
+                    x-on:click="save"><span class="mx-auto"><?= __('Save') ?></span></button></div>
+        </div>
+</div>
+<script>
+    function initGdprSettingsModal() {
+        return {
+            open: false,
+            close: function () {
+                this.open = false;
+                document.querySelector('body').style.overflow = 'auto';
+            },
+            save: function() {
+                window.dispatchEvent(new Event('handle-cookie-allow'));
+                this.close();
+            },
+            init: function () {
+                window.addEventListener('mst-gdpr-cookie-settings-open', () => {
+                    document.querySelector('body').style.overflow = 'hidden';
+                    this.open = true;
+                })
+            }
+        };
+    }
+</script>

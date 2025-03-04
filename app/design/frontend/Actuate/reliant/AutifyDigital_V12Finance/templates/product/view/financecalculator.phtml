@@ -1,0 +1,858 @@
+<?php
+/*
+ * This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+ * Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+ * Copyright (c) 2020-2022 Autify digital Ltd.
+ * This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+ * ALL RIGHTS RESERVED.
+ *
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Catalog\Block\Product\View;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var View $block */
+
+/** @var \Hyva\Theme\ViewModel\Modal $modelViewModel */
+$modelViewModel = $viewModels->require(\Hyva\Theme\ViewModel\Modal::class);
+
+
+$product = $block->getProduct();
+$autifyDigitalHelper = $this->helper('AutifyDigital\V12Finance\Helper\Data');
+$price = $product->getPriceInfo()->getPrice('final_price')->getValue();
+$checkProductLevelFinanceConfig = $autifyDigitalHelper->getProductFinanceEnableConfig();
+$productLevelFinance = $product->getData('v12_finance_enable');
+
+if($checkProductLevelFinanceConfig === '1' && $productLevelFinance === '0') {
+    return false;
+}
+
+if($product->isSaleable() && $autifyDigitalHelper->checkModuleEnable() === '1' && $autifyDigitalHelper->getConfig('v12finance/product_page/enable_v12_finance')):
+
+    $productConfigArray = $autifyDigitalHelper->getProductConfig();
+
+    $minOrderAmount = $productConfigArray['min_order_total'];
+    $maxOrderAmount = $productConfigArray['max_order_total'];
+    $minPercentage = $productConfigArray['min_percentage_value'];
+    $maxPercentage = $productConfigArray['max_percentage_value'];
+    $minFinanceDeposit = $productConfigArray['min_deposit'];
+    $maxFinanceDeposit = $productConfigArray['max_deposit'];
+
+    $minDepositAmount = (($price*$minPercentage)/100);
+    $maxDepositAmount = (($price*$maxPercentage)/100);
+
+    $priceHelper = $this->helper('Magento\Framework\Pricing\Helper\Data');
+    $productCategoryIds = $product->getCategoryIds();
+    $productPopupTerms = $productConfigArray['product_popup_terms'];
+
+    $productDisableCategory = $autifyDigitalHelper->getConfig('autifydigital/v12finance/finance_category_option');
+    $productDisableCategoryIds = $autifyDigitalHelper->getConfig('autifydigital/v12finance/finance_category_list');
+    $displayFinance = true;
+    if($productDisableCategory) {
+        if($productDisableCategoryIds) {
+            $productDisableCategoryIdsArray = explode(",", $productDisableCategoryIds ?? "");
+        }
+        foreach($productCategoryIds as $productCategoryId) {
+            if(in_array($productCategoryId, $productDisableCategoryIdsArray)) {
+                $displayFinance = false;
+                break;
+            }
+        }
+    }
+
+    if(!$displayFinance) {
+        return;
+    }
+
+    $enableSaleCategory = $productConfigArray['sale_category_enable'];
+    $saleCategoryId = $productConfigArray['sale_category_id'];
+
+    $skuFinanceEnable = $productConfigArray['sku_enable_finance'];
+    $skuFinanceList = explode(',', $productConfigArray['sku_list'] ?? "");
+
+    $isFinanceSkuExist = false;
+    if(is_array($skuFinanceList) && in_array($product->getSku(), $skuFinanceList)){
+        $isFinanceSkuExist = true;
+    }
+
+    $priceBasedFinance = $productConfigArray['price_based_finance'];
+
+    $noFinanceImage = $this->getViewFileUrl("AutifyDigital_V12Finance::images/calculator-blue.png");
+    $noFinanceImageValue = $autifyDigitalHelper->getConfig('autifydigitaldesign/design/no_finance_img');
+    if($noFinanceImageValue) {
+        $noFinanceImage = $autifyDigitalHelper->getMediaUrl() . 'autifydigital/' . $noFinanceImageValue;
+    }
+
+    $noFinanceImageHover = $this->getViewFileUrl("AutifyDigital_V12Finance::images/calculator-white.png");
+    $noFinanceImageHoverValue = $autifyDigitalHelper->getConfig('autifydigitaldesign/design/no_finance_img_hover');
+    if($noFinanceImageHoverValue) {
+        $noFinanceImageHover = $autifyDigitalHelper->getMediaUrl() . 'autifydigital/' . $noFinanceImageHoverValue;
+    }
+
+    $financeOkImage = $this->getViewFileUrl("AutifyDigital_V12Finance::images/check.png");
+    $financeOkImageValue = $autifyDigitalHelper->getConfig('autifydigitaldesign/design/finance_ok_img');
+    if($financeOkImageValue) {
+        $financeOkImage = $autifyDigitalHelper->getMediaUrl() . 'autifydigital/' . $financeOkImageValue;
+    }
+
+    $financeOkImageHover = $this->getViewFileUrl("AutifyDigital_V12Finance::images/check-white.png");
+    $financeOkImageHoverValue = $autifyDigitalHelper->getConfig('autifydigitaldesign/design/finance_ok_img_hover');
+    if($financeOkImageHoverValue) {
+        $financeOkImageHover = $autifyDigitalHelper->getMediaUrl() . 'autifydigital/' . $financeOkImageHoverValue;
+    }
+
+    $financeIssueImage = $this->getViewFileUrl("AutifyDigital_V12Finance::images/error.png");
+    $financeIssueImageValue = $autifyDigitalHelper->getConfig('autifydigitaldesign/design/finance_issue_img');
+    if($financeIssueImageValue) {
+        $financeIssueImage = $autifyDigitalHelper->getMediaUrl() . 'autifydigital/' . $financeIssueImageValue;
+    }
+
+    $financeIssueImageHover = $this->getViewFileUrl("AutifyDigital_V12Finance::images/error-white.png");
+    $financeIssueImageHoverValue = $autifyDigitalHelper->getConfig('autifydigitaldesign/design/finance_issue_img_hover');
+    if($financeIssueImageHoverValue) {
+        $financeIssueImageHover = $autifyDigitalHelper->getMediaUrl() . 'autifydigital/' . $financeIssueImageHoverValue;
+    }
+
+    if($price <= $maxOrderAmount):
+        if( $autifyDigitalHelper->checkSalePriceProduct($product) === '1' && $productConfigArray['sale_price_enable'] === '1' ){
+            $getAllServices = $autifyDigitalHelper->getSaleFinanceOptions();
+            $defaultFinanceOption = $productConfigArray['default_sale_finance_options'];
+        } else if( $enableSaleCategory === '1' && in_array($saleCategoryId, $productCategoryIds) ){
+            $getAllServices = $autifyDigitalHelper->getSaleFinanceOptions();
+            $defaultFinanceOption = $productConfigArray['default_sale_finance_options'];
+        } else if ( $priceBasedFinance === '1' && $autifyDigitalHelper->getPriceBasedFinanceOptions($price) ) {
+            $getAllServices = $autifyDigitalHelper->getPriceBasedFinanceOptions($price);
+            $defaultFinanceOption = $productConfigArray['default_price_finance_options'];
+        } else if ( $skuFinanceEnable === '1' && $isFinanceSkuExist) {
+            $getAllServices = $autifyDigitalHelper->getSkuBasedFinanceOptions();
+            $defaultFinanceOption = $productConfigArray['default_sku_finance_options'];
+        } else {
+            $getAllServices = $autifyDigitalHelper->getNormalFinanceOptions();
+            $defaultFinanceOption = $productConfigArray['default_finance_option'];
+        }
+        $currencyCode = $autifyDigitalHelper->getCurrentCurrencyCode();
+
+        $styleCss = "display:block;";
+        if($price <= $minOrderAmount) {
+            $styleCss = "display:none;";
+        }
+?>
+
+<div x-data="hyva.modal()" class="autifydigital-finance mb-1">
+    <input type="hidden" @update-product-final-price.window="recalculateFinanceWithFinalPrice(event.detail)" />
+    <input type="hidden" @update-custom-option-active.window="recalculateFinanceWithOptions(event.detail)" />
+    <div @click="show" class="finance-calculator cursor-pointer w-full mt-4 !bg-transparent" id="calculator-button-click">
+        <div class="text-xs font-semibold !bg-transparent !text-[#1D3654] cursor-pointer finance-calculator">
+            <div class="flex justify-between items-center" >
+                <div class="finance-calculator-img w-20 !hidden">
+                    <img class="no-finance" src="<?= $noFinanceImage; ?>" alt="<?= ('calculator-icon') ?>" />
+                    <img class="no-finance-hover" src="<?= $noFinanceImageHover; ?>" alt="<?= ('calculator-icon') ?>" />
+                    <img class="finance-ok" src="<?= $financeOkImage; ?>" alt="<?= ('calculator-icon') ?>" />
+                    <img class="finance-ok-hover" src="<?= $financeOkImageHover; ?>" alt="<?= ('calculator-icon') ?>" />
+                    <img class="finance-issue" src="<?= $financeIssueImage; ?>" alt="<?= ('calculator-icon') ?>" />
+                    <img class="finance-issue-hover" src="<?= $financeIssueImageHover; ?>" alt="<?= ('calculator-icon') ?>" />
+                </div>
+                <div class="text-right v12logo mr-2">
+                    <img src="<?= $this->getViewFileUrl("AutifyDigital_V12Finance::images/v12logo_new.png"); ?>" alt="V12" >
+                </div>
+                <div class="flex-grow w-full finance-overview-product">
+                    <span class="finance-overview-hint position-relative text-sm" id="finance-overview-hint"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-cloak x-spread="overlay()" x-bind="overlay()" class="finance-popup !hidden fixed inset-0 flex items-center justify-center text-left bg-black bg-opacity-50 z-30">
+        <div x-ref="dialog" role="dialog" aria-labelledby="the-label" class="container max-h-screen max-auto inline-block  overflow-auto bg-white shadow-xl rounded-lg">
+            <div id="finance-calculator-popup" class="relative">
+                <!-- Modal header -->
+                <div class="flex items-start justify-between p-6 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white"><?= __('V12 Finance Calculator') ?></h3>
+                    <button @click="hide" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <div class="finance-view-popup lg:flex">
+                    <div class="v12-left-finance !px-0 lg:w-1/2 !py-5 md:!p-7 flex flex-col">
+                        <h3 class="title-big"><span><?= $productConfigArray['product_popup_finance_title'] ?></span></h3>
+                        <div class="desc-left">
+                            <?= $productConfigArray['product_popup_para'] ?>
+                        </div>
+                        <div class="finance-options">
+                            <div class="deposit" x-data="{total_value:<?= number_format($minDepositAmount, 0, '.', '') ?>}">
+                                <h3 class="title-big"><?= __('Deposit Payment') ?></h3>
+                                <p class="repayment-text"><?= __('This is the amount of money you pay upfront. Please be aware that you must pay a minimum of ' . $minPercentage . '% upfront (<span class="min-deposit">' . $priceHelper->currency($minDepositAmount, true, false) . '</span>) and maximum of ' . $maxPercentage . '% (<span class="max-deposit">' . $priceHelper->currency($maxDepositAmount, true, false) .'</span>).') ?></p>
+                                <div class="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-4 deposit-text-area">
+                                    <button onclick="decrementDeposit()" id="minus-icon" class="relative text-sm border cursor-pointer flex items-center justify-center whitespace-nowrap px-6 rounded-l-lg">
+                                        <span class="font-semibold text-lg">−</span>
+                                    </button>
+                                    <input type="text" x-model="total_value" onkeyup="financeUpdate()" onchange="financeUpdate()" class="value  deposit_amount outline-none focus:outline-none text-center w-full bg-gray-300 font-semibold text-md hover:text-black focus:text-black  md:text-basecursor-default flex items-center text-gray-700 " name="custom-input-number" data-price="<?= number_format($minDepositAmount, 0, '.', ''); ?>" value="<?= $currencyCode . number_format($minDepositAmount, 0, '.', '') ?>"></input>
+                                    <button onclick="incrementDeposit()" id="plus-icon" class="relative text-sm border cursor-pointer flex items-center justify-center whitespace-nowrap px-6 rounded-r-lg">
+                                        <span class="font-semibold text-lg">+</span>
+                                    </button>
+                                </div>
+                                <!-- <input class="w-full range-slider" type="range" x-model="total_value" min="<?= number_format($minDepositAmount, 0, '.', '') ?>" max="<?= number_format($maxDepositAmount, 0, '.', '') ?>" id="slider-finance"> -->
+                                <input id="slider-finance" type="range" oninput="financeUpdate()" onchange="financeUpdate()" data-price="<?= number_format($minDepositAmount, 0, '.', ''); ?>" min="<?= number_format($minDepositAmount, 0, '.', '') ?>" max="<?= number_format($maxDepositAmount, 0, '.', '') ?>" value="<?= number_format($minDepositAmount, 0, '.', '') ?>">
+                                <span id="range-slider__value" class="hidden"><?= number_format($minDepositAmount, 0, '.', '') ?></span>
+                            </div>
+                            <div class="repayment">
+                                <h4 class="title-big text-base font-semibold text-gray-900 dark:text-white mb-2 mt-5"><?= __('Repayment Condition') ?></h4>
+                                <p class="repayment-text"><?= __('You can choose how many months you want to repay your finance over. The longer the term the lower the monthly repayments.') ?></p>
+                                <h5 class="title-small text-base font-semibold text-gray-900 dark:text-white mb-2 mt-5"><?= __('Term Length') ?></h5>
+                                <div class="w-full">
+                                    <select id="finance-options" name="finance-options" onchange="checkFinance()" class="w-full sm:w-auto">
+                                        <?= $getAllServices; ?>
+                                    </select>
+                                    <span class="display-depositamount mt-4 sm:mt-0">
+                                        <span class="display-depositamount1"></span>
+                                        <span class="display-depositamount2 font-normal"><?= __('per month') ?></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="v12-right-finance !px-0 lg:w-1/2 !py-5 md:!p-7 flex flex-col">
+                        <h4 class="finance-sub-title"><?= __('Finance Summary') ?></h4>
+                        <ul class="finance-summary finance-calculator-summary" id="finance-calculator-summary">
+                            <li class="flex items-start justify-between font-medium text-base mb-4 deposit-payment">
+                                <label><?= __('Deposit Payment') ?></label>
+                                <span class="value"></span>
+                            </li>
+                            <li class="flex items-start justify-between font-medium text-base mb-4 finance-payment">
+                                <label><?= __('Finance Amount') ?></label>
+                                <span class="value"></span>
+                            </li>
+                            <li class="flex items-start justify-between font-medium text-base mb-4 repayment-term">
+                                <label><?= __('Repayment Term') ?></label>
+                                <span class="value"></span>
+                            </li>
+                            <li class="flex items-start justify-between font-medium text-base mb-4 interest-charged">
+                                <label><?= __('Representative APR') ?></label>
+                                <span class="value"></span>
+                            </li>
+                            <li class="flex items-start justify-between font-medium text-base mb-4 monthly-amount">
+                                <label><?= __('Instalment Amount') ?></label>
+                                <span class="value"></span>
+                            </li>
+                            <li class="flex items-start justify-between font-medium text-base mb-4 annual-rate-of-interest">
+                                <label><?= __('Annual Rate Of Interest') ?></label>
+                                <span class="value"></span>
+                            </li>
+                            <li class="flex items-start justify-between font-medium text-base mb-4 total-amount-payable">
+                                <label><?= __('Total Amount Payable') ?></label>
+                                <span class="value"></span>
+                            </li>
+                            <li class="flex items-start justify-between text-base total-amount-payable-now font-bold">
+                                <label><?= __('Total Amount Payable Now') ?></label>
+                                <span class="value"></span>
+                            </li>
+                        </ul>
+                        <div class="mb-6 product_popup_terms text-base font-bold leading-8"><?= $productConfigArray['product_popup_terms'] ?></div>
+                        <div class="error-message mb-6" style="display:none;"><?= __('You can get a min loan amount of ' . $currencyCode . '<span class="minloan-v12">'.number_format($minFinanceDeposit, 2) . '</span> and max loan amount of ' . $currencyCode . '<span class="maxloan-v12">' . number_format($maxFinanceDeposit, 2) . '</span>.') ?></div>
+                        <div class="error-message-v12 mb-6" style="display:none;"><?= __('You can get a min loan amount of ' . $currencyCode . '<span class="minloan-v12">'.number_format($minFinanceDeposit, 2) . '</span> and max loan amount of ' . $currencyCode . '<span class="maxloan-v12">' . number_format($maxFinanceDeposit, 2) . '</span>.') ?></div>
+                        <div class="action-control grid sm:flex items-start justify-between gap-5 w-full">
+                            <div class="v12-finance-options">
+                                <div class="label"><?= __('Your Monthly Payment') ?></div>
+                                <div class="value"></div>
+                            </div>
+                            <?php  if($product->getTypeId() == 'simple') :  ?>
+                                <button @click="hide" class="btn bg-[#50d71e]" id="apply-finance" onclick="applyFinance()"><span><?= __("Proceed with Finance") ?></span></button>
+                            <?php else: ?>
+                                <button @click="hide" class="btn bg-[#50d71e]" id="apply-finance" onclick="applyFinance()"><span><?= __("Choose the Finance Plan") ?></span></button>
+                            <?php endif; ?>
+                        </div>
+                        <div class="addto-cart-notice">
+                            <?= $autifyDigitalHelper->getConfig('autifydigital/v12finance/addtocartnotice'); ?>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal footer -->
+                <div class="flex items-start justify-between gap-2 p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600 logo-with-autifybrand hidden">
+                    <img src="<?= $this->getViewFileUrl("AutifyDigital_V12Finance::images/v12logo.png"); ?>" alt="V12" class="w-20" />
+                    <span @click="hide" class="brand-copyright">Powered by <a href="//autify.co.uk/v12-magento-integration/" target="_blank" rel="dofollow" class="font-bold">Autify Digital Ltd</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var depositAdded = '';
+    var price = '<?= $price ?>';
+    var productId = '<?= $product->getId(); ?>';
+    var currencyCode = '<?= $currencyCode; ?>';
+    var minPercentage = '<?= $minPercentage; ?>';
+    var maxPercentage = '<?= $maxPercentage; ?>';
+    var minDepositAmount = Math.round(roundFinanceNum(<?= $minDepositAmount; ?>, 1));
+    var maxDepositAmount = Math.round(roundFinanceNum(<?= $maxDepositAmount; ?>, -0.2));
+    var minFinanceDeposit = Math.round('<?= $minFinanceDeposit; ?>');
+    var maxFinanceDeposit = Math.round('<?= $maxFinanceDeposit; ?>');
+    var minOrderAmount = '<?= $minOrderAmount ?>';
+    var maxOrderAmount = '<?= $maxOrderAmount ?>';
+    var defaultFinanceOption = '<?= $defaultFinanceOption ?>';
+    var productType = '<?php echo $product->getTypeId() ?>';
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+        initV12Finance();
+    });
+
+    function recalculateFinanceWithFinalPrice(price){
+        window.price = price;
+        window.reloadPriceWrap = true;
+    }
+
+    function recalculateFinanceWithOptions(event){
+        let recalculateFinanceFlag = setTimeout(function(){
+            var priceUpdate = document.querySelector('#product-price-'+productId+' .price').innerHTML;
+            var priceUpdateWithoutCurrency = priceUpdate.replace("£", "");
+            window.price = priceUpdateWithoutCurrency;
+            window.reloadPriceWrap = true;
+            clearTimeout(recalculateFinanceFlag);
+        }, 500);
+    }
+
+    function setCookie(name,value,days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + ";secure samesite=strict path=/";
+    }
+
+    function deleteCookie(name) {
+        console.log(1);
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    };
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+
+    initV12Finance();
+
+    function initV12Finance(){
+        const link = document.createElement('link')
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = '<?= $escaper->escapeUrl($block->getViewFileUrl('AutifyDigital_V12Finance::css/hyva_v12finance.css'))?>';
+        document.head.append(link);
+
+        var financeCookie = getCookie('finance');
+
+        var minSliderAmount = 0;
+
+        if(typeof financeCookie === 'undefined') {
+            var financeJsonDecoded = "";
+        } else {
+            var financeJsonDecoded = JSON.parse(financeCookie);
+        }
+
+        var depositCookie = financeOptionCookie = productIdCookie = '';
+        if(financeJsonDecoded){
+            var depositCookie = financeJsonDecoded['deposit'];
+            var financeOptionCookie = financeJsonDecoded['finance_option'];
+            var productIdCookie = financeJsonDecoded['product_id'];
+        }
+
+
+        if([document.querySelector("#finance-options").options].map(o => o.value).includes(financeOptionCookie).length <= 0 || financeOptionCookie == '') {
+            document.getElementById("finance-options").value = defaultFinanceOption;
+        }else{
+            document.getElementById("finance-options").value = financeOptionCookie;
+        }
+
+        if(depositCookie){
+            if(productIdCookie.includes(productId) == -1 && productIdCookie) {
+                reinitializeDeposit(minDepositAmount);
+                minSliderAmount = minDepositAmount;
+            }else{
+                if(minDepositAmount > depositCookie) {
+                    reinitializeDeposit(minDepositAmount);
+                    minSliderAmount = minDepositAmount;
+                }else{
+                    reinitializeDeposit(depositCookie);
+                    minSliderAmount = depositCookie;
+                }
+            }
+        }else{
+            reinitializeDeposit(minDepositAmount);
+            minSliderAmount = minDepositAmount;
+        }
+
+        document.querySelector(".min-deposit").innerHTML = currencyCode + minDepositAmount;
+        document.querySelector(".max-deposit").innerHTML = currencyCode + maxDepositAmount;
+
+        checkFinance();
+        rangeSlider();
+
+        document.querySelector(".finance-calculator").onmouseenter = function() {
+            var financeCookie = getCookie('finance');
+
+            if(typeof financeCookie === 'undefined') {
+                var financeJsonDecoded = "";
+            } else {
+                var financeJsonDecoded = JSON.parse(financeCookie);
+            }
+
+            var depositCookie = productIdCookie = '';
+            if(financeJsonDecoded){
+                var depositCookie = 0;
+                var productIdCookie = financeJsonDecoded['product_id'];
+            }
+            document.querySelector(".finance-calculator").classList.add('hoverclass');
+
+            if(productIdCookie.includes(productId) != -1 && depositCookie) {
+                document.querySelector(".finance-calculator-img .finance-ok").style.display = 'none';
+                document.querySelector(".finance-calculator-img .finance-ok-hover").style.display = 'block';
+                if (document.querySelector(".v12logo .withouthover")) {
+                    document.querySelector(".v12logo .withouthover").style.display = 'none';
+                }
+                if (document.querySelector(".v12logo .withhover")) {
+                    document.querySelector(".v12logo .withhover").style.display = 'block';
+                }
+            }else{
+                if(depositCookie) {
+                    document.querySelector(".finance-calculator").style.border = '';
+                    document.querySelector(".finance-calculator-img .finance-issue").style.display = 'none';
+                    document.querySelector(".finance-calculator-img .finance-issue-hover").style.display = 'block';
+                    if (document.querySelector(".v12logo .withouthover")) {
+                        document.querySelector(".v12logo .withouthover").style.display = 'none';
+                    }
+                    if (document.querySelector(".v12logo .withhover")) {
+                        document.querySelector(".v12logo .withhover").style.display = 'block';
+                    }
+                }else{
+                    document.querySelector(".finance-calculator-img .no-finance").style.display = 'none';
+                    document.querySelector(".finance-calculator-img .no-finance-hover").style.display = 'block';
+                    if (document.querySelector(".v12logo .withouthover")) {
+                        document.querySelector(".v12logo .withouthover").style.display = 'none';
+                    }
+                    if (document.querySelector(".v12logo .withhover")) {
+                        document.querySelector(".v12logo .withhover").style.display = 'block';
+                    }
+                }
+            }
+        };
+
+        document.querySelector(".finance-calculator").onmouseleave = function(){
+            var financeCookie = getCookie('finance');
+
+            if(typeof financeCookie === 'undefined') {
+                var financeJsonDecoded = "";
+            } else {
+                var financeJsonDecoded = JSON.parse(financeCookie);
+            }
+
+            var depositCookie = productIdCookie = '';
+            if(financeJsonDecoded){
+                var depositCookie = 0;
+                var productIdCookie = financeJsonDecoded['product_id'];
+            }
+
+            document.querySelector(".finance-calculator").classList.remove('hoverclass');
+            if(productIdCookie.includes(productId) != -1 && depositCookie) {
+                document.querySelector(".finance-calculator-img .finance-ok").style.display = 'block';
+                document.querySelector(".finance-calculator-img .finance-ok-hover").style.display = 'none';
+                if (document.querySelector(".v12logo .withouthover")) {
+                    document.querySelector(".v12logo .withouthover").style.display = 'block';
+                }
+                if (document.querySelector(".v12logo .withhover")) {
+                    document.querySelector(".v12logo .withhover").style.display = 'none';
+                }
+            }else{
+                if(depositCookie) {
+                    document.querySelector(".finance-calculator").style.border = '1px solid #F7B500';
+                    document.querySelector(".finance-calculator-img .finance-issue").style.display = 'block';
+                    document.querySelector(".finance-calculator-img .finance-issue-hover").style.display = 'none';
+                    if (document.querySelector(".v12logo .withouthover")) {
+                        document.querySelector(".v12logo .withouthover").style.display = 'block';
+                    }
+                    if (document.querySelector(".v12logo .withhover")) {
+                        document.querySelector(".v12logo .withhover").style.display = 'none';
+                    }
+                }else{
+                    document.querySelector(".finance-calculator-img .no-finance").style.display = 'block';
+                    document.querySelector(".finance-calculator-img .no-finance-hover").style.display = 'none';
+                    if (document.querySelector(".v12logo .withouthover")) {
+                        document.querySelector(".v12logo .withouthover").style.display = 'block';
+                    }
+                    if (document.querySelector(".v12logo .withhover")) {
+                        document.querySelector(".v12logo .withhover").style.display = 'none';
+                    }
+                }
+            }
+        };
+    }
+
+    function decrementDeposit() {
+        var depositValue = Math.round(document.querySelector('.deposit-text-area .deposit_amount').getAttribute("data-price"));
+
+        if (depositValue <= minDepositAmount) return;
+        if(depositValue < 99) {
+            depositValue--;
+        }else if(depositValue >= 99 && depositValue <= 999) {
+            depositValue -= 10;
+            var fillCheck = depositValue - minDepositAmount;
+            if(fillCheck < 0){
+                depositValue += 10;
+            }
+        }else{
+            depositValue -= 100;
+            var fillCheck = depositValue - minDepositAmount;
+            if(fillCheck < 0){
+                depositValue += 100;
+            }
+        }
+        reinitializeDeposit(depositValue);
+        checkFinance();
+    }
+
+    function incrementDeposit() {
+        var depositValue = Math.round(document.querySelector('.deposit-text-area .deposit_amount').getAttribute("data-price"));
+
+        if (depositValue >= maxDepositAmount) return;
+        if(depositValue < 99) {
+            depositValue++;
+        }else if(depositValue >= 99 && depositValue <= 999) {
+            depositValue += 10;
+            var fillPlusCheck = maxDepositAmount - depositValue;
+            if(fillPlusCheck < 0){
+                depositValue -= 10;
+            }
+        }else{
+            depositValue += 100;
+            var fillPlusCheck = maxDepositAmount - depositValue;
+            if(fillPlusCheck < 0){
+                depositValue -= 100;
+            }
+        }
+        reinitializeDeposit(depositValue);
+        checkFinance();
+    }
+
+
+    function financeUpdate(event){
+        var currentValue = document.querySelector('.deposit-text-area .deposit_amount').value;
+        if(currentValue >= minDepositAmount && currentValue <= maxDepositAmount){
+            document.querySelector(".repayment-text").classList.remove('blinker');
+            reinitializeDeposit(currentValue);
+            checkFinance();
+        } else {
+            if(currentValue != '') {
+                document.querySelector(".repayment-text").classList.add('blinker');
+                let financeUpdateFlag = setTimeout(function () {
+                    document.querySelector(".repayment-text").classList.remove('blinker');
+                    clearTimeout(financeUpdateFlag);
+                }, 5000);
+            }
+        }
+    }
+
+    function reinitializeDeposit(depositValue) {
+        //TODO SLIDER
+            document.querySelector('.deposit-text-area .deposit_amount').value = currencyCode + Number(depositValue).toFixed(0);
+            document.querySelector('.deposit-text-area .deposit_amount').setAttribute("data-price", depositValue);
+        // var hs = $('#slider-finance').slider();
+        // hs.slider('option',{min: minDepositAmount, max: maxDepositAmount});
+        // hs.slider('value', depositValue);
+        // hs.trigger('slide',{ ui: $('.ui-slider-handle', hs), value: depositValue });
+        // var depositAmount = document.querySelector('.deposit-text-area .deposit_amount').value;
+        document.querySelector('#slider-finance').setAttribute("data-price", depositValue);
+        document.querySelector('#slider-finance').value =  depositValue;
+
+        let reInitializeDepositFlag = setTimeout(function() {
+            document.querySelector('.deposit-text-area .deposit_amount').value = currencyCode + Number(depositValue).toFixed(0);
+            clearTimeout(reInitializeDepositFlag);
+        }, 700)
+    }
+
+    function zeroAmountFinance(){
+
+        //TODO
+        document.querySelector('#finance-calculator-summary .deposit-payment .value').innerHTML = currencyCode + 0;
+        document.querySelector('#finance-calculator-summary .finance-payment .value').innerHTML = currencyCode + 0;
+        document.querySelector('#finance-calculator-summary .repayment-term .value').innerHTML = "Select correct finance/deposit";
+        document.querySelector('#finance-calculator-summary .interest-charged .value').innerHTML = '0.00%';
+        document.querySelector('#finance-calculator-summary .monthly-amount .value').innerHTML = currencyCode + 0;
+        document.querySelector('#finance-calculator-summary .total-amount-payable .value').innerHTML = currencyCode + 0;
+        document.querySelector('#finance-calculator-summary .total-amount-payable-now .value').innerHTML = currencyCode + 0;
+        document.querySelector('#finance-calculator-summary .annual-rate-of-interest .value').innerHTML = '0.00%';
+        document.querySelector('#finance-calculator-summary .total-amount-payable-now .value').innerHTML = currencyCode + 0;
+
+        document.querySelector('.v12-left-finance .display-depositamount1').innerHTML = currencyCode + 0;
+        document.querySelector('.v12-right-finance .v12-finance-options .value').innerHTML = 'Please select finance/deposit' + ' x ' + currencyCode + 0;
+
+        document.querySelector(".finance-calculator").classList.remove('issueclass');
+
+        var financeCookie = getCookie('finance');
+
+        if(typeof financeCookie === 'undefined') {
+            var financeJsonDecoded = "";
+        } else {
+            var financeJsonDecoded = JSON.parse(financeCookie);
+        }
+
+        var depositCookie = financeOptionCookie = productIdCookie = '';
+        if(financeJsonDecoded){
+            var depositCookie = 0;
+            var financeOptionCookie = financeJsonDecoded['finance_option'];
+            var productIdCookie = financeJsonDecoded['product_id'];
+        }
+
+        if(productIdCookie.includes(productId) != -1 && depositCookie) {
+            document.querySelector(".finance-calculator-img .finance-ok").style.display = 'block';
+            document.querySelector('.finance-message .finance-pro-title').innerHTML = 'Your Finance Plan';
+            document.querySelector('#finance-overview-hint').innerHTML = 'Learn More';
+        }else{
+            if(depositCookie) {
+                document.querySelector(".finance-calculator").classList.add('issueclass');
+                document.querySelector(".finance-calculator-img .finance-issue").style.display = 'block';
+                document.querySelector('.finance-message .finance-pro-title').innerHTML = 'Finance Plan Changed';
+                document.querySelector("#finance-overview-hint").innerHTML = "Learn More";
+            }else{
+                document.querySelector(".finance-calculator-img .no-finance").style.display = 'block';
+                document.querySelector("#finance-overview-hint").innerHTML = "Learn More";
+            }
+        }
+    }
+
+    function checkFinance() {
+        if(parseFloat(price.replace(',', '')) >= parseFloat(minOrderAmount)) {
+            document.querySelector(".autifydigital-finance").style.display = 'block';
+        }else if(parseFloat(price.replace(',', '')) >= parseFloat(minOrderAmount) && parseFloat(price.replace(',', '')) <= parseFloat(maxOrderAmount)) {
+            document.querySelector(".autifydigital-finance").style.display = 'block';
+        } else {
+            document.querySelector(".autifydigital-finance").style.display = 'none';
+        }
+
+        document.querySelector(".finance-calculator-img .no-finance").style.display = 'none';
+        document.querySelector(".finance-calculator-img .no-finance-hover").style.display = 'none';
+        document.querySelector(".finance-calculator-img .finance-ok").style.display = 'none';
+        document.querySelector(".finance-calculator-img .finance-issue").style.display = 'none';
+
+        selectedFinance = document.getElementById("finance-options").value;
+        selectedDeposit = document.querySelector('.deposit-text-area .deposit_amount').getAttribute("data-price");
+
+        if(selectedFinance == '' || selectedFinance == null){
+            var financeOptionList= document.getElementById("finance-options");
+            selectedFinance = financeOptionList.options[0].value;
+            document.getElementById("finance-options").value = selectedFinance;
+            document.querySelector("#finance-overview-hint").innerHTML = "Please select finance options";
+
+            // document.querySelector("#finance-deposit-error").style.display = 'block';
+        }else{
+            // document.querySelector("#finance-deposit-error").innerHTML = '';
+            // document.querySelector("#finance-deposit-error").style.display = 'none';
+        }
+
+        if(selectedFinance == '' || selectedDeposit == ''){
+            zeroAmountFinance();
+        }else{
+            var financeCookie = getCookie('finance');
+
+            if(typeof financeCookie === 'undefined') {
+                var financeJsonDecoded = "";
+            } else {
+                var financeJsonDecoded = JSON.parse(financeCookie);
+            }
+
+            if(selectedFinance) {
+                var selectedFinanceArray = selectedFinance.split("|");
+                var selectedFOptions = document.querySelector("#finance-options");
+
+                var monthlyContract = selectedFOptions.options[selectedFOptions.selectedIndex].getAttribute('data-month');
+                var interest = selectedFOptions.options[selectedFOptions.selectedIndex].getAttribute('data-interest');
+                var financeName = selectedFOptions.options[selectedFOptions.selectedIndex].getAttribute('data-finance-name');
+                var calculationFactor = selectedFOptions.options[selectedFOptions.selectedIndex].getAttribute('data-cf');
+                var minLoanFinanceAtV12 = selectedFOptions.options[selectedFOptions.selectedIndex].getAttribute('data-min-loan');
+                var maxLoanFinanceAtV12 = selectedFOptions.options[selectedFOptions.selectedIndex].getAttribute('data-max-loan');
+
+                var selectedDepositPrice = hyva.formatPrice(selectedDeposit);
+
+                if(depositAdded == 1 && productIdCookie.includes(productId) != -1) {
+                    if(document.querySelector('#finance-calculator-summary .finance-payment .value').getAttribute('data-price')){
+                        var excludeDeposit = parseFloat(price.replace(',',''))-parseFloat(selectedDeposit);
+                    }else{
+                        var excludeDeposit = parseFloat(price.replace(',',''))-parseFloat(selectedDeposit);
+                    }
+                }else{
+                    var excludeDeposit = parseFloat(price.replace(',',''))-parseFloat(selectedDeposit);
+                }
+
+                if(excludeDeposit < minFinanceDeposit || excludeDeposit > maxFinanceDeposit) {
+                    document.querySelector(".v12-right-finance .error-message").style.display = 'block';
+                    zeroAmountFinance();
+                    return;
+                } else {
+                    document.querySelector(".v12-right-finance .error-message").style.display = 'none';
+                }
+
+                if(interest > 0) {
+                    var monthlyAmount = excludeDeposit * calculationFactor;
+                } else {
+                    var monthlyAmount = excludeDeposit/monthlyContract;
+                }
+                var monthlyAmount = Number(monthlyAmount).toFixed(2);
+
+                var interestAmount = (monthlyAmount*monthlyContract)-excludeDeposit;
+                var annualinterestrate = ((interestAmount/excludeDeposit)/(monthlyContract/12)*100);
+
+                if(interest > 0) {
+                    var totalPayment = ((monthlyAmount*monthlyContract)+Number(selectedDeposit));
+                    var annualinterestrate = ((interestAmount/excludeDeposit)/(monthlyContract/12)*100);
+                    var financeAmountCheck = (monthlyAmount*monthlyContract);
+                }else{
+                    var totalPayment = excludeDeposit+Number(selectedDeposit);
+                    var financeAmountCheck = excludeDeposit;
+                    var annualinterestrate = 0.00;
+                }
+
+                if(financeAmountCheck < minLoanFinanceAtV12 || financeAmountCheck > maxLoanFinanceAtV12) {
+                    document.querySelector(".v12-right-finance .error-message-v12").style.display = 'block';
+                    document.querySelector(".v12-right-finance .error-message-v12 .minloan-v12").innerHTML = minLoanFinanceAtV12.toFixed(2);
+                    document.querySelector(".v12-right-finance .error-message-v12 .maxloan-v12").innerHTML = maxLoanFinanceAtV12.toFixed(2);
+                    //return;
+                } else {
+                    document.querySelector(".v12-right-finance .error-message-v12").style.display = 'none';
+                }
+
+                totalDeposit = Math.round(selectedDeposit);
+
+                document.querySelector('#finance-calculator-summary .deposit-payment .value').innerHTML = currencyCode + Number(totalDeposit).toFixed(2);
+                document.querySelector('#finance-calculator-summary .finance-payment .value').innerHTML = currencyCode + Number(excludeDeposit).toFixed(2);
+                document.querySelector('#finance-calculator-summary .finance-payment .value').setAttribute('data-price', excludeDeposit);
+                document.querySelector('#finance-calculator-summary .repayment-term .value').innerHTML = monthlyContract + ' months';
+                document.querySelector('#finance-calculator-summary .interest-charged .value').innerHTML = Number(interest).toFixed(2) + '%';
+                document.querySelector('#finance-calculator-summary .monthly-amount .value').innerHTML = currencyCode + monthlyAmount;
+                document.querySelector('#finance-calculator-summary .total-amount-payable .value').innerHTML = currencyCode + Number(totalPayment).toFixed(2);
+                document.querySelector('#finance-calculator-summary .total-amount-payable-now .value').innerHTML =currencyCode + Number(totalDeposit).toFixed(2);
+                document.querySelector('#finance-calculator-summary .annual-rate-of-interest .value').innerHTML = Math.abs(annualinterestrate).toFixed(2) + '%';
+
+                document.querySelector('.v12-left-finance .display-depositamount1').innerHTML = currencyCode + Number(monthlyAmount).toFixed(2);
+                document.querySelector('.v12-right-finance .v12-finance-options .value').innerHTML = monthlyContract + ' x ' + currencyCode + Number(monthlyAmount).toFixed(2);
+
+                document.querySelector(".finance-calculator").classList.remove('issueclass');
+
+                document.querySelector(".finance-calculator-img .no-finance").style.display = 'block';
+                document.querySelector("#finance-overview-hint").innerHTML = "Finance from " + currencyCode + Number(monthlyAmount).toFixed(2) + "/month <a class='text-[#126366] underline finance-link'>Finance Calculator</a>";
+            }else{
+                document.querySelector(".autifydigital-finance").remove();
+                console.log("Finance Option not found");
+            }
+        }
+    }
+
+    function applyFinance() {
+        selectedFinance = document.getElementById("finance-options").value;
+        selectedDeposit = Math.round(document.querySelector('.deposit-text-area .deposit_amount').getAttribute("data-price"));
+        if(selectedFinance == '') {
+            alert('Please select the finance options');
+        }else{
+
+            var financeCookie = getCookie('finance');
+            if(typeof financeCookie === 'undefined') {
+                var financeJsonDecoded = "";
+            } else {
+                var financeJsonDecoded = JSON.parse(financeCookie);
+            }
+            var productIdCookie = '';
+            var productIdArray = [];
+            if(financeJsonDecoded){
+                var productIdVal = financeJsonDecoded['product_id'];
+                productIdVal.forEach(function(entry) {
+                    productIdArray.push( entry );
+                });
+            }
+
+            if(!productIdArray.includes(productId)) {
+                productIdArray.push( productId );
+            }
+
+            var financeArray = {};
+            financeArray["deposit"] = selectedDeposit;
+            financeArray["finance_option"] = selectedFinance;
+            financeArray["product_id"] = productIdArray;
+            var financeArrayJson = JSON.stringify(financeArray);
+            setCookie("finance", financeArrayJson, 10);
+            //deleteCookie("finance");
+            checkFinance();
+            if(productType == 'simple') {
+                document.getElementById("product-addtocart-button").click();
+            }
+        }
+    };
+
+    function roundFinanceNum(val, multiplesOf) {
+        var s = 1 / multiplesOf;
+        var res = Math.ceil(val*s)/s;
+        res = res < val ? res + multiplesOf: res;
+        var afterZero = multiplesOf.toString().split(".")[1];
+        return parseFloat(res.toFixed(afterZero ? afterZero.length : 0));
+    }
+
+    setInterval(function(){ reloadPriceWrapFinance() }, 1000);
+
+    function reloadPriceWrapFinance() {
+        if(window.reloadPriceWrap) {
+            var $minDepositAmount = (window.price.replace(',', '')*window.minPercentage)/100;
+            var $maxDepositAmount = (window.price.replace(',', '')*window.maxPercentage)/100;
+            window.minDepositAmount = Math.round(roundFinanceNum($minDepositAmount, 1));
+            window.maxDepositAmount = Math.round(roundFinanceNum($maxDepositAmount, -0.2));
+
+            document.querySelector(".min-deposit").innerHTML = currencyCode + window.minDepositAmount;
+            document.querySelector(".max-deposit").innerHTML = currencyCode + window.maxDepositAmount;
+
+            document.getElementById("slider-finance").setAttribute("min", window.minDepositAmount);
+            document.getElementById("slider-finance").setAttribute("max", window.maxDepositAmount);
+
+            reinitializeDeposit(window.minDepositAmount);
+            checkFinance();
+            window.reloadPriceWrap = false;
+        }
+    }
+
+    function rangeSlider() {
+        var slider = document.getElementById("slider-finance");
+        var output = document.getElementById("range-slider__value");
+        var depositAmount = document.querySelector('.deposit-text-area .deposit_amount');
+
+        if(slider) {
+            output.innerHTML = slider.value;
+            depositAmount.value = slider.value;
+
+            // This function input current value in span and add progress colour in range
+            slider.oninput = function() {
+                output.innerHTML = this.value;
+                depositAmount.value = slider.value;
+                document.querySelector('.deposit-text-area .deposit_amount').setAttribute("data-price", slider.value);
+                document.querySelector('#slider-finance').setAttribute("data-price", slider.value);
+            }
+        }
+    }
+
+</script>
+<?php else: ?>
+    <script type="text/javascript">
+        var minOrderAmount = 0;
+        var maxOrderAmount = 0;
+    </script>
+<?php endif;
+else: ?>
+    <script type="text/javascript">
+        var minOrderAmount = 0;
+        var maxOrderAmount = 0;
+    </script>
+<?php endif; ?>

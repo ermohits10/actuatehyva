@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.detail.page">
+            <block class="Bss\FBT\Block\Product\ProductList\Fbt" name="actuate.product.info.fbt" template="Bss_FBT::product/list/items.phtml">
+                <arguments>
+                    <argument name="type" xsi:type="string">fbt</argument>
+                </arguments>
+                <block class="Magento\Catalog\Block\Product\ProductList\Item\Container" name="fbt.product.addto" as="addto">
+                    <block class="Magento\Catalog\Block\Product\ProductList\Item\AddTo\Compare"
+                           name="fbt.product.addto.compare" as="compare"
+                           template="Magento_Catalog::product/list/addto/compare.phtml"/>
+                </block>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="product.info.fbt" remove="true" />
+    </body>
+</page>

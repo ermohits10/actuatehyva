@@ -1,0 +1,819 @@
+<?php
+/**
+ * @author Hyvä Themes <info@hyva.io>
+ *
+ * For the full copyright and license information, please view the LICENSE.txt
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\Magewire\Component\Evaluation;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+<script>
+    'use strict';
+
+    const hyvaCheckout = {
+        <?php /** @api */ ?>
+        main: {
+            <?php /* Returns the Main stepper element DOM id. */ ?>
+            id: null,
+            <?php /* Returns the Main stepper wire name. */ ?>
+            name: null,
+            <?php /* Returns the Main container element DOM id. */ ?>
+            container: null,
+            <?php /* Returns if the API was successfully initialized. */ ?>
+            active: false,
+            <?php /* Returns the current active checkout name. */ ?>
+            activeNamespace: null,
+
+            /**
+             * @return {{step: string, config: Object, navigateToStep: Function, navigateToSuccess: Function, placeOrder: Function}|null} || null
+             */
+            getWireComponent() {
+                try {
+                    return Magewire.find(this.id)
+                } catch (exception) {
+                    return null
+                }
+            },
+            getElement() {
+                return document.getElementById(this.id)
+            },
+            getConfig(namespace = null) {
+                const config = this.getWireComponent() ? this.getWireComponent().config : {}
+                return namespace ? config[namespace] : config
+            },
+            getStepHistory(key = null) {
+                const history = this.getConfig('step_history')
+                return key ? history[key] : history
+            },
+            getVersion() {
+                return 1.0
+            },
+            isApiActive() {
+                return this.active
+            },
+
+            async init (stepperHtmlId, stepperHtmlContainerId, exceptionCallback) {
+                this.id = stepperHtmlId
+                this.container = stepperHtmlContainerId
+
+                try {
+                    this.getWireComponent()
+                } catch (exception) {
+                    throw exceptionCallback(exception)
+                }
+
+                <?php /* Try to initialize the API based on object order. */ ?>
+                await Promise.all(Object.keys(hyvaCheckout).map(key => {
+                    const namespace = hyvaCheckout[key]
+
+                    if (typeof namespace === 'object') {
+                        if ('initialize' in namespace) {
+                            namespace.initialize(this.getConfig())
+                        }
+
+                        window.dispatchEvent(
+                            new CustomEvent(`checkout:init:${ key }`, { detail: { namespace: namespace } })
+                        )
+                    } else if (typeof namespace === 'function') {
+                        namespace()
+                    }
+                })).then(() => {
+                    this.active = true
+
+                    window.dispatchEvent(
+                        new Event('checkout:init:after')
+                    )
+                }).catch(exception => {
+                    throw exceptionCallback(exception)
+                })
+            },
+
+            initialize() {
+                [this.id, this.container].map(element => {
+                    if (document.getElementById(element) === null) {
+                        throw new Error(`Required DOM element #${ element } is missing.`)
+                    }
+                })
+
+                <?php /* Validate if the Main wire component is available. */ ?>
+                const component = this.getWireComponent()
+
+                if (component === null) {
+                    throw new Error('Main wire element could not be found.')
+                }
+            }
+        },
+
+        <?php /** @api */ ?>
+        storage: {
+            data: null,
+
+            initialize() {
+                let storage = sessionStorage.getItem('hyva_checkout')
+
+                if (storage === '{}' || storage === null) {
+                    storage = sessionStorage.getItem('hyva_checkout') || {}
+
+                    if (typeof storage === 'string') {
+                        storage = JSON.parse(storage)
+                    }
+
+                    <?php /* Making sure we always have a hyva_checkout session storage object. */ ?>
+                    sessionStorage.setItem('hyva_checkout', JSON.stringify(storage))
+                }
+
+                this.data = typeof storage === 'string' ? JSON.parse(storage) : storage
+            },
+            clear() {
+                sessionStorage.removeItem('hyva_checkout')
+            },
+            setValue(key, value, group = null) {
+                if (typeof sessionStorage === 'undefined') {
+                    console.warn('<?= $escaper->escapeJs(__('Browser Storage is unavailable.')) ?>')
+                    return
+                }
+
+                const changeEventDetails = {
+                    item: key,
+                    newValue: value
+                }
+
+                if (group) {
+                    this.data[group] = this.data[group] || {}
+
+                    changeEventDetails.group = group
+                    changeEventDetails.previousValue = this.data[group][key]
+                    changeEventDetails.data = this.data[group]
+
+                    this.data[group][key] = value
+                } else {
+                    this.data[key] = value
+
+                    changeEventDetails.previousValue = this.data[key]
+                    changeEventDetails.data = this.data
+                }
+
+                sessionStorage.setItem('hyva_checkout', JSON.stringify(this.data))
+            },
+            getValue(key, group) {
+                if (group) {
+                    try {
+                        return this.data[group][key]
+                    } catch (exception) {
+                        return null
+                    }
+                }
+
+                return this.data[key]
+            },
+            getGroupData(group) {
+                return this.data[group] || null
+            }
+        },
+
+        <?php /** @api */ ?>
+        config: {
+            config: {},
+
+            initialize(config) {
+                <?php /* Register main update hook to re-set (optionally fresh) configuration. */ ?>
+                Magewire.hook('message.received', (message, component) => {
+                    if (component.id === hyvaCheckout.main.id) {
+                        if (typeof component.data.config !== 'object') {
+                            throw new Error(`Config object can only be of type object, ${ typeof component.data.config } given.`)
+                        }
+
+                        this.config = component.data.config
+                    }
+                })
+            },
+            hasValue(path) {
+                return this.getValue(path) !== undefined
+            },
+            getValue(path) {
+                return path.split('.').reduce((acc, part) => acc && acc[part], this.config)
+            },
+            isSetFlag(path) {
+                let flag = this.getValue(path)
+
+                if ([true, false].includes(flag)) {
+                    return flag
+                }
+
+                throw new Error(`Value for path "${ path }" can only be of type Boolean, ${ typeof flag } given.`)
+            }
+        },
+
+        <?php /** @api */ ?>
+        validation: {
+            validations: {},
+
+            register(name, callback, el = null, group = null, options = {}) {
+                if (! hyvaCheckout.navigation.hasCurrent()) {
+                    return
+                }
+
+                options = Object.assign({
+                    scrollOnFailure: true,
+                    skipOnFailure: false,
+                    stackPosition: 100
+                }, options)
+
+                const step = hyvaCheckout.navigation.getCurrent().name
+                this.validations[step] = this.validations[step] || {}
+
+                this.validations[step][name] = {
+                    step: step,
+                    name: name,
+                    group: (typeof group === 'string' ? group : 'default'),
+                    validate: callback,
+                    el: el,
+                    options: options
+                }
+            },
+            remove(name) {
+                if (hyvaCheckout.navigation.hasCurrent() === false) {
+                    return
+                }
+
+                const step = hyvaCheckout.navigation.getCurrent().name
+
+                if (this.validations[step] && name in this.validations[step]) {
+                    delete this.validations[step][name]
+                }
+            },
+            block(name, el) {
+                this.register(name, () => {}, el, 'blocking')
+            },
+            unblock(name) {
+                this.remove(name, 'blocking')
+            },
+            hasBlocking() {
+                return Object.values(this.getValidationForCurrentStep('blocking')).length !== 0
+            },
+            reset() {
+                this.validations = {}
+            },
+            getValidations() {
+                return this.validations
+            },
+            getValidationsForStep(step, group = null) {
+                if (step in this.validations) {
+                    let stepValidations = this.validations[step]
+
+                    if (group) {
+                        return Object.values(stepValidations).filter(validation => validation.group === group)
+                    }
+
+                    return stepValidations
+                }
+
+                return {}
+            },
+            getValidationForCurrentStep(group = null) {
+                return this.getValidationsForStep(hyvaCheckout.navigation.getCurrent().name, group)
+            },
+
+            async validate() {
+                if (hyvaCheckout.navigation.hasCurrent() === false) {
+                    return true
+                }
+
+                let step = hyvaCheckout.navigation.getCurrent().name
+
+                if (! this.validations[step] || Object.values(this.validations[step]).length === 0) {
+                    return true
+                }
+
+                try {
+                    let previousResult = true
+
+                    const results = await Promise.all(
+                        Object.values(this.validations[step])
+                            <?php /* Sorts validation objects based on the numeric value of their 'position' option. */ ?>
+                            .sort((a, b) => a.options.stackPosition - b.options.stackPosition)
+
+                            .map(validation => {
+                                const options = validation.options
+                                const mainElement = hyvaCheckout.main.getElement()
+
+                                if ((validation.el && mainElement && ! mainElement.contains(validation.el))
+                                    || (! previousResult && options.skipOnFailure))
+                                {
+                                    previousResult = true
+                                    return previousResult
+                                }
+
+                                previousResult = validation.validate(options)
+
+                                if (validation.el
+                                    && ! previousResult
+                                    && options.scrollOnFailure
+                                    && ! hyvaCheckout.viewport.isElementFullyVisible(validation.el)
+                                ) {
+                                    validation.el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                }
+
+                                return previousResult
+                            })
+                    ).then(results => {
+                        return results
+                    })
+
+                    return results.includes(false) !== true
+                } catch (exception) {
+                    let message = exception instanceof Error
+                        && exception.message.length !== 0
+                            ? exception.message
+                            : '<?= $escaper->escapeJs(__('Something went wrong')) ?>'
+
+                    hyvaCheckout.message.console(message)
+                    return false
+                }
+            }
+        },
+
+        <?php /** @api */ ?>
+        evaluation: {
+            <?php /** @see \Hyva\Checkout\Model\Magewire\Component\Evaluation\EvaluationResult::getType() */ ?>
+            processors: {},
+            <?php /** @see \Hyva\Checkout\Model\Magewire\Component\Evaluation\Validation */ ?>
+            validators: [],
+            <?php /** @see \Hyva\Checkout\Model\Magewire\Component\Evaluation\NavigationTask */ ?>
+            executables: [],
+
+            registerValidator(name, callback) {
+                this.validators[name] = callback
+            },
+            registerExecutable(name, callback) {
+                this.executables[name] = callback
+            },
+            registerProcessor(name, callback) {
+                this.processors[name] = callback
+            },
+            hasProcessor(name) {
+                return name in this.processors
+            },
+            getProcessor(name) {
+                return this.processors[name]
+            },
+            async process(el, component, result = null) {
+                if (! 'serverMemo' in component) {
+                    throw new Error('Server memo not found for component.')
+                }
+                if (! 'evaluation' in component.serverMemo) {
+                    throw new Error('No evaluation data available in component server memo.')
+                }
+
+                <?php /* if no result was set, each component carries the server memo evaluation data as the alternative. */ ?>
+                result = result || component.serverMemo.evaluation[component.id]
+
+                if (result.type in this.processors) {
+                    await this.processors[result.type](component, el, result)
+
+                    if ('blocking' in result && result.blocking === true) {
+                        this.processors['<?= $escaper->escapeJs(Evaluation\Blocking::TYPE) ?>'](component, el, result)
+                    }
+                } else {
+                    throw new Error(`Evaluation processor ${ result.type } does not exist.`)
+                }
+
+                window.dispatchEvent(
+                    new CustomEvent('checkout:evaluation-process:after', { detail: { el: el, component: component }})
+                )
+            }
+        },
+
+        <?php /** @api */ ?>
+        navigation: {
+            tasks: [],
+
+            async stepTo(route, validate = true) {
+                <?php /* Remove all flash message from the page before trying to navigate into the next step. */ ?>
+                window.dispatchEvent(new Event('clear-messages'));
+
+                const currentStep = this.getCurrent();
+                const previousStep = this.getPrevious();
+
+                <?php /* Make sure navigating backwards is always possible without any requirements. */ ?>
+                if (typeof route === 'string') {
+                    if (previousStep && currentStep
+                        && route === previousStep.route
+                        && previousStep.position < currentStep.position)
+                    {
+                        validate = false
+
+                        this.clearTasks()
+                    }
+                }
+
+                const validationFn = async () => {
+                    return validate ? hyvaCheckout.validation.validate() : true
+                }
+
+                return this.executeTasks()
+
+                    <?php /* Only proceed if API is idle. */ ?>
+                    .then(hyvaCheckout.isIdle)
+                    <?php /* Process all validation callbacks. */ ?>
+                    .then(validationFn)
+                    <?php /* Finally try to navigate to the next step. */ ?>
+                    .then(async isValid => {
+                        if (! currentStep) {
+                            return true
+                        }
+                        if (! isValid || route === currentStep.route) {
+                            return false
+                        }
+
+                        <?php /* Clears all tasks that need to be executed immediately or upfront. */ ?>
+                        this.clearTasks(task => task.options.executeAfter === false)
+
+                        return hyvaCheckout.main.getWireComponent().navigateToStep(route)
+                            .then(async () => {
+                                <?php /* Wait for the execution of tasks that follow a successful navigation. */ ?>
+                                await this.executeTasks({ executeAfter: true })
+
+                                const mainBounding = hyvaCheckout.main.getElement().getBoundingClientRect()
+
+                                if (mainBounding.top <= 0) {
+                                    window.scroll({ top: 0, behavior: 'smooth' })
+                                }
+
+                                window.dispatchEvent(
+                                    new CustomEvent('checkout:navigation:success', { detail: { route: route } })
+                                )
+
+                                return true
+                            })
+                            .catch(exception => {
+                                hyvaCheckout.message.warn(
+                                    '<?= $escaper->escapeJs(__('Navigation error. Please try again.')) ?>'
+                                )
+                            })
+                    })
+                    .catch(exception => {
+                        <?php /* Suppress console errors from form validation failures. */ ?>
+                    })
+            },
+
+            getCurrent() {
+                <?php /* @see Hyva\Checkout\Model\Magewire\ServerMemoConfig\StepHistory */ ?>
+                return hyvaCheckout.config.getValue('step_history.current')
+            },
+            hasCurrent() {
+                return this.getCurrent() !== null
+            },
+            getPrevious() {
+                <?php /* @see Hyva\Checkout\Model\Magewire\ServerMemoConfig\StepHistory */ ?>
+                return hyvaCheckout.config.getValue('step_history.previous')
+            },
+            hasPrevious() {
+                return this.getPrevious() !== null
+            },
+
+            <?php /* Tasks that may return a promise that will pause navigation until it resolves. */ ?>
+            addTask(fn, options = {}) {
+                <?php /* Assigning an optional task name for enhanced clarity and easier identification. */ ?>
+                options.name = options.name || null
+
+                if (options.name) {
+                    this.clearTasksByName(options.name)
+                }
+
+                this.tasks.push({
+                    callback: fn,
+
+                    options: Object.assign({
+                        stackPosition: 500,
+                        executeAfter: false
+                    }, options)
+                })
+            },
+
+            clearTasks(filter = () => true) {
+                this.tasks = this.tasks.filter(task => ! filter(task, task.options));
+            },
+            clearTasksByName(name) {
+                this.clearTasks((task, options) => name === options.name)
+            },
+
+            executeTasks(options = {}) {
+                options = Object.assign({ executeAfter: false }, options)
+
+                return Promise.all(this.tasks
+                    .filter(task => task.options.executeAfter === options.executeAfter)
+                    .sort((a, b) => a.options.stackPosition - b.options.stackPosition)
+                    .map(task => task.callback()))
+            }
+        },
+
+        <?php /** @api */ ?>
+        payment: {
+            method: null,
+
+            config: {
+                browserEventError: 'payment:method:error',
+                browserEventSuccess: 'payment:method:success'
+            },
+
+            activate(code, method = {}, el) {
+                method = Object.assign({
+                    code: code,
+                    // Payment method body element (optional).
+                    el: el,
+
+                    initialize() {
+                    },
+
+                    async validate() {
+                        return true
+                    },
+                    async placeOrder() {
+                    },
+
+                    // Enable skipping the place order via the core Place Order Service.
+                    placeOrderViaJs() {
+                        return false
+                    },
+                    // Get payment method code.
+                    getCode() {
+                        return this.code
+                    },
+                    // Get payment method DOM-element.
+                    getElement() {
+                        return this.el
+                    },
+                    // Validate if the payment method is visible on the current/active step.
+                    isVisibleInStep() {
+                        return hyvaCheckout.main.getElement().contains(this.el)
+                    },
+                    // Validate if the payment method (body) is a MagewireAddress component.
+                    isWireComponent() {
+                        return this.getElement().hasAttribute('wire:id')
+                    }
+                }, method)
+
+                this.method = method
+                this.method.initialize()
+
+                <?php /* Register validation provided by the latest active payment method. */ ?>
+                hyvaCheckout.validation.register(`has_active_payment_method`, method.validate, el)
+            },
+
+            getActive() {
+                return this.method
+            },
+            hasActive() {
+                return this.method !== null
+            },
+            dispatchSuccessMessage(text, event = this.config.browserEventSuccess) {
+                hyvaCheckout.message.dispatch(event, text)
+            },
+            dispatchExceptionMessage(text, type = 'warning', event = this.config.browserEventError) {
+                hyvaCheckout.message.dispatch(event, text, type)
+            }
+        },
+
+        <?php /** @api */ ?>
+        shipping: {
+            method: null,
+
+            config: {
+                browserEventError: 'shipping:method:error',
+                browserEventSuccess: 'shipping:method:success'
+            },
+
+            activate(code, method = {}) {
+                method = Object.assign({
+                    code: code,
+
+                    initialize() {
+                    },
+                    // Will run on navigation or order placement.
+                    validate () {
+                        return true
+                    },
+                    // Get shipping method code.
+                    getCode () {
+                        return this.code
+                    }
+                }, method)
+
+                method.initialize()
+                this.method = method
+
+                <?php /* Register validation provided by the latest active shipping method. */ ?>
+                hyvaCheckout.validation.register(`has_active_shipping_method`, method.validate)
+            },
+
+            getActive() {
+                return this.method
+            },
+            hasActive() {
+                return this.method !== null
+            },
+            deactivate() {
+                this.method = null
+            },
+            dispatchSuccessMessage(text, event = this.config.browserEventSuccess) {
+                hyvaCheckout.message.dispatch(event, text)
+            },
+            dispatchExceptionMessage(text, type = 'warning', event = this.config.browserEventError) {
+                hyvaCheckout.message.dispatch(event, text, type)
+            }
+        },
+
+        <?php /** @api */ ?>
+        order: {
+            place() {
+                return hyvaCheckout.navigation.executeTasks()
+                    .then(() => hyvaCheckout.validation.validate())
+
+                    .then(async isValid => {
+                        await hyvaCheckout.isIdle()
+
+                        return isValid;
+                    })
+
+                    .then(async isValid => {
+                        if (! isValid) {
+                            return false
+                        }
+
+                        const method = hyvaCheckout.payment.getActive()
+
+                        if (method && method.placeOrderViaJs() && method.isVisibleInStep()) {
+                            <?php /* Place the order via the Payment Method when it's visible in the current step. */ ?>
+                            await method.placeOrder()
+                                .then(() => hyvaCheckout.storage.clear())
+
+                            return true
+                        }
+
+                        <?php /* Place the order via the Main component fallback method. */ ?>
+                        await hyvaCheckout.main
+                            <?php /* Grep the Main Magewire component. */ ?>
+                            .getWireComponent()
+                            <?php /* Execute the placeOrder method with the session storage and wait for it resolves. */ ?>
+                            .placeOrder(hyvaCheckout.storage.data)
+                            <?php /* Re-validate after the order placement completed. */ ?>
+                            .then(() => hyvaCheckout.validation.validate())
+                            <?php /* Process the final evaluation result. */ ?>
+                            .then(result => {
+                                if (result === true) {
+                                    hyvaCheckout.navigation.executeTasks({
+                                        executeAfter: true
+                                    })
+                                }
+                            })
+
+                        return true
+                    })
+            }
+        },
+
+        <?php /** @api */ ?>
+        message: {
+            warn(text, duration) {
+                this.send(text, 'warn', duration)
+            },
+            alert(text, duration) {
+                this.send(text, 'error', duration)
+            },
+            notify(text, duration) {
+                this.send(text, 'info', duration)
+            },
+            send(text, type = 'success', duration) {
+                text = text.charAt(0).toUpperCase() + text.slice(1)
+
+                window.dispatchMessages([
+                    {
+                        type: ['error', 'warning', 'success', 'info'].includes(type) ? type : 'info',
+                        text: text
+                    }
+                ], duration)
+            },
+
+            <?php /* Dispatch a message window event in a uniform manner. */ ?>
+            dispatch(event, text, type = 'success', options = {}) {
+                text = text || '<?= $escaper->escapeJs(__('Something went wrong')) ?>'
+                text = text.charAt(0).toUpperCase() + text.slice(1)
+                options = typeof options === 'object' ? options : {}
+
+                window.dispatchEvent(new CustomEvent(event, {
+                    detail: Object.assign(options, {
+                        message: {
+                            type: ['error', 'warning', 'success', 'info'].includes(type) ? type : 'info',
+                            text: text
+                        }
+                    })
+                }))
+            },
+
+            <?php /* Console log as a warning including a "Checkout:" message prefix. */ ?>
+            console(text) {
+                console.warn('Checkout:', text || '<?= $escaper->escapeJs(__('Something went wrong')) ?>')
+            }
+        },
+
+        <?php /** @api */ ?>
+        messenger: {
+            dispatch(prefix, text, type = 'error', options = {}) {
+                hyvaCheckout.message.dispatch(`${ prefix }:${ ['error', 'success'].includes(type) ? type : 'error' }`, text, type, options)
+            }
+        },
+
+        <?php /** @api */ ?>
+        loader: {
+            callback: null,
+            active: 0,
+
+            start(callback) {
+                if (! callback) {
+                    if (! this.callback) {
+                        return
+                    }
+
+                    callback = this.callback
+                }
+
+                this.running++
+
+                try {
+                    <?php /* The object either contains a 'start' fn or is a fn itself. */ ?>
+                    if ('start' in callback) {
+                        return callback.start()
+                    }
+
+                    callback()
+                } catch(exception) {
+                    hyvaCheckout.message.console('Something went wrong while trying to start the loader.')
+                }
+            },
+
+            stop(callback) {
+                if (! callback) {
+                    if (! this.callback) {
+                        return
+                    }
+
+                    callback = this.callback
+                }
+
+                this.running--
+
+                try {
+                    if (this.active === 0) {
+                        <?php /* The object either contains a 'stop' fn or is a fn itself. */ ?>
+                        if ('stop' in callback) {
+                            return callback.stop()
+                        }
+
+                        callback()
+                    }
+                } catch(exception) {
+                    hyvaCheckout.message.console('Something went wrong while trying to start the loader.')
+                }
+            },
+
+            set(callback) {
+                if (! callback.start || ! callback.stop) {
+                    return hyvaCheckout.message.console(
+                        'The loader callback necessitates the implementation of both a "start" and a "stop" method for proper functionality.'
+                    )
+                }
+
+                this.callback = callback
+            }
+        },
+
+        <?php /** @api */ ?>
+        viewport: {
+            isElementFullyVisible (el) {
+                let bounding = el.getBoundingClientRect()
+
+                return (bounding.top >= 0 && bounding.left >= 0 && bounding.right <= window.innerWidth && bounding.bottom <= window.innerHeight)
+            },
+            isElementPartiallyVisible (el) {
+                let bounding = el.getBoundingClientRect()
+
+                return (bounding.top >= -el.offsetHeight
+                    && bounding.left >= -el.offsetWidth
+                    && bounding.right <= (window.innerWidth || document.documentElement.clientWidth) + el.offsetWidth
+                    && bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) + el.offsetHeight)
+            }
+        }
+    }
+</script>
+
+<?php /* Extend the API with custom requirements. */ ?>
+<?= $this->getChildHtml('after') ?>

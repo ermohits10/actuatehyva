@@ -1,0 +1,194 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">autifydigital_v12finance_financeoptions_form.financeoptions_form_data_source</item>
+		</item>
+		<item name="label" translate="true" xsi:type="string">General Information</item>
+		<item name="template" xsi:type="string">templates/form/collapsible</item>
+	</argument>
+	<settings>
+		<buttons>
+		    <button class="AutifyDigital\V12Finance\Block\Adminhtml\FinanceOptions\Edit\BackButton" name="back"/>
+			<button class="AutifyDigital\V12Finance\Block\Adminhtml\FinanceOptions\Edit\DeleteButton" name="delete" />
+			<button class="AutifyDigital\V12Finance\Block\Adminhtml\FinanceOptions\Edit\SaveButton" name="save" />
+			<button class="AutifyDigital\V12Finance\Block\Adminhtml\FinanceOptions\Edit\SaveAndContinueButton" name="save_and_continue" />
+		</buttons>
+		<namespace>autifydigital_v12finance_financeoptions_form</namespace>
+		<dataScope>data</dataScope>
+		<deps>
+			<dep>autifydigital_v12finance_financeoptions_form.financeoptions_form_data_source</dep>
+		</deps>
+	</settings>
+	<dataSource name="financeoptions_form_data_source">
+		<argument name="data" xsi:type="array">
+			<item name="js_config" xsi:type="array">
+				<item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+			</item>
+		</argument>
+		<settings>
+			<submitUrl path="*/*/save"/>
+		</settings>
+		<dataProvider class="AutifyDigital\V12Finance\Model\FinanceOptions\DataProvider" name="financeoptions_form_data_source">
+			<settings>
+				<requestFieldName>financeoptions_id</requestFieldName>
+				<primaryFieldName>financeoptions_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<fieldset name="general">
+		<settings>
+			<label>General</label>
+		</settings>
+		<field formElement="input" name="finance_id" sortOrder="170">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">FinanceOptions</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Finance Product ID</label>
+				<dataScope>finance_id</dataScope>
+				<validation>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                    <rule name="no-whitespace" xsi:type="boolean">true</rule>
+                    <rule name="validate-no-html-tags" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">2</rule>
+					<rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+		<field formElement="input" name="finance_guid" sortOrder="180">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">FinanceOptions</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Finance Product GUID</label>
+				<dataScope>finance_guid</dataScope>
+				<validation>
+                    <rule name="no-whitespace" xsi:type="boolean">true</rule>
+                    <rule name="validate-no-html-tags" xsi:type="boolean">true</rule>
+					<rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+		<field formElement="input" name="finance_name" sortOrder="190">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">FinanceOptions</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Finance Name</label>
+				<dataScope>finance_name</dataScope>
+				<validation>
+                    <rule name="validate-no-html-tags" xsi:type="boolean">true</rule>
+					<rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+		<field formElement="input" name="interest_rate" sortOrder="200">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">FinanceOptions</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Finance Interest Rate</label>
+				<dataScope>interest_rate</dataScope>
+				<validation>
+                    <rule name="no-whitespace" xsi:type="boolean">true</rule>
+                    <rule name="validate-no-html-tags" xsi:type="boolean">true</rule>
+					<rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+		<field formElement="input" name="contract_length" sortOrder="210">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">FinanceOptions</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Finance Contract Length</label>
+				<dataScope>contract_length</dataScope>
+				<validation>
+                    <rule name="validate-greater-than-zero" xsi:type="boolean">true</rule>
+                    <rule name="no-whitespace" xsi:type="boolean">true</rule>
+                    <rule name="validate-no-html-tags" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="max_text_length" xsi:type="number">2</rule>
+					<rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+		<field formElement="input" name="calculation_factor" sortOrder="210">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">FinanceOptions</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Finance Calculation Factor</label>
+				<dataScope>calculation_factor</dataScope>
+				<validation>
+                    <rule name="no-whitespace" xsi:type="boolean">true</rule>
+                    <rule name="validate-no-html-tags" xsi:type="boolean">true</rule>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+		<field formElement="input" name="min_loan" sortOrder="210">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">FinanceOptions</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Finance Min Loan</label>
+				<dataScope>min_loan</dataScope>
+				<validation>
+          <rule name="no-whitespace" xsi:type="boolean">true</rule>
+          <rule name="validate-no-html-tags" xsi:type="boolean">true</rule>
+          <rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+		<field formElement="input" name="max_loan" sortOrder="210">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="source" xsi:type="string">FinanceOptions</item>
+				</item>
+			</argument>
+			<settings>
+				<dataType>text</dataType>
+				<label translate="true">Finance Max Loan</label>
+				<dataScope>max_loan</dataScope>
+				<validation>
+          <rule name="no-whitespace" xsi:type="boolean">true</rule>
+          <rule name="validate-no-html-tags" xsi:type="boolean">true</rule>
+          <rule name="required-entry" xsi:type="boolean">true</rule>
+				</validation>
+			</settings>
+		</field>
+	</fieldset>
+</form>

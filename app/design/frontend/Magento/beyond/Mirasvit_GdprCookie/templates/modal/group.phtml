@@ -1,0 +1,62 @@
+<?php
+/** @var Mirasvit\GdprCookie\Block\CookieGroupBlock $block */
+
+/** @var SecureHtmlRenderer $secureRenderer */
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+?>
+<?php
+$group   = $block->getCookieGroup();
+$groupId = $group->getId();
+
+$disabled = $group->isRequired() ? 'disabled' : '';
+$checked  = !$group->isRequired() && !$block->getOptionalGroupsChecked() ? '' : 'checked';
+?>
+<div class="mst-gdpr__cookie-settings--cookie-group-container mst-gdpr__cookie-settings--cookie-group-container-<?= /* @noEscape */ $groupId; ?>">
+    <div class="title-container">
+        <h4 class="title">
+            <?= $block->escapeHtml(__($group->getName())); ?>
+        </h4>
+        <?php $inputAttrName = 'name="allowed-group-' . $groupId . '"'; ?>
+        <label class="switch">
+            <span style="display: none"><?= $block->escapeHtml(__('Allow')) ?></span>
+            <input id="allowed-group-<?= /* @noEscape */ $groupId ?>" class="checkbox" type="checkbox" value="1" <?= /* @noEscape */ $disabled; ?> <?= /* @noEscape */ $checked; ?> data-group-id="<?= /* @noEscape */ $groupId; ?>" <?= /* @noEscape */ $inputAttrName ?> aria-label="<?= $block->escapeHtmlAttr(__('Allow')) ?>">
+            <span class="slider round <?= /* @noEscape */ $disabled; ?>"></span>
+        </label>
+
+        <div class="content">
+            <div>
+                <?= $block->escapeHtml(__($group->getDescription())); ?>
+            </div>
+            <table>
+                <tr>
+                    <th><?= $block->escapeHtml(__('Name')) ?></th>
+                    <th><?= $block->escapeHtml(__('Description')) ?></th>
+                    <th><?= $block->escapeHtml(__('Lifetime')) ?></th>
+                </tr>
+                <?php foreach ($block->getCookies() as $cookie): ?>
+                    <tr>
+                        <td><?= $block->escapeHtml($cookie->getName()) ?></td>
+                        <td><?= $block->escapeHtml(__($cookie->getDescription())) ?></td>
+                        <td><?= $block->escapeHtml($block->humanReadableLifetime($cookie->getLifetime())) ?></td>
+                    </tr>
+                <?php endforeach ?>
+            </table>
+        </div>
+    </div>
+
+</div>
+<?php
+$scriptString = <<<script
+    require([
+        'jquery',
+        'collapsible'
+    ], function ($) {
+        var elSelector = ".mst-gdpr__cookie-settings--cookie-group-container-{$groupId}";
+        $(elSelector).collapsible(
+            {header: $(elSelector + " .title"), content: $(elSelector + " .content")}
+        );
+    });
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>

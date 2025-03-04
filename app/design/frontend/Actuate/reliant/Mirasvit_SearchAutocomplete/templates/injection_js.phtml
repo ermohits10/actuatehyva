@@ -1,0 +1,298 @@
+<?php
+
+/**
+ * Mirasvit - Search Autocomplete Compatability Module
+ *
+ * HyvÃ¤ Themes - https://hyva.io
+ * Copyright Â© HyvÃ¤ Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var SearchHelper $helper */
+/** @var \Mirasvit\SearchAutocomplete\Block\Injection $block */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Search\Helper\Data as SearchHelper;
+use Mirasvit\SearchAutocomplete\Model\ConfigProvider;
+use Magento\Catalog\Block\Product\ReviewRendererInterface;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+
+
+$config = $block->getJsConfig();
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+$helper = $this->helper(SearchHelper::class);
+$col2 = $config['layout'] == "2columns";
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+
+<?php /** Main Search Area */ ?>
+<div class="container py-2 px-0 lg:px-6 mx-auto text-black relative" x-data="initMirasvitSearch()" @click.away="closeSearch">
+    <form class="form minisearch relative" id="search_mini_form" action="<?= $escaper->escapeUrl($helper->getResultUrl()) ?>" method="get" autocomplete="off">
+        <label class="hidden" for="search" data-role="minisearch-label">
+            <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+        </label>
+        <input id="search" x-ref="searchInput" type="search" name="<?= $escaper->escapeHtmlAttr($helper->getQueryParamName()) ?>" value="<?= $escaper->escapeHtmlAttr($helper->getEscapedQueryText()) ?>" placeholder="<?= $escaper->escapeHtmlAttr(__('Search entire store here...')) ?>" maxlength="<?= $escaper->escapeHtmlAttr($helper->getMaxQueryLength()) ?>" class="w-full py-2 px-3 text-sm font-sans font-medium leading-normal transition appearance-none bg-[#F3F3FF] rounded border-2 border-[#126366] text-grey-900 focus:outline-none focus:border-[#126366] lg:text-sm" x-on:keyup.debounce.300="doSearch($refs.searchInput.value)" x-on:click.debounce.150="openSearch" x-on:keydown.debounce.100="startSearch($refs.searchInput.value)" />
+        <span class="action search absolute block right-1 top-1 bg-[#126366] rounded text-center pl-0.5 w-[30px] h-[30px]">
+            <span class="hidden"><?= $escaper->escapeHtml(__('Search')) ?></span>
+            <?= $heroicons->searchHtml("w-5 h-5 text-white pl-1 mt-[5px]", 25, 25) ?>
+        </span>
+    </form>
+
+
+    <div x-cloak x-show="isOpen" id="mirasvitSearchResults" class="border-solid border-4 border-light-blue-500 p-2 text-lg leading-normal transition appearance-none text-grey-900 inset-x-0 lg:inset-x-6 md:left-auto lg:text-xl absolute bg-white z-[999]">
+        <?php /** Loading Spinner */ ?>
+        <?= $block->getChildHtml('loading.search');  ?>
+        <template x-if="hotSearch">
+            <div>
+                <p class="text-lg leading-normal transition appearance-none text-grey-900 lg:text-xl"><?= $escaper->escapeHtml(__('Hot Searches: ')) ?></p>
+                <div class="my-3 flex flex-wrap">
+                    <?php if ($config['popularSearches']) : ?>
+                        <?php foreach ($config['popularSearches'] as $search) :  ?>
+                            <span x-on:click="hotSearchClickEvent" class="m-1 bg-gray-200 hover:bg-gray-300 rounded-full px-2 font-bold text-sm leading-loose cursor-pointer"><?= $escaper->escapeHtml(__($search)) ?></span>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </template>
+        <template x-if="searchResults">
+            <div class="<?= $col2 ? 'grid gap-4 lg:grid-cols-12' : '' ?>">
+                <?php if ($col2) : ?>
+                <div class="col-span-12 lg:col-span-8 lg:order-1">
+                    <?php endif; ?>
+                    <p class="font-sans text-sm px-0 md:px-6 py-1 leading-6 font-semibold transition appearance-none text-grey-900"><?= $escaper->escapeHtml(__('Products: ')) ?>
+                        <template x-if="searchItems != ''">
+                            <span class="text-gray-500" x-html="searchItemsTotal  + ' <?= $escaper->escapeHtml(__('Items')) ?>'"></span>
+                        </template>
+                    </p>
+                    <div class="container mx-auto grid grid-cols-1 py-2 px-0 md:px-6 gap-4">
+                        <template x-for="item in searchItems">
+                            <div class="flex flex-wrap bg-white g overflow-hidden flex-col lg:flex-row xl:flex-nowrap">
+                                <a x-bind:href="`${item.url}`" class="w-full flex flex-row">
+                                    <div class="flex-shrink-0 max-w-[15%]">
+                                        <img x-bind:src="`${item.imageUrl}`" class="mx-auto"/>
+                                    </div>
+                                    <div class="px-4 pb-4">
+                                        <h4 class="text-sm lg:leading-7 lg:text-xl font-semibold" x-html="item.name"></h4>
+                                        <div class="inline-flex mr-2 item-center justify-between mt-2 lg:flex-col xl:flex-row">
+                                            <span class="text-gray-900 font-bold text-base font-sans lg:text-xl" x-html="item.price"></span>
+                                        </div>
+                                        <template x-if="item.savePrice != ''">
+                                            <span class="inline-flex flex-wrap old-price mt-0 text-gray-900 font-sans leading-6 rounded-md">
+                                                <span class="price-container mr-2 price-final_price tax weee">
+                                                    <span class="price-label"></span>
+                                                    <span id="old-price-437" data-price-amount="`${item.mainPrice}`" data-price-type="oldPrice" class="price-wrapper line-through font-semibold text-xs">
+                                                        RRP <span class="price" x-html="item.mainPrice"></span>
+                                                    </span>
+                                                </span>
+                                                <div class="price-container">
+                                                    <span class="save-upto text-[#D30202] text-sm leading-6">
+                                                        <strong>Save <span class="price" x-html="item.savePrice"></span></strong>
+                                                    </span>
+                                                </div>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </a>
+                            </div>
+                        </template>
+                        <template x-if="searchItems == ''">
+                            <p class="font-sans text-base leading-6 font-semibold"><?= $escaper->escapeHtml(__('No results found.')) ?></p>
+                        </template>
+                    </div>
+                    <?php if ($col2) : ?>
+                </div>
+                <div class="col-span-12 lg:col-span-4">
+                    <?php endif; ?>
+                    <?php if ($col2) : ?>
+                </div>
+            <?php endif; ?>
+                <div class="py-4 px-6 w-full order-2 col-span-12">
+                    <hr class="">
+                    <div class="flex items-center justify-center">
+                        <a x-bind:href="numberResultsUrl">
+                            <p class="text-gray-900 transition duration-300 hover:text-gray-500 font-sans text-base leading-6 font-semibold mt-4" x-html="numberResults"></p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template x-if="noResults">
+            <div>
+                <p class="font-sans text-base leading-6 font-semibold transition appearance-none text-grey-900" x-html="noResultsText"></p>
+            </div>
+        </template>
+    </div>
+</div>
+<style>
+    i {
+        margin: 5px;
+    }
+</style>
+<script>
+    function initMirasvitSearch() {
+        return {
+            //initialize Variables
+            hotSearch: false,
+            searchResults: false,
+            noResults: false,
+            isLoading: false,
+            isOpen: false,
+            php_config: <?= json_encode($config); ?>,
+            searchItems: [],
+            searchCategories: [],
+            searchPages: [],
+            xhttp: false,
+            noResultsText: '',
+            numberResults: '',
+            numberResultsUrl: '',
+            searchItemsTotal: '',
+            searchCategoriesTotal: '',
+            searchPagesTotal: '',
+
+            searchMap: {
+                'magento_cms_page': 'Pages',
+                'magento_catalog_category': 'Categories',
+                'magento_catalog_product': 'Items'
+            },
+
+            hotSearchClickEvent: function(ev) {
+                var hotSearchClick = event.currentTarget.innerText;
+                document.getElementById("search").value = hotSearchClick;
+                this.doSearch(hotSearchClick);
+            },
+            openSearch: function() {
+                this.isOpen = true;
+                searchValue = document.getElementById("search").value.length;
+                if (searchValue >= this.php_config.minSearchLength) {
+                    this.hideHotSearch();
+                } else {
+                    this.showHotSearch();
+                    this.hideSearchResults();
+                }
+            },
+            startSearch: function(e) {
+                if (e) {
+                    this.isOpen = true;
+                }
+            },
+            closeSearch: function() {
+                this.isOpen = false;
+            },
+            showHotSearch: function() {
+                this.hotSearch = true;
+            },
+            hideHotSearch: function() {
+                this.hotSearch = false;
+            },
+            showSearchResults: function() {
+                this.searchResults = true;
+            },
+            hideSearchResults: function() {
+                this.searchResults = false;
+            },
+            showNoResults: function() {
+                this.noResults = true;
+            },
+            hideNoResults: function() {
+                this.noResults = false;
+            },
+            setNoResultsText(text) {
+                if (!text) {
+                    return;
+                }
+
+                this.noResultsText = text;
+            },
+            setNumberResults(text) {
+                this.numberResults = text;
+            },
+            setNumberResultsUrl(text) {
+                this.numberResultsUrl = text;
+            },
+            resetSearchData: function() {
+                // Reinitialize Variables to avoid wrong search results.
+                this.searchPages = [];
+                this.searchPagesTotal = 0;
+                this.searchCategories = [];
+                this.searchCategoriesTotal = 0;
+                this.searchItems = [];
+                this.searchItemsTotal = 0;
+            },
+
+            doSearch: function(query) {
+                var self = this;
+                // Min search length
+                if (query.length < this.php_config.minSearchLength) {
+                    this.showHotSearch();
+                    this.isLoading = false;
+                    this.hideSearchResults();
+                    return;
+                } else {
+                    this.hideHotSearch();
+                    this.isLoading = true;
+                    this.showSearchResults();
+                }
+
+                // AJAX for searchautocomplete/ajax/suggest/
+                if (this.xhttp) {
+                    try {
+                        this.xhttp.abort();
+                    } catch {
+
+                    }
+                }
+                this.xhttp = new XMLHttpRequest();
+                var xhttp = this.xhttp;
+
+                var queryEncoded = encodeURIComponent(query);
+                var url = this.php_config.url.replace(/\/$/, "") + "/?q=" + queryEncoded + "&store_id=" + this.php_config.storeId + "&cat=false";
+
+                xhttp.open("GET", url, true);
+                xhttp.setRequestHeader("Content-Type", "application/json");
+
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        // Response from ajax call in JSON.
+                        var response = JSON.parse(this.responseText);
+
+                        self.resetSearchData();
+
+                        // Product Search Results
+                        for (index in response.indexes) {
+
+                            if (response.indexes[index].items.length > 0) {
+                                var res = response.indexes[index];
+                                var identifier = res.identifier;
+                                var map = null;
+
+                                if (self.searchMap[res.identifier]) {
+                                    map = self.searchMap[res.identifier];
+                                    self['search' + map] = res.items;
+                                    self['search' + map + 'Total'] = res.totalItems;
+                                }
+                            }
+                        }
+
+                        self.isLoading = false;
+                        self.hideNoResults();
+                        self.setNumberResults(response.textAll);
+                        self.setNumberResultsUrl(response.urlAll);
+
+                        if (response.noResults) {
+                            self.setNoResultsText(response.textEmpty);
+                            self.hideSearchResults();
+                            self.showNoResults();
+                        }
+                    }
+                };
+                xhttp.send();
+            }
+        }
+    }
+</script>

@@ -1,0 +1,19 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/**
+ * @var \MageWorx\DeliveryDate\Block\Adminhtml\Queue $block
+ */
+?>
+<div class="page-main-actions">
+    <div class="page-actions">
+        <div class="page-actions-buttons">
+            <?= /* @noEscape */
+            $block->getBackButton(); ?>
+        </div>
+    </div>
+</div>
+<?= $block->getChildHtml('queue_calendar_config'); ?>
+<?= $block->getChildHtml('queue_calendar'); ?>

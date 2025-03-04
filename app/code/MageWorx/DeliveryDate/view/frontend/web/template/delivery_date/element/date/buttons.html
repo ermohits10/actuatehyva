@@ -1,0 +1,32 @@
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<input class="admin__control-text" type="text" hidden="hidden" data-bind="
+    valueUpdate: valueUpdate,
+    attr: {
+        value: value,
+        name: inputName,
+        id: uid,
+        placeholder: placeholder,
+        'aria-describedby': noticeId,
+        disabled: disabled
+    }"/>
+<div data-bind="if: dates() && disabled()">
+    <div class="data-row" data-bind="foreach: {data: dates}">
+        <!-- ko if: $parent.value() == $data.date -->
+        <div class="data-item" data-bind="click: $parent.value.bind($parent, $data.date), css: { 'data-item-selected': $parent.value() == $data.date }">
+            <span data-bind="html: $data.date_formatted"></span>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+<div data-bind="if: dates() && !disabled()">
+    <div class="data-row" data-bind="foreach: {data: dates}">
+        <div class="data-item" data-bind="click: $parent.value.bind($parent, $data.date), css: { 'data-item-selected': $parent.value() == $data.date }">
+            <span data-bind="html: $data.date_formatted"></span>
+        </div>
+    </div>
+</div>

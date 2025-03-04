@@ -1,0 +1,13 @@
+<?php
+use Hyva\Checkout\Magewire\Checkout\AddressView\MagewireAddressFormInterface;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var MagewireAddressFormInterface $magewire */
+/** @var Escaper $escaper */
+?>
+
+<div class="shipping-address-view form-inline text-[26px] leading-8 mt-2.5">
+    <?= $magewire->shippingAddress; ?>
+</div>

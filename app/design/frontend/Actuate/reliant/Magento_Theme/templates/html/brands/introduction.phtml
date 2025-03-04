@@ -1,0 +1,8 @@
+<?php
+    $brandPage = $block->getBrandPage();
+    $brandID = $block->stripTags($brandPage->getBrandTitle(), null, true);
+    $brandContent = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('brandintro-'.$brandID.'')->toHtml();
+    if($brandContent != ''):
+        echo $brandContent;
+    endif;
+?>

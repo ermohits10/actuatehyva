@@ -1,0 +1,21 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/**
+ * @var \MageWorx\DeliveryDate\Block\Adminhtml\Queue\Calendar\Config $block
+ */
+?>
+<script type="text/javascript">
+    if (!window.mageworx) {
+        window.mageworx = {};
+    }
+    window.mageworx.delivery_date = {
+        "config": {
+            "list": <?= /* @noEscape */ json_encode($block->getConfig()); ?>,
+            "delivery_options": <?= /* @noEscape */ json_encode($block->getAllDeliveryOptions()); ?>,
+            "timezone": '<?= $block->escapeHtml($block->getStoreTimezone()) ?>'
+        }
+    };
+</script>

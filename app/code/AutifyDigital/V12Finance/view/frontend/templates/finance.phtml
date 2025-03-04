@@ -1,0 +1,15 @@
+<?php
+/*
+ * This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+ * Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+ * Copyright (c) 2020-2022 Autify digital Ltd.
+ * This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+ * ALL RIGHTS RESERVED.
+ *
+ */
+
+$product = $block->getData('product');
+$finance_config = $block->getData('finance_config');
+$getFinanceOptions = $block->getCategoryFinance($finance_config, $product); ?>
+<?= $getFinanceOptions; ?>
+

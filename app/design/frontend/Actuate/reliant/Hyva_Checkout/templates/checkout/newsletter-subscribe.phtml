@@ -1,0 +1,37 @@
+<?php
+use Mageside\SubscribeAtCheckout\Helper\Config;
+
+$subscribeHelper = $this->helper(Config::class);
+$checkbox = $subscribeHelper->getConfigModule('checkout_subscribe');
+$checked = $checkbox == 2 ? 0 : 1;
+$visible = $checkbox == 3 ? 0 : 1;
+$changeable = $checkbox == 4 ? 0 : 1;
+
+$checkoutLabel = $subscribeHelper->getConfigModule('checkout_label');
+?>
+
+<div>
+    <?php if($visible): ?>
+        <?php if($changeable): ?>
+            <label class="label flex" for="newsletter-subscribe">
+                <input class="input-text"
+                    type="checkbox"
+                    name="newsletter-subscribe"
+                    id="newsletter-subscribe"
+                    wire:model="subscribe"
+                    <?= $checked ? 'checked' : '' ?>
+                />
+                <span><?= __($checkoutLabel) ?></span>
+            </label>
+        <?php else: ?>
+            <input type="checkbox"
+                    id="newsletter-subscribe-disabled"
+                    disabled="disabled"
+                    wire:model="subscribe"
+                    checked="checked"/>
+            <label class="label" for="newsletter-subscribe-disabled">
+                <span><?= __($checkoutLabel) ?></span>
+            </label>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>

@@ -1,0 +1,82 @@
+<?php
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ * @category   BSS
+ * @package    Hyva_BssProductLabel
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2017-2022 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+?>
+
+<?php
+// @codingStandardsIgnoreFile
+
+use Bss\ProductLabel\Block\Label;
+
+/** @var Label $block */
+
+$labelData = $block->getLabelData();
+
+$productId = $block->getProduct()->getId();
+
+?>
+
+<?php if (!empty($labelData)): ?>
+    <div class="bss-label-productlist" >
+        <?php foreach ($labelData as $imageData): ?>
+            <div class='label-image'
+                 data-label-product-id='<?php echo $imageData['product_id'] ?>'
+                 is-main-product='<?php echo $imageData['product_id'] == $productId ? 'true' : 'false' ?>'
+                 data-display="<?php echo $imageData['product_id'] == $productId ? 'block' : 'none' ?>"
+                 data-background-image="<?php echo $imageData['image'] ?>" data-width="<?php echo $imageData['width'] ?>%"
+                 data-height="<?php echo $imageData['height'] ?>%" data-top="<?php echo $imageData['top'] ?>%"
+                 data-left="<?php echo $imageData['left'] ?>%" data-priority="<?php echo $imageData['priority'] ?>">
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <script>
+
+        appendLabel()
+
+        function appendLabel() {
+            const labelImage = document.querySelectorAll('.label-image');
+            labelImage.forEach(function (labelImage) {
+                var productId = labelImage.getAttribute('data-label-product-id');
+                const itemElement = document.getElementsByClassName("product-image-container-" + productId)[0];
+                if(typeof(itemElement) != 'undefined' && itemElement != null) {
+                    itemElement.style.position = 'relative';
+                    itemElement.appendChild(labelImage.parentElement);
+                }
+            })
+        }
+
+        setLabel();
+
+        function setLabel() {
+            const labelImage = document.querySelectorAll('.label-image');
+            labelImage.forEach(function (labelImage) {
+                labelImage.style.position = 'absolute';
+                labelImage.style.backgroundSize = 'contain';
+                labelImage.style.backgroundRepeat = 'no-repeat';
+                labelImage.style.backgroundPosition = 'center';
+                labelImage.style.display = labelImage.getAttribute('data-display');
+                labelImage.style.backgroundImage = 'url(' + labelImage.getAttribute('data-background-image') + ')';
+                labelImage.style.top = labelImage.getAttribute('data-top');
+                labelImage.style.height = labelImage.getAttribute('data-height');
+                labelImage.style.width = labelImage.getAttribute('data-width');
+                labelImage.style.left = labelImage.getAttribute('data-left');
+                labelImage.style.zIndex = labelImage.getAttribute('data-priority');
+            })
+        }
+    </script>
+<?php endif; ?>

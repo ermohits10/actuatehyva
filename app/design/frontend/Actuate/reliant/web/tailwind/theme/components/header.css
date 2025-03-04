@@ -1,0 +1,34 @@
+.page-header {
+}
+.ninjamenus-desktop-wrapper {
+    @apply md:w-full;
+}
+.magezon-builder.magezon-builder-preload {
+    @apply md:justify-between md:w-full lg:flex lg:items-center;
+}
+.navigation > .ninjamenus.ninjamenus-desktop {
+    @apply md:!m-0;
+}
+.ninjamenus-desktop.ninjamenus-top .level0 {
+    @apply text-center;
+    &.level0 {
+        > a {
+            @apply lg:leading-5 lg:flex lg:justify-center;
+            > span.title {
+                @apply py-3 lg:py-[15px];
+            }
+        }
+    }
+}
+.header-top {
+    @apply w-full transition-transform duration-300 ease-in-out opacity-100;
+}
+.header-scrolling {
+    @apply fixed top-0 left-0 w-full opacity-0 bg-white z-[999];
+}
+.header-scrollup {
+    @apply fixed top-0 left-0 w-full opacity-100 bg-white z-[999] shadow-md;
+}
+.header-wrapper {
+    @apply min-h-[150px] md:min-h-[154px] lg:min-h-[200px] xl:min-h-[160px] 2xl:min-h-[138px];
+}

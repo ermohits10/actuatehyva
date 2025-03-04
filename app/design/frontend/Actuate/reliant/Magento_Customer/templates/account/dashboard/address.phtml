@@ -1,0 +1,71 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Customer\Block\Account\Dashboard\Address;
+use Magento\Framework\Escaper;
+
+/** @var Address $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<div class="block block-dashboard-addresses mt-10 lg:mt-12">
+    <div class="block-title flex items-center card font-serif text-xl leading-7 font-normal pb-2 border-b border-gray-200 mb-6 lg:text-2xl lg:leading-10 block-title">
+        <span class="text-2xl block"><?= $escaper->escapeHtml(__('Address Book')) ?></span>
+        <a class="action edit inline-block font-sans text-sm leading-5 font-bold text-[#126366] ml-2 lg:ml-6 lg:text-base"
+           href="<?= $escaper->escapeUrl($block->getAddressBookUrl()) ?>"><span><?= $escaper->escapeHtml(
+               __('Manage Addresses')
+           ) ?></span></a>
+    </div>
+    <div class="block-content">
+        <div class="flex flex-wrap justify-between">
+            <div class="lg:w-1/2 w-full">
+                <div class="flex sm:flex-row flex-col h-full card">
+                    <div class="flex-grow">
+                        <h2 class="font-sans text-base leading-6 font-bold text-[#126366] lg:text-xl lg:leading-10 lg:font-extrabold mb-2">
+                            <span><?= $escaper->escapeHtml(__('Default Billing Address')) ?></span>
+                        </h2>
+                        <address class="font-sans text-sm leading-5 font-normal lg:text-lg lg:mb-4 not-italic">
+                            <?= $block->getPrimaryBillingAddressHtml() ?>
+                        </address>
+                        <a
+                            class="mt-3 w-full inline-flex items-center font-sans text-sm leading-5 font-bold text-[#126366] lg:text-base"
+                            href="<?= $escaper->escapeUrl($block->getPrimaryBillingAddressEditUrl()) ?>"
+                            data-ui-id="default-billing-edit-link"><span><?= $escaper->escapeHtml(
+                                __('Edit Address')
+                            ) ?></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:w-1/2 w-full">
+                <div class="flex sm:flex-row flex-col h-full card">
+                    <div class="flex-grow">
+                        <h2 class="font-sans text-base leading-6 font-bold text-[#126366] lg:text-xl lg:leading-10 lg:font-extrabold mb-2">
+                            <span><?= $escaper->escapeHtml(__('Default Shipping Address')) ?></span>
+                        </h2>
+                        <address class="font-sans text-sm leading-5 font-normal lg:text-lg lg:mb-4 not-italic">
+                            <?= $block->getPrimaryShippingAddressHtml() ?>
+                        </address>
+                        <a
+                            class="mt-3 w-full inline-flex items-center font-sans text-sm leading-5 font-bold text-[#126366] lg:text-base"
+                            href="<?= $escaper->escapeUrl($block->getPrimaryShippingAddressEditUrl()) ?>"
+                            data-ui-id="default-billing-edit-link"><span><?= $escaper->escapeHtml(
+                                __('Edit Address')
+                            ) ?></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

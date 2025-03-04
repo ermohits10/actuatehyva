@@ -1,0 +1,6 @@
+<?php /** @var Magento\Framework\View\TemplateEngine\Php $this */
+	$craftyConfig = $this->helper('Craftyclicks\Ukpostcodelookup\Helper\Data');
+?>
+<script>
+	var crafty_cfg = <?php echo $craftyConfig->getBackendCfg(); ?>;
+</script>

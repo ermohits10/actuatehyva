@@ -1,0 +1,39 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+<div class="text-gray-700 body-font bg-[#F2F6FA]">
+    <div class="container pt-8 pb-6 mx-auto">
+        <div class="flex flex-wrap order-first">
+            <?php foreach ($block->getChildNames() as $childName): ?>
+                <?= $childName !== 'footer-copyright' ? $block->getBlockHtml($childName) : '' ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <div class="lower-footer bg-[#126366]">
+        <div class="container py-6 mx-auto flex items-center sm:flex-row flex-col">
+            <?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer-legal-links')->toHtml(); ?>
+        </div>
+    </div>
+    <div class="copyright-footer bg-[#002A2C]">
+        <div class="container py-3 mx-auto flex items-center sm:flex-row flex-col text-center">
+            <p class="text-sm leading-5 font-normal text-white w-full">Copyright © - All Rights Reserved | VAT No. 155629056 | Company Reg No. 1100752 | FCA Number 671120  | The Granary Buildings, Weeton, Blackpool, Lancashire, FY4 4XB</p>
+        </div>
+    </div>
+</div>

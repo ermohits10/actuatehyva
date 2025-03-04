@@ -1,0 +1,669 @@
+<?xml version="1.0" ?>
+<!--
+~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+~ Copyright (c) 2020-2022 Autify digital Ltd.
+~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+~ ALL RIGHTS RESERVED.
+~
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<tab id="autifydigital" sortOrder="999" translate="label">
+			<label>Autify Digital</label>
+		</tab>
+		<section id="v12finance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+			<label>V12 Finance</label>
+			<tab>autifydigital</tab>
+			<resource>AutifyDigital_V12Finance::config_autifydigital_v12finance</resource>
+			<group id="current_version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+	            <label>Current Version Installed</label>
+	            <field id="version" translate="label" type="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+	                <label>Current Version</label>
+	                <backend_model>AutifyDigital\V12Finance\Model\Config\Source\Version</backend_model>
+	            </field>
+	        </group>
+			<group id="general" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+				<label>General V12 Finance Configuration</label>
+				<field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="select">
+					<label>Enable V12 Finance</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<config_path>payment/v12finance/active</config_path>
+				</field>
+				<field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label" type="text">
+					<label>Payment Title</label>
+					<config_path>payment/v12finance/title</config_path>
+				</field>
+				<field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="obscure">
+					<label>Authentication Key</label>
+					<comment>V12 Finance Authentication key. You will get this from the V12 finance.</comment>
+					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+					<config_path>payment/v12finance/api_key</config_path>
+				</field>
+				<field id="retailer_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+					<config_path>payment/v12finance/retailer_id</config_path>
+					<label>Retailer ID</label>
+					<!-- <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model> -->
+					<comment>v12 finance Retailer ID</comment>
+				</field>
+				<field id="retailer_guid" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="obscure">
+					<config_path>payment/v12finance/retailer_guid</config_path>
+					<label>Retailer GUID</label>
+					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+					<comment>v12 finance Retailer GUID</comment>
+				</field>
+				<field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="allowspecific">
+					<config_path>payment/v12finance/allowspecific</config_path>
+					<label>Payment from Applicable Countries</label>
+					<source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+				</field>
+				<field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="multiselect">
+					<config_path>payment/v12finance/specificcountry</config_path>
+					<label>Payment from Applicable Countries</label>
+					<source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+					<can_be_empty>1</can_be_empty>
+				</field>
+				<field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+					<label>Sort Order</label>
+					<config_path>payment/v12finance/sort_order</config_path>
+				</field>
+				<field id="min_order_total" translate="label" type="text" sortOrder="80" showInDefault="1"
+					showInWebsite="0" showInStore="0">
+					<label>Minimum Order </label>
+					<config_path>payment/v12finance/min_order_total</config_path>
+				</field>
+				<field id="max_order_total" translate="label" type="text" sortOrder="90" showInDefault="1"
+					showInWebsite="0" showInStore="0">
+					<label>Maximum Order </label>
+					<config_path>payment/v12finance/max_order_total</config_path>
+				</field>
+				<field id="min_deposit" translate="label" type="text" sortOrder="100" showInDefault="1"
+					showInWebsite="0" showInStore="0">
+					<label>Minimum Loan Amount</label>
+					<config_path>payment/v12finance/min_deposit</config_path>
+					<comment>This field is using only for the validation based on the default finance.</comment>
+				</field>
+				<field id="max_deposit" translate="label" type="text" sortOrder="110" showInDefault="1"
+					showInWebsite="0" showInStore="0">
+					<label>Maximum Loan Amount</label>
+					<config_path>payment/v12finance/max_deposit</config_path>
+					<comment>This field is using only for the validation based on the default finance.</comment>
+				</field>
+				<field id="finance_percentage_value" translate="label" type="text" sortOrder="120" showInDefault="1"
+					showInWebsite="0" showInStore="0">
+					<config_path>payment/v12finance/finance_percentage_value</config_path>
+					<label>Minimum Finance Percentage</label>
+				</field>
+				<field id="finance_max_percentage_value" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="0" showInStore="0">
+					<config_path>payment/v12finance/finance_max_percentage_value</config_path>
+					<label>Maximum Finance Percentage</label>
+				</field>
+			</group>
+			<group id="financeoptions" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+				<label>Finance Options Configuration</label>
+				<field id="default_finance_options" translate="label" type="select" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Default Finance Options</label>
+					<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOption</source_model>
+					<can_be_empty>1</can_be_empty>
+				</field>
+				<field id="default_sale_finance_options" translate="label" type="select" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Default Sale Finance Options</label>
+					<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOption</source_model>
+					<can_be_empty>1</can_be_empty>
+				</field>
+				<field id="default_sku_finance_options" translate="label" type="select" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Default SKU Based Finance Options</label>
+					<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOption</source_model>
+					<can_be_empty>1</can_be_empty>
+				</field>
+				<field id="default_price_finance_options" translate="label" type="select" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Default Price Based Finance Options</label>
+					<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOption</source_model>
+					<can_be_empty>1</can_be_empty>
+				</field>
+				<field id="finance_options" translate="label" type="multiselect" sortOrder="83" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Finance Options</label>
+					<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOption</source_model>
+					<can_be_empty>1</can_be_empty>
+				</field>
+				<field id="sale_finance_options" translate="label" type="multiselect" sortOrder="84" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Sale Finance Options</label>
+					<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOption</source_model>
+					<can_be_empty>1</can_be_empty>
+				</field>
+				<field id="sku_finance_options" translate="label" type="multiselect" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>SKU Based Finance Options</label>
+					<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOption</source_model>
+					<can_be_empty>1</can_be_empty>
+					<comment>This finance options will display based on skus</comment>
+				</field>
+			</group>
+			<group id="finance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+				<label>Extendable Configuration</label>
+				<group id="normal" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+					<label>Technical Configuration</label>
+					<field id="application_issue_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="select">
+						<config_path>autifydigital/v12finance/application_issue_enable</config_path>
+						<label>Redirect To CMS Page</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>If you would like to redirect it to the custom CMS Page after application is declined, cancelled or error.</comment>
+					</field>
+					<field id="application_issue_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="text">
+						<label>Redirection URL (CMS Page)</label>
+						<comment>Set the redirection url for the cms page</comment>
+						<config_path>autifydigital/v12finance/application_issue_url</config_path>
+					</field>
+					<field id="quote_cron_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="select">
+						<config_path>autifydigital/v12finance/quote_cron_enable</config_path>
+						<label>Enable Quote through Cron</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>It will run the cron to enable V12 Finance for Quote. It will enable the V12 Finance after configuration of the hours.</comment>
+					</field>
+					<field id="quote_cron_enable_hours" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="text">
+						<config_path>autifydigital/v12finance/quote_cron_enable_hours</config_path>
+						<label>Enable Quote through Cron</label>
+						<validate>validate-number validate-not-negative-number validate-zero-or-greater</validate>
+						<comment>It will run the cron to enable V12 Finance for Quote. It will enable the V12 Finance after configuration of the hours.</comment>
+					</field>
+					<field id="request_payment_application" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="select">
+						<config_path>autifydigital/v12finance/request_payment_application</config_path>
+						<label>Request Payment application</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>If you enable this option, it will allow backend user to request payment from the backend as well as auto request from the shipment.</comment>
+					</field>
+					<field id="order_cancel" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="select">
+						<config_path>autifydigital/v12finance/order_cancel</config_path>
+						<label>Cancel Order Depend on Application Status</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>Cancel the order if the application get declined, cancelled or error.</comment>
+					</field>
+					<field id="cancel_application" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="select">
+						<config_path>autifydigital/v12finance/cancel_application</config_path>
+						<label>Cancel the application</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>Cancel the application when order is cancelled or fully refunded.</comment>
+					</field>
+					<field id="partial_refund" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label" type="select">
+						<config_path>autifydigital/v12finance/partial_refund</config_path>
+						<label>Partial Refund the application</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>send partial refund request for the application when order is partially refunded.</comment>
+					</field>
+					<field id="click_and_collect" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="12" translate="label" type="select">
+						<config_path>autifydigital/v12finance/click_and_collect</config_path>
+						<label>Enable Click and Collect</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>It will pass the click and collect address to the V12. (Magento 2.4)</comment>
+					</field>
+					<field id="click_and_collect_update_address" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="13" translate="label" type="select">
+						<config_path>autifydigital/v12finance/click_and_collect_update_address</config_path>
+						<label>Update Shipping Address For Click and Collect</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>Update Shipping Address for the Click and Collect. (Magento 2.4)</comment>
+					</field>
+					<field id="click_and_collect_shipment_code_backend" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="13" translate="label" type="text">
+						<config_path>autifydigital/v12finance/click_and_collect_shipment_code_backend</config_path>
+						<label>Click and Collect Shipment Code</label>
+						<comment>The default Magento machine code will be instore_pickup</comment>
+					</field>
+					<field id="coupon_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="14" translate="label" type="select">
+						<config_path>autifydigital/v12finance/coupon_enable</config_path>
+						<label>Coupon Code Enable Finance</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>If you enable this, It will check the discount is applied or not then this will display the sale finance option on the checkout page.</comment>
+					</field>
+					<field id="product_finance_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="14" translate="label" type="select">
+						<config_path>autifydigital/v12finance/product_finance_enable</config_path>
+						<label>Product Finance Enable Finance</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>If you enable this, It will check product level finance.</comment>
+					</field>
+					<field id="sale_price_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="14" translate="label" type="select">
+						<config_path>autifydigital/v12finance/sale_price_enable</config_path>
+						<label>Sale Price Product Finance</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>If you enable this, It will check the product contain sale price and will display the sale finance option on the checkout page.</comment>
+					</field>
+					<field id="sku_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="select">
+						<config_path>autifydigital/v12finance/sku_enable</config_path>
+						<label>SKU Based Finance Enable</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>It will get the sku's finance option and display on checkout page.</comment>
+					</field>
+					<field id="sku_list" translate="label" type="textarea" sortOrder="16" showInDefault="1"
+						showInWebsite="0" showInStore="0">
+						<config_path>autifydigital/v12finance/sku_list</config_path>
+						<label>SKUs list</label>
+						<comment>Add your skus by comma seperated. For ex. sku1,sku2,sku3</comment>
+					</field>
+					<field id="cron_time" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="select">
+						<config_path>autifydigital/v12finance/short_time_cron</config_path>
+						<label>Business Hours cron application month</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetCronHour</source_model>
+						<comment>It will fetch the application during current to selected month</comment>
+					</field>
+					<field id="price_based_finance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="select">
+						<label>Enable Price Based Finance Options</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>If yes(It will disable the normal finance options)</comment>
+						<config_path>autifydigital/v12finance/price_based_finance</config_path>
+					</field>
+					<field id="pending_email_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="45" translate="label" type="select">
+						<label>Enable Pending Application Email</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<config_path>autifydigital/v12finance/pending_email_enable</config_path>
+					</field>
+					<field id="email_template" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="select">
+						<label>Pending Application Email Templates</label>
+						<source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+						<config_path>autifydigital/v12finance/email_template</config_path>
+					</field>
+					<field id="declined_email_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="select">
+						<label>Enable Declined Application Email</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<config_path>autifydigital/v12finance/declined_email_enable</config_path>
+					</field>
+					<field id="declinedemail_template" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="select">
+						<label>Declined Application Email Templates</label>
+						<source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+						<config_path>autifydigital/v12finance/declinedemail_template</config_path>
+					</field>
+
+					<field id="error_email_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="select">
+						<label>Enable Error Application Email</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<config_path>autifydigital/v12finance/error_email_enable</config_path>
+					</field>
+					<field id="erroremail_template" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="select">
+						<label>Error Application Email Templates</label>
+						<source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+						<config_path>autifydigital/v12finance/erroremail_template</config_path>
+					</field>
+
+					<field id="cancelledemail_email_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="select">
+						<label>Enable Canceled Application Email</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<config_path>autifydigital/v12finance/cancelledemail_email_enable</config_path>
+					</field>
+					<field id="cancelledemail_template" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="select">
+						<label>Canceled Application Email Templates</label>
+						<source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+						<config_path>autifydigital/v12finance/cancelledemail_template</config_path>
+					</field>
+
+					<field id="pending_email_template_ack" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+						<label>Pending Email Template Acknowledged Application Text</label>
+						<comment>It will set the message in the email templates. For ex. to proceed the application</comment>
+						<config_path>autifydigital/v12finance/pending_email_template_ack</config_path>
+					</field>
+					<field id="pending_email_template_accepted" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+						<label>Pending Email Template Accepted Application Text</label>
+						<comment>It will set the message in the email templates. For ex. to sign the application</comment>
+						<config_path>autifydigital/v12finance/pending_email_template_accepted</config_path>
+					</field>
+					<field id="awaitingcontract_email_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="59" translate="label" type="select">
+						<label>Enable Awaiting Contract Application Email</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<config_path>autifydigital/v12finance/awaitingcontract_email_enable</config_path>
+					</field>
+					<field id="awaitingcontract_template" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="select">
+						<label>Awaiting Contract Email Templates</label>
+						<source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+						<config_path>autifydigital/v12finance/awaitingcontract_template</config_path>
+					</field>
+					<field id="addtocartnotice" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="textarea">
+						<label>Add to cart Notice Text</label>
+						<comment>Add to cart notice after the button</comment>
+						<config_path>autifydigital/v12finance/addtocartnotice</config_path>
+					</field>
+					<field id="outofstock_check" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label" type="select">
+						<label>Enable Out of stock check</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<config_path>autifydigital/v12finance/outofstock_check</config_path>
+					</field>
+				</group>
+				<group id="finance_category" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
+				    <label>Finance Category Based Configuration</label>
+				    <field id="finance_category_option" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+						<config_path>autifydigital/v12finance/finance_category_option</config_path>
+						<label>Disable Feature for Finance for Below Category</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>If you select it yes,then it will disable the finance for the specific below categories .</comment>
+					</field>
+					<field id="finance_category_list" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="multiselect">
+						<config_path>autifydigital/v12finance/finance_category_list</config_path>
+						<label>Select the Categories</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetCategoryList</source_model>
+						<comment>It will disable the finance option for the categories.</comment>
+					</field>
+				</group>
+				<group id="google" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
+					<label>Analytics/Adwords Configuration</label>
+					<group id="google_analytics" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+						<label>Google Analytics Configuration</label>
+						<field id="analytics_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+							<config_path>autifydigital/v12finance/analytics_enable</config_path>
+							<label>V12 Google Analytics Enable</label>
+							<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+							<comment>If you would like to track the conversion after the signing the application on the V12, please enable this option.</comment>
+						</field>
+						<field id="success_analytics_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="select">
+							<config_path>autifydigital/v12finance/success_analytics_enable</config_path>
+							<label>Success Page Google Analytics Enable</label>
+							<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+							<comment>If you would like to track the conversion after the signing the application on the success page, please enable this option.</comment>
+						</field>
+						<field id="google_analytics_type" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="select">
+							<config_path>autifydigital/v12finance/google_analytics_type</config_path>
+							<label>Google Analytics Tracking Type</label>
+							<source_model>AutifyDigital\V12Finance\Model\Config\Source\TagManagerType</source_model>
+						</field>
+					</group>
+					<group id="google_adwords" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
+						<label>Google Adwords Configuration</label>
+						<field id="adwords_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="select">
+							<config_path>autifydigital/v12finance/adwords_enable</config_path>
+							<label>Google Adwords Enable</label>
+							<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+							<comment>If you would like to track the conversion after the signing the application, please enable this option.</comment>
+						</field>
+						<field id="conversion_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+							<label>Conversion ID</label>
+							<comment>Set the Google Conversion ID</comment>
+							<config_path>autifydigital/v12finance/conversion_id</config_path>
+						</field>
+						<field id="conversion_language" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+		                    <label>Conversion Language</label>
+		                    <source_model>Magento\GoogleAdwords\Model\Config\Source\Language</source_model>
+		                    <config_path>autifydigital/v12finance/conversion_language</config_path>
+		                </field>
+		                <field id="conversion_format" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+		                    <label>Conversion Format</label>
+		                    <config_path>autifydigital/v12finance/conversion_format</config_path>
+		                </field>
+		                <field id="conversion_color" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+		                    <label>Conversion Color</label>
+		                    <backend_model>Magento\GoogleAdwords\Model\Config\Backend\Color</backend_model>
+		                    <config_path>autifydigital/v12finance/conversion_color</config_path>
+		                </field>
+		                <field id="conversion_label" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+		                    <label>Conversion Label</label>
+		                    <config_path>autifydigital/v12finance/conversion_label</config_path>
+		                </field>
+		            </group>
+		            <group id="google_tagmanager" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label">
+						<label>Google Tag Manager Configuration</label>
+						<field id="tagmanagers_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+							<config_path>autifydigital/v12finance/tagmanagers_enable</config_path>
+							<label>Google Tag Manager Successful Application Enable</label>
+							<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+							<comment>It will track the record on the V12 Success Page.</comment>
+						</field>
+						<field id="tagmanagers_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+							<label>Account Number</label>
+							<comment>Set the Google Tag Manager Account Number for Successful Application</comment>
+							<config_path>autifydigital/v12finance/tagmanagers_id</config_path>
+						</field>
+						<field id="v12_order_statusvar" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+							<label>V12 Order Status Variable</label>
+							<config_path>autifydigital/v12finance/v12_order_statusvar</config_path>
+						</field>
+						<field id="referred_active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="select">
+		                    <label>Enable V12 finance Referred Ads tracking custom</label>
+		                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+		                    <config_path>autifydigital/v12finance/referred_active</config_path>
+		                </field>
+		                <field id="tag_google_analytics_type" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="select">
+							<config_path>autifydigital/v12finance/tag_google_analytics_type</config_path>
+							<label>Google Analytics Tracking Type</label>
+							<source_model>AutifyDigital\V12Finance\Model\Config\Source\TagManagerType</source_model>
+						</field>
+					</group>
+				</group>
+				<group id="category_page_configuration" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="29" translate="label">
+					<label>Category Page Configuration</label>
+					<field id="enable_v12_finance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+	                    <label>Enable V12 finance text for Category Page and Product grid</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>v12finance/category_page/enable_v12_finance</config_path>
+	                </field>
+				</group>
+				<group id="product_page_configuration" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label">
+					<label>Product Page Configuration</label>
+					<field id="product_page_title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+						<label>Product Page Text</label>
+						<comment>It will set the text on product page</comment>
+						<config_path>v12finance/product_page/product_page_title</config_path>
+					</field>
+					<field id="product_page_text_header" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+						<label>Product Page Popup Text</label>
+						<comment>It will set the text on product page popup</comment>
+						<config_path>v12finance/product_page/product_page_text_header</config_path>
+					</field>
+					<field id="product_page_button" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+						<label>Product Page Popup Button Text</label>
+						<comment>It will set the text on product page popup button</comment>
+						<config_path>v12finance/product_page/product_page_button</config_path>
+					</field>
+					<field id="main_header_area" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="textarea">
+						<label>After Main title Text (V12 Popup)</label>
+						<comment>It will display information in popup after main title.</comment>
+						<config_path>v12finance/product_page/main_header_area</config_path>
+					</field>
+					<field id="finance_terms_conditions" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="textarea">
+						<label>Finance Terms And Conditions (V12 Popup)</label>
+						<comment>It will display information in popup after finance summary.</comment>
+						<config_path>v12finance/product_page/finance_terms_conditions</config_path>
+					</field>
+					<field id="enable_v12_finance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="select">
+	                    <label>Enable V12 finance Popup for Product page</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>v12finance/product_page/enable_v12_finance</config_path>
+	                </field>
+					<field id="enable_v12_finance_related" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="select">
+	                    <label>Enable V12 finance for Related Product </label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>v12finance/product_page/enable_v12_finance_related</config_path>
+	                </field>
+					<field id="enable_v12_finance_upsell" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="select">
+	                    <label>Enable V12 finance for Upsell Product </label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>v12finance/product_page/enable_v12_finance_upsell</config_path>
+	                </field>
+				</group>
+				<group id="category_page_configuration" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="32" translate="label">
+					<label>Cart Page Configuration</label>
+					<field id="enable_v12_finance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+	                    <label>Enable V12 finance text for Cart Page Product grid</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>v12finance/cart_page/enable_v12_finance</config_path>
+	                </field>
+				</group>
+				<group id="checkout_page_configuration" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label">
+					<label>Checkout Page Configuration</label>
+					<field id="checkout_page_payment_button" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+						<label>Checkout Page Button Text</label>
+						<comment>It will set the text on checkout place order button</comment>
+						<config_path>v12finance/checkout_page/checkout_page_payment_button</config_path>
+					</field>
+					<field id="checkout_page_message_time" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+						<label>Checkout Timeout Message Time ( in seconds )</label>
+						<validate>validate-number validate-no-html-tags validate-zero-or-greater</validate>
+						<comment>It will set the time to hold the message on the checkout when we update the finance. For e.g (1) </comment>
+						<config_path>v12finance/checkout_page/checkout_page_message_time</config_path>
+					</field>
+					<field id="checkout_page_message_text" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="51" translate="label" type="text">
+						<label>Checkout Timeout Message</label>
+						<comment>It will set the message on the checkout when we update the finance.</comment>
+						<config_path>v12finance/checkout_page/checkout_page_message_text</config_path>
+					</field>
+					<field id="checkout_page_billing_text" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="51" translate="label" type="text">
+						<label>Checkout Page Billing Text</label>
+						<comment>It will set the text for billing information.</comment>
+						<config_path>v12finance/checkout_page/checkout_page_billing_text</config_path>
+					</field>
+					<field id="checkout_financeamount_text" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="51" translate="label" type="text">
+						<label>Checkout Finance Amount Deposit Error Message</label>
+						<config_path>v12finance/checkout_page/checkout_financeamount_text</config_path>
+					</field>
+				</group>
+				<group id="categoryfinance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label">
+					<label>Sale Category Finance Option Setting</label>
+					<field id="enable_sale_category_finance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+						<label>Enable Sale Category Finance Option</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>It will display only sale category finance option like 9.9% otherwise will display normal finance option.</comment>
+						<config_path>v12finance/categoryfinance/enable_sale_category_finance</config_path>
+					</field>
+					<field id="sale_category" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+						<label>Sale Category Id</label>
+						<comment>It will display only sale category finance option.</comment>
+						<depends>
+							<field id="v12finance/categoryfinance/enable_sale_category_finance">1</field>
+						</depends>
+						<config_path>v12finance/categoryfinance/sale_category</config_path>
+					</field>
+				</group>
+				<group id="finance_order_status" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label">
+					<label>V12 Finance Order Status</label>
+					<field id="acknowledged" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+						<label>Acknowledged Finance Status</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOrderStatus</source_model>
+						<comment>It will set the order status when we get the acknowledged finance status</comment>
+						<config_path>v12finance/finance_order_status/acknowledged</config_path>
+					</field>
+					<field id="accepted" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+						<label>Accepted Finance Status</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOrderStatus</source_model>
+						<comment>It will set the order status when we get the accepted finance status</comment>
+						<config_path>v12finance/finance_order_status/accepted</config_path>
+					</field>
+					<field id="awaitingfulfilment" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+						<label>Awaiting Fulfilment Finance Status</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOrderStatus</source_model>
+						<comment>It will set the order status when we get the awaiting fulfilment finance status</comment>
+						<config_path>v12finance/finance_order_status/awaitingfulfilment</config_path>
+					</field>
+					<field id="referred" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+						<label>Referred Finance Status</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOrderStatus</source_model>
+						<comment>It will set the order status when we get the referred finance status</comment>
+						<config_path>v12finance/finance_order_status/referred</config_path>
+					</field>
+					<field id="error" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+						<label>Error Finance Status</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOrderStatus</source_model>
+						<comment>It will set the order status when we get the error finance status</comment>
+						<config_path>v12finance/finance_order_status/error</config_path>
+					</field>
+					<field id="declined" showInDefault="0" showInStore="0" showInWebsite="0" sortOrder="10" translate="label" type="hidden">
+						<label>Declined Finance Status</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOrderStatus</source_model>
+						<config_path>v12finance/finance_order_status/declined</config_path>
+					</field>
+					<field id="cancelled" showInDefault="0" showInStore="0" showInWebsite="0" sortOrder="10" translate="label" type="hidden">
+						<label>Cancelled Finance Status</label>
+						<source_model>AutifyDigital\V12Finance\Model\Config\Source\GetFinanceOrderStatus</source_model>
+						<config_path>v12finance/finance_order_status/cancelled</config_path>
+					</field>
+				</group>
+				<group id="checkout_success_configuration" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label">
+					<label>Checkout Success Page Configuration</label>
+					<field id="application_status_display" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+						<label>Display Below Messages to Success Page</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>It will set the text in the V12 success page.</comment>
+						<config_path>v12finance/checkout_success_configuration/application_status_display</config_path>
+					</field>
+					<field id="referred_status_message" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="textarea">
+						<label>Referred Status Message</label>
+						<comment>It will set the text in the V12 success page.</comment>
+						<config_path>v12finance/checkout_success_configuration/referred_status_message</config_path>
+					</field>
+					<field id="signed_status_message" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="textarea">
+						<label>Signed Status Message</label>
+						<comment>It will set the text in the V12 success page.</comment>
+						<config_path>v12finance/checkout_success_configuration/signed_status_message</config_path>
+					</field>
+					<field id="other_status_message" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="textarea">
+						<label>Other Status Message</label>
+						<comment>It will set the text in the V12 success page.</comment>
+						<config_path>v12finance/checkout_success_configuration/other_status_message</config_path>
+					</field>
+				</group>
+			</group>
+		</section>
+		<!-- <section id="autifydigitaldesign" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
+			<label>V12 Finance Design Configuration</label>
+			<tab>autifydigital</tab>
+			<resource>AutifyDigital_V12Finance::config_autifydigital_v12finance</resource>
+			<group id="design" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label">
+				<label>V12 Finance Design Configuration</label>
+				<field id="no_finance_img" translate="label comment" type="image" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>No Finance Image</label>
+					<backend_model>AutifyDigital\V12Finance\Model\Config\Source\UploadFinanceIcons</backend_model>
+					<base_url type="media" scope_info="1">autifydigital</base_url>
+					<comment><![CDATA[Allowed file types: jpg, jpeg, png]]></comment>
+				</field>
+				<field id="no_finance_img_hover" translate="label comment" type="image" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>No Finance Image Hover</label>
+					<backend_model>AutifyDigital\V12Finance\Model\Config\Source\UploadFinanceIcons</backend_model>
+					<base_url type="media" scope_info="1">autifydigital</base_url>
+					<comment><![CDATA[Allowed file types: jpg, jpeg, png]]></comment>
+				</field>
+				<field id="finance_ok_img" translate="label comment" type="image" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Finance Selected Image</label>
+					<backend_model>AutifyDigital\V12Finance\Model\Config\Source\UploadFinanceIcons</backend_model>
+					<base_url type="media" scope_info="1">autifydigital</base_url>
+					<comment><![CDATA[Allowed file types: jpg, jpeg, png]]></comment>
+				</field>
+				<field id="finance_ok_img_hover" translate="label comment" type="image" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Finance Selected Image Hover</label>
+					<backend_model>AutifyDigital\V12Finance\Model\Config\Source\UploadFinanceIcons</backend_model>
+					<base_url type="media" scope_info="1">autifydigital</base_url>
+					<comment><![CDATA[Allowed file types: jpg, jpeg, png]]></comment>
+				</field>
+				<field id="finance_issue_img" translate="label comment" type="image" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Finance Issue Image</label>
+					<backend_model>AutifyDigital\V12Finance\Model\Config\Source\UploadFinanceIcons</backend_model>
+					<base_url type="media" scope_info="1">autifydigital</base_url>
+					<comment><![CDATA[Allowed file types: jpg, jpeg, png]]></comment>
+				</field>
+				<field id="finance_issue_img_hover" translate="label comment" type="image" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Finance Issue Image Hover</label>
+					<backend_model>AutifyDigital\V12Finance\Model\Config\Source\UploadFinanceIcons</backend_model>
+					<base_url type="media" scope_info="1">autifydigital</base_url>
+					<comment><![CDATA[Allowed file types: jpg, jpeg, png]]></comment>
+				</field>
+				<field id="font_color" translate="label" type="text" sortOrder="70" showInDefault="1">
+					<label>Choose Font Color</label>
+					<frontend_model>AutifyDigital\V12Finance\Block\ColorPicker</frontend_model>
+				</field>
+				<field id="button_color" translate="label" type="text" sortOrder="80" showInDefault="1">
+					<label>Choose Button Font Color</label>
+					<frontend_model>AutifyDigital\V12Finance\Block\ColorPicker</frontend_model>
+				</field>
+				<field id="button_hover_color" translate="label" type="text" sortOrder="80" showInDefault="1">
+					<label>Choose Button Font Hover Color</label>
+					<frontend_model>AutifyDigital\V12Finance\Block\ColorPicker</frontend_model>
+				</field>
+				<field id="button_background_color" translate="label" type="text" sortOrder="80" showInDefault="1">
+					<label>Choose Button Background Color</label>
+					<frontend_model>AutifyDigital\V12Finance\Block\ColorPicker</frontend_model>
+				</field>
+				<field id="button_background_hover_color" translate="label" type="text" sortOrder="90" showInDefault="1">
+					<label>Choose Button Background Hover Color</label>
+					<frontend_model>AutifyDigital\V12Finance\Block\ColorPicker</frontend_model>
+				</field>
+				<field id="font_size" translate="label" type="text" sortOrder="90" showInDefault="1">
+					<label>Font Size</label>
+					<comment><![CDATA[For Ex.: 14]]></comment>
+				</field>
+				<field id="custom_css" translate="label" type="textarea" sortOrder="100" showInDefault="1">
+					<label>Custom CSS</label>
+				</field>
+			</group>
+		</section> -->
+	</system>
+</config>

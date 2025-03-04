@@ -1,0 +1,48 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+?>
+<?php
+/** @var \MageWorx\DeliveryDate\Block\Adminhtml\Order\Create\DeliveryInfo $block */
+?>
+<section class="admin__page-section order-delivery-date-options">
+    <div class="admin__page-section-title"><strong class="title"><?= $block->escapeHtml(__('Delivery Date')) ?></strong>
+    </div>
+    <div id="order-delivery-date" class="delivery-date-order-create">
+        <fieldset class="admin__fieldset">
+            <?= $block->getFormHtml($block->getQuote(), 'main') ?>
+        </fieldset>
+    </div>
+</section>
+<script>
+    require([
+        "jquery",
+        "mage/translate",
+        "jquery/ui",
+        "jquery/validate",
+        "validation"
+    ], function ($, $tr) {
+
+        $.validator.addMethod(
+            'validate-min-delivery-time',
+            function (value) {
+                var deliveryHoursToValue = $('[name="order[delivery_info][delivery_hours_to]"]').val();
+
+                return value === '' || deliveryHoursToValue === '' || Number(value) <= Number(deliveryHoursToValue);
+            },
+            $tr('Delivery time from must be less than delivery time to')
+        );
+
+        $.validator.addMethod(
+            'validate-max-delivery-time',
+            function (value) {
+                var deliveryHoursFrom = $('[name="order[delivery_info][delivery_hours_from]"]').val();
+
+                return value === '' || deliveryHoursFrom === '' || Number(value) >= Number(deliveryHoursFrom);
+            },
+            $tr('Delivery time to must be greater than delivery time from')
+        );
+    });
+</script>

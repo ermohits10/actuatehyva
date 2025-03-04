@@ -1,0 +1,101 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Catalog\Helper\Output as CatalogOutputHelper;
+use Magento\Catalog\Block\Product\View\Attributes;
+use Magento\Catalog\Model\Product;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\SvgIcons;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var Escaper $escaper */
+/** @var CatalogOutputHelper $output */
+/** @var Attributes $block */
+
+/** @var SvgIcons $hyvaicons */
+$hyvaicons = $viewModels->require(SvgIcons::class);
+
+/** @var CatalogOutputHelper $catalogOutputHelper */
+$catalogOutputHelper = $this->helper(CatalogOutputHelper::class);
+
+/** @var Product $product */
+$product = $block->getProduct();
+
+$attributeMappingViewModels = $viewModels->require(\Actuate\ProductAttribute\ViewModel\ProductAttributeMappingViewModel::class);
+$_energyrating = $block->getProduct()->getResource()->getAttribute('energyrating_rating')->getFrontend()->getValue($block->getProduct());
+$_energyrating_link = $product->getAttributeText('energyrating_link');
+$_energyrating_datasheet = $product->getAttributeText('energyrating_datasheet');
+?>
+
+<?php if ($attributes = $block->getAdditionalData()): ?>
+    <?php $groupAttributes = $attributeMappingViewModels->getSpecificationByAttributeMapping($attributes) ?>
+    <div class="!max-w-none" id="product-attributes">
+        <?php foreach ($groupAttributes as $group => $attributes): ?>
+            <p class="text-center text-lg text-[#1D3654] font-medium px-0 leading-[29px] clear-both bg-[#ECECEC] my-1.5 font-serif"><?= $group ?></p>
+            <ul class="additional-attributes w-full font-serif flex flex-wrap">
+                <?php foreach ($attributes as $attribute): ?>
+                    <li class="w-full items-center lg:w-[calc(50%-25px)] even:ml-auto flex border border-[#F5F5F5] mx-0 my-[5px]">
+                        <strong class="text-sm flex md:text-lg font-medium px-[15px] bg-[#F5F5F5] text-[#1D3654] py-2.5 inline-block h-full items-center !leading-[normal] label w-1/2 text-left font-serif text-lg leading-5 product-attribute-label lg:float-left lg:pr-6"
+                            scope="row"><?= $escaper->escapeHtml($attribute['label']) ?>
+                                <?php if($escaper->escapeHtml($attribute['label'])
+                                    && !empty($attributeMappingViewModels->getTooltip($attribute['code'], null, 2))):
+                                    echo '<div class="att-tooltip">'.$hyvaicons->renderHtml('tooltip', 'w-5 h-5 ml-1.5').'<span class="tooltiptext">'. $attributeMappingViewModels->getTooltip($attribute['code'], null, 2) .'</span></div>';
+                                endif; ?>
+                            </strong>
+                        <?php if ($attribute['code'] == 'energyrating_rating'): ?>
+                            <span class="text-sm md:text-lg pl-2"><?php if ($_energyrating_link != ''): echo '<a href="' . $_energyrating_link . '" title="View Energy Rating" target="_blank">'; endif; ?><img src="<?php echo $this->getUrl('media/energy-ratings/') . $_energyrating . '.webp'; ?>" width="63" height="35" alt="View Energy Rating" class="w-[40px] inline-block"><?php if ($_energyrating_link != ''): echo '</a>'; endif; ?></span>
+                        <?php elseif($attribute['code'] == 'manfgteelabour'):
+                            $manfgteelabour = $catalogOutputHelper->productAttribute($product, $attribute['value'], $attribute['code']);
+                        ?>
+                            <span class="inline-block text-[#1D3654] font-medium data w-1/2 py-2.5 px-2 text-left font-serif text-sm break-all md:break-words md:text-lg !leading-[normal] leading-5 product-attribute-value lg:float-right" data-th="<?= $escaper->escapeHtmlAttr($attribute['label']) ?>">
+                                <?php if (($manfgteelabour/12) > 1): ?>
+                                    <?= __('%1 Years', (float) round($manfgteelabour/12, 1)); ?>
+                                <?php else: ?>
+                                    <?= __('%1 Year', (float) round($manfgteelabour/12, 1)); ?>
+                                <?php endif ?>
+                            </span>
+                        <?php elseif($attribute['code'] == 'manfgteeparts'):
+                            $manfgteeparts = $catalogOutputHelper->productAttribute($product, $attribute['value'], $attribute['code']);
+                        ?>
+                            <span class="inline-block text-[#1D3654] font-medium data w-1/2 py-2.5 px-2 text-left font-serif text-sm break-all md:break-words md:text-lg !leading-[normal] leading-5 product-attribute-value lg:float-right" data-th="<?= $escaper->escapeHtmlAttr($attribute['label']) ?>">
+                                <?php if (($manfgteeparts/12) > 1): ?>
+                                    <?= __('%1 Years', (float) round($manfgteeparts/12, 1)); ?>
+                                <?php else: ?>
+                                    <?= __('%1 Year', (float) round($manfgteeparts/12, 1)); ?>
+                                <?php endif ?>
+                            </span>
+                        <?php elseif($attribute['code'] == 'modelno'): ?>
+                            <span class="inline-block text-[#1D3654] font-medium data w-1/2 py-2.5 px-2 text-left font-serif text-sm break-all md:break-words md:text-lg !leading-[normal] leading-5 product-attribute-value lg:float-right" data-th="<?= $escaper->escapeHtmlAttr($attribute['label']) ?>">
+                                <?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $attribute['value'], $attribute['code']) ?>
+                            </span>
+                        <?php else: ?>
+                            <span class="inline-block text-[#1D3654] font-medium data w-1/2 py-2.5 px-2 text-left font-serif text-sm break-all md:break-words md:text-lg !leading-[normal] leading-5 product-attribute-value lg:float-right" data-th="<?= $escaper->escapeHtmlAttr($attribute['label']) ?>">
+                                <?php if ($catalogOutputHelper->productAttribute($product, $attribute['value'], $attribute['code']) == 'Yes'): ?>
+                                    <?= $hyvaicons->renderHtml('icon-check', 'w-8 h-4'); ?>
+                                <?php elseif ($catalogOutputHelper->productAttribute($product, $attribute['value'], $attribute['code']) == 'No'): ?>
+                                    <?= __('No'); ?>
+                                <?php else: ?>
+                                    <?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $attribute['value'], $attribute['code']) ?>
+                                <?php endif; ?>
+                                <?php if($catalogOutputHelper->productAttribute($product, $attribute['value'], $attribute['code'])
+                                    && !empty($attributeMappingViewModels->getTooltip($attribute['code'], $product->getData($attribute['code'])))):
+                                    echo '<div class="att-tooltip">'.$hyvaicons->renderHtml('tooltip', 'w-5 h-5 ml-1.5').'<span class="tooltiptext">' . $attributeMappingViewModels->getTooltip($attribute['code'], $product->getData($attribute['code'])) . '</span></div>';
+                                endif; ?>
+                                </span>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endforeach; ?>
+    </div>
+<?php endif;?>
+

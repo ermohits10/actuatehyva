@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">autifydigital_v12finance_financeoptions_listing.autifydigital_v12finance_financeoptions_listing_data_source</item>
+		</item>
+	</argument>
+	<settings>
+		<spinner>autifydigital_v12finance_financeoptions_columns</spinner>
+		<deps>
+			<dep>autifydigital_v12finance_financeoptions_listing.autifydigital_v12finance_financeoptions_listing_data_source</dep>
+		</deps>
+		<buttons>
+			<button name="add">
+				<url path="*/*/new"/>
+				<class>primary</class>
+				<label translate="true">Add New Finance Option</label>
+				<aclResource>AutifyDigital_V12Finance::FinanceOptions_save</aclResource>
+			</button>
+			<button name="fetch">
+                <url path="*/*/fetch"/>
+                <class>primary</class>
+                <label translate="true">Fetch Finance Options From Your V12 Account</label>
+                <aclResource>AutifyDigital_V12Finance::FinanceOptions_save</aclResource>
+            </button>
+		</buttons>
+	</settings>
+	<dataSource component="Magento_Ui/js/grid/provider" name="autifydigital_v12finance_financeoptions_listing_data_source">
+		<settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">financeoptions_id</param>
+            </storageConfig>
+			<updateUrl path="mui/index/render"/>
+		</settings>
+		<aclResource>AutifyDigital_V12Finance::FinanceOptions_view</aclResource>
+		<dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="autifydigital_v12finance_financeoptions_listing_data_source">
+			<settings>
+				<requestFieldName>id</requestFieldName>
+				<primaryFieldName>financeoptions_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<listingToolbar name="listing_top">
+		<settings>
+			<sticky>true</sticky>
+		</settings>
+		<bookmark name="bookmarks"/>
+		<columnsControls name="columns_controls"/>
+		<filters name="listing_filters"/>
+		<paging name="listing_paging"/>
+	</listingToolbar>
+	<columns name="autifydigital_v12finance_financeoptions_columns">
+		<settings>
+			<editorConfig>
+				<param name="selectProvider" xsi:type="string">autifydigital_v12finance_financeoptions_listing.autifydigital_v12finance_financeoptions_listing.autifydigital_v12finance_financeoptions_columns.ids</param>
+				<param name="enabled" xsi:type="boolean">false</param>
+				<param name="indexField" xsi:type="string">financeoptions_id</param>
+			</editorConfig>
+			<childDefaults>
+				<param name="fieldAction" xsi:type="array">
+					<item name="provider" xsi:type="string">autifydigital_v12finance_financeoptions_listing.autifydigital_v12finance_financeoptions_listing.autifydigital_v12finance_financeoptions_columns_editor</item>
+					<item name="target" xsi:type="string">startEdit</item>
+					<item name="params" xsi:type="array">
+						<item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+						<item name="1" xsi:type="boolean">true</item>
+					</item>
+				</param>
+			</childDefaults>
+		</settings>
+		<column name="financeoptions_id">
+			<settings>
+				<filter>text</filter>
+				<sorting>asc</sorting>
+				<label translate="true">ID</label>
+			</settings>
+		</column>
+		<column name="finance_id">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Product ID</label>
+			</settings>
+		</column>
+		<column name="finance_guid">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Product GUID</label>
+			</settings>
+		</column>
+		<column name="finance_name">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Finance Name</label>
+			</settings>
+		</column>
+		<column name="interest_rate">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Interest Rate</label>
+			</settings>
+		</column>
+		<column name="contract_length">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Contract Length</label>
+			</settings>
+		</column>
+		<column name="min_loan">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Min Loan</label>
+			</settings>
+		</column>
+		<column name="max_loan">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Max Loan</label>
+			</settings>
+		</column>
+		<actionsColumn class="AutifyDigital\V12Finance\Ui\Component\Listing\Column\FinanceOptionsActions" name="actions">
+			<settings>
+				<indexField>financeoptions_id</indexField>
+				<resizeEnabled>false</resizeEnabled>
+				<resizeDefaultWidth>107</resizeDefaultWidth>
+			</settings>
+		</actionsColumn>
+	</columns>
+</listing>

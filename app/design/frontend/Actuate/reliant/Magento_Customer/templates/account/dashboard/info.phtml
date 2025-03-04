@@ -1,0 +1,47 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Customer\Block\Account\Dashboard\Info;
+use Magento\Framework\Escaper;
+
+/** @var Info $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<div class="font-serif text-xl leading-7 font-normal pb-2 border-b border-gray-200 mb-6 lg:text-2xl lg:leading-10 block-title"><?= $escaper->escapeHtml(__('Account Information')) ?></div>
+<div class="flex flex-wrap justify-between">
+    <div class="w-full">
+        <div class="flex flex-col h-full sm:flex-row card">
+            <div class="flex-grow">
+                <h2 class="font-sans text-base leading-6 font-bold text-[#126366] lg:text-xl lg:leading-10 lg:font-extrabold mb-2">
+                    <span><?= $escaper->escapeHtml(__('Contact Information')) ?></span></h2>
+                <p class="font-sans text-sm leading-5 font-normal lg:text-lg lg:mb-4">
+                    <?= $escaper->escapeHtml($block->getName()) ?><br>
+                    <?= $escaper->escapeHtml($block->getCustomer()->getEmail()) ?><br>
+                </p>
+                <?= $block->getChildHtml('customer.account.dashboard.info.extra'); ?>
+                <a
+                    class="inline-flex w-auto items-center font-sans text-sm leading-5 font-bold text-[#126366] lg:text-base"
+                    href="<?= $escaper->escapeUrl($block->getUrl('customer/account/edit')) ?>">
+                    <span><?= $escaper->escapeHtml(__('Edit')) ?></span>
+                </a>
+                <span class="inline-flex w-auto items-center text-gray-200 px-1">|</span>
+                <a
+                    class="inline-flex items-center w-auto font-sans text-sm leading-5 font-bold text-[#126366] lg:text-base"
+                    href="<?= $escaper->escapeUrl($block->getChangePasswordUrl()) ?>" class="action change-password">
+                    <?= $escaper->escapeHtml(__('Change Password')) ?>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

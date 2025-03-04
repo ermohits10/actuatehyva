@@ -1,0 +1,7 @@
+<?php
+// @codingStandardsIgnoreFile
+/** @var $block \WeltPixel\GA4\Block\MetaPixel\Common */
+?>
+<?php if ($block->isMetaPixelTrackingEnabled()) : ?>
+    <?php echo $block->getMetaPixelTrackingCode(); ?>
+<?php endif; ?>

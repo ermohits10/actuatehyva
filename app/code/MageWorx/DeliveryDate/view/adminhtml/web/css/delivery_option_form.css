@@ -1,0 +1,30 @@
+.has-dynamic-rows {
+    margin-left: calc((100%) * 0.25);
+}
+
+.has-dynamic-rows > .admin__field-control {
+    margin-left: calc( (100%) * 0.25 + 30px ) !important;
+}
+
+.green_button {
+    background-color: #30af32 !important;
+    border-color: #009620 !important;
+    color: #ffffff !important;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25) !important;
+}
+
+.admin__control-table-wrapper {
+    overflow: visible;
+}
+
+.admin-red-notice-container {
+    padding: 20px 100px 10px 100px;
+    font-style: italic;
+    color: crimson;
+}
+
+.admin-black-notice-container {
+    padding: 20px 100px 10px 100px;
+    font-style: italic;
+    color: darkgray;
+}

@@ -1,0 +1,70 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+?>
+<button type="submit"
+        form="product_addtocart_form"
+        title="<?= $escaper->escapeHtmlAttr(__('Add to Cart')) ?>"
+        class="btn btn-primary bg-[#05CE31] font-serif leading-5 text-xl md:leading-7 font-bold text-center"
+        id="product-addtocart-button"
+>
+    <span class="inline-block w-full"><?= $block->getData('is_cart_configure') ?
+            $escaper->escapeHtml(__('Update item')) :
+            $escaper->escapeHtml(__('Add to Basket')) ?>
+    </span>
+</button>
+<?= $block->getChildHtml('', true) ?>
+<script>
+    if (document.querySelector('.add-to-cart-sticky-bar button')) {
+        document.querySelector('.add-to-cart-sticky-bar button').addEventListener('click', function (event) {
+            if (document.body.classList.contains('page-product-configurable')) {
+                let allOptions = [];
+                document.querySelectorAll('[required]').forEach(function (item) {
+                    if (item.getAttribute('name').indexOf('super_attribute') >= 0) {
+                        if (!allOptions.includes(item.getAttribute('name'))) {
+                            allOptions.push(item.getAttribute('name'));
+                        }
+                    }
+                });
+
+                let isValid = true;
+                allOptions.forEach(function (option) {
+                    let elementType = document.querySelector('[name="' + option + '"]').getAttribute('type') || document.querySelector('[name="' + option + '"]').tagName;
+                    if (elementType === 'SELECT') {
+                        if (document.querySelector('[name="' + option + '"]').value === null) {
+                            isValid = false;
+                        }
+                    } else {
+                        if (document.querySelector('[name="' + option + '"]:checked') === null) {
+                            isValid = false;
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    document.querySelector('.main-product-info').scrollIntoView({ behavior: "smooth", inline: "nearest" });
+                    event.preventDefault();
+                }
+            }
+        })
+    }
+</script>

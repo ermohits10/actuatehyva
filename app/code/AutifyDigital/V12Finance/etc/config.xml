@@ -1,0 +1,99 @@
+<?xml version="1.0" ?>
+<!--
+~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+~ Copyright (c) 2020-2022 Autify digital Ltd.
+~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+~ ALL RIGHTS RESERVED.
+~
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+		<autifydigital>
+			<v12finance>
+			    <order_cancel>1</order_cancel>
+				<product_finance_enable>0</product_finance_enable>
+				<cancel_application>1</cancel_application>
+				<partial_refund>1</partial_refund>
+				<click_and_collect>0</click_and_collect>
+				<click_and_collect_update_address>0</click_and_collect_update_address>
+				<click_and_collect_shipment_code_backend>instore_pickup</click_and_collect_shipment_code_backend>
+				<sku_enable>0</sku_enable>
+				<short_time_cron>1</short_time_cron>
+				<price_based_finance>0</price_based_finance>
+				<pending_email_enable>1</pending_email_enable>
+				<declined_email_enable>1</declined_email_enable>
+				<error_email_enable>1</error_email_enable>
+				<cancelledemail_email_enable>1</cancelledemail_email_enable>
+				<awaitingcontract_email_enable>1</awaitingcontract_email_enable>
+				<pending_email_template_ack>complete the application</pending_email_template_ack>
+				<pending_email_template_accepted>sign the application</pending_email_template_accepted>
+				<quote_cron_enable>1</quote_cron_enable>
+				<quote_cron_enable_hours>6</quote_cron_enable_hours>
+				<analytics_enable>0</analytics_enable>
+				<anonymize_ip>0</anonymize_ip>
+				<adwords_enable>0</adwords_enable>
+				<conversion_language>en</conversion_language>
+				<conversion_format>2</conversion_format>
+				<conversion_color>FFFFFF</conversion_color>
+				<request_payment_application>1</request_payment_application>
+				<outofstock_check>1</outofstock_check>
+				<google_analytics_type>ga4</google_analytics_type>
+				<tag_google_analytics_type>ga4</tag_google_analytics_type>
+			</v12finance>
+		</autifydigital>
+		<v12finance>
+			<product_page>
+				<product_page_title>V12 Finance Calculator</product_page_title>
+				<product_page_text_header>Available Finance Options</product_page_text_header>
+				<product_page_button>Choose the Finance Plan</product_page_button>
+				<main_header_area>Getting the new watch or jewellery of your dreams is now even easier with our easy-to-apply for finance options. Define how much deposit you’re able to pay now and select the term for repayment.</main_header_area>
+				<finance_terms_conditions><![CDATA[Please note, V12 is only available to UK residents over 18, subject to <a href="https://www.v12retailfinance.com/terms-and-conditions" target="_blank">terms and conditions</a>. To apply for finance, please add the product to your shopping cart, proceed through checkout and select 'Pay by Finance' as your payment option. You will be redirected to the V12 Finance website, where you can complete the application form online. Your purchase will be delivered to the address provided on your application]]></finance_terms_conditions>
+			</product_page>
+			<checkout_page>
+				<checkout_page_payment_button>Apply For Finance</checkout_page_payment_button>
+				<checkout_page_message_time>5</checkout_page_message_time>
+				<checkout_page_message_text>We have updated finance plan.</checkout_page_message_text>
+				<checkout_page_billing_text>Your purchase will be delivered to the address provided on your application.</checkout_page_billing_text>
+				<checkout_financeamount_text>You can get a min loan amount of £250 and max loan amount of £15000.</checkout_financeamount_text>
+			</checkout_page>
+			<categoryfinance>
+				<enable_sale_category_finance>0</enable_sale_category_finance>
+			</categoryfinance>
+			<finance_order_status>
+				<acknowledged>finance_acknowledged</acknowledged>
+				<accepted>finance_accepted</accepted>
+				<awaitingfulfilment>finance_awaitingfulfilment</awaitingfulfilment>
+				<referred>finance_referred</referred>
+				<error>finance_error</error>
+				<declined>finance_declined</declined>
+				<cancelled>finance_cancelled</cancelled>
+			</finance_order_status>
+			<checkout_success_configuration>
+			    <application_status_display>0</application_status_display>
+				<referred_status_message><![CDATA[<p>Your order has been referred. It seems V12 Finance may need some more information before completing your order.</p><p>Therefore, please keep an eye on your email inbox as you may be contacted by V12 Finance for further details regarding your application before it can be processed.</p><p>If you have any queries, please do not hesitate to get in touch.</p>]]></referred_status_message>
+				<signed_status_message><![CDATA[]]></signed_status_message>
+				<other_status_message><![CDATA[<p>We have received your application.</p><p>Once the application is signed, we will send the order confirmation email.</p>]]></other_status_message>
+			</checkout_success_configuration>
+		</v12finance>
+		<payment>
+			<v12finance>
+				<active>0</active>
+				<model>AutifyDigital\V12Finance\Model\Payment\V12finance</model>
+				<order_status>pending</order_status>
+				<title>Pay by Finance</title>
+				<allowspecific>1</allowspecific>
+				<specificcountry>GB</specificcountry>
+				<min_order_total>280</min_order_total>
+				<max_order_total>30100</max_order_total>
+				<min_deposit>250</min_deposit>
+				<max_deposit>15000</max_deposit>
+				<group>offline</group>
+				<sort_order>0</sort_order>
+				<finance_percentage_value>10</finance_percentage_value>
+				<finance_max_percentage_value>50</finance_max_percentage_value>
+			</v12finance>
+		</payment>
+	</default>
+</config>

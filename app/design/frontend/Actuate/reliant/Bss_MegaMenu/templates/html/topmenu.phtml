@@ -1,0 +1,88 @@
+<?php
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ * @category   BSS
+ * @package    Bss_MegaMenu
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2017-2018 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+?>
+<?php
+/**
+ * Top menu for store
+ *
+ * @var $block Bss\MegaMenu\Block\Html\Menu
+ */ 
+?>
+<?php $columnsLimit = $block->getColumnsLimit() ?: 0; ?>
+<?php $menuHtml = $block->getHtml() ?>
+<?php $uniqueId = '_' . uniqid(); ?>
+<?php
+$helper = $block->getHelperData();
+
+?>
+<?php if ($helper->getConfig('enable') == 1): ?>
+
+<div x-data="initMenuDesktop<?= $escaper->escapeHtml($uniqueId) ?>()"
+    class="topmenu z-20 order-2 w-full border-t border-gray-200 sm:order-1 lg:order-2 navigation hidden lg:flex">
+    <!-- desktop -->
+    <div x-ref="nav-desktop"
+         @load.window="setActiveMenu($el)"
+        class="hidden lg:mx-auto lg:block lg:min-h-0 lg:px-8 lg:w-auto lg:pt-0">
+        <nav class="w-full duration-150 ease-in-out flex justify-start
+            w-auto min-h-0 transition-display bss-megamenu">
+            <?php if ($helper->getConfig('enable_home') == 1): ?>
+                <div class="relative mr-2 level-0">
+                    <span class="flex items-center block py-0.5  text-md bg-opacity-95">
+                        <a class="nav-link w-full py-3 px-6 font-serif text-base leading-6 font-normal text-gray-900 hover:underline level-0" href="<?= $block->escapeUrl($block->getBaseUrl()) ?>"
+                           title="<?= $block->escapeHtml(__("Home")) ?>">
+                            <span class="hover:underline category-name">
+                                <?= $block->escapeHtml(__("Home")) ?>
+                            </span>
+                        </a>
+                    </span>
+                </div>
+            <?php endif ?>
+            <?= $menuHtml ?>
+            <?= $block->getChildHtml() ?>
+        </nav>
+    </div>
+</div>
+
+    <script>
+        'use strict';
+
+        const initMenuDesktop<?= $escaper->escapeHtml($uniqueId) ?> = () => {
+            return {
+                hoverPanelActiveId: {},
+                setActiveMenu(menuNode) {
+                    Array.from(menuNode.querySelectorAll('a.nav-link')).filter(link => {
+                        return link.href === window.location.href.split('?')[0];
+                    }).map(item => {
+                        item.querySelector('span.category-name').classList.add('underline');
+                        item.closest('div.level-0') &&
+                        item.closest('div.level-0').querySelector('a.level-0 span.level-0') &&
+                        item.closest('div.level-0').querySelector('a.level-0 span.level-0').classList.add('underline');
+                    });
+                },
+                setActiveHoverMenu(id) {
+                    // debugger
+                    return this.hoverPanelActiveId[id] = true;
+                },
+                getActiveHoverMenu(id) {
+                    return this.hoverPanelActiveId[id] || false
+                }
+            }
+        }
+    </script>
+
+<?php endif; ?>

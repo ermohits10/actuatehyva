@@ -1,0 +1,15 @@
+<?php
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/**
+ * @var \MageWorx\DeliveryDate\Block\Adminhtml\Queue\Calendar $block
+ */
+?>
+<?= $block->getChildHtml('lnb'); ?>
+<div id="right" style="<?= $block->getQueueId() ? 'width:100%;' : ''; ?>">
+    <?= $block->getChildHtml('calendar_menu'); ?>
+    <div id="calendar"></div>
+</div>
+<?= $block->getChildHtml('js_config'); ?>

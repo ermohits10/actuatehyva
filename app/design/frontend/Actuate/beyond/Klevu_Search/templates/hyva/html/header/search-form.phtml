@@ -1,0 +1,141 @@
+<?php
+// Klevu override of default Hyvä template to include check for Magento\Search\ViewModel\ConfigProvider::isSuggestionsAllowed
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Search\Helper\Data as SearchHelper;
+// Start Klevu customisation of default Hyvä template
+use Magento\Search\ViewModel\ConfigProvider;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+// End Klevu customisation of default Hyvä template
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var SearchHelper $helper */
+/** @var ViewModelRegistry $viewModels */
+
+// Start Klevu customisation of default Hyvä template
+/** @var ConfigProvider $configProvider */
+$configProvider = $viewModels->require(ConfigProvider::class);
+// End Klevu customisation of default Hyvä template
+
+$helper = $this->helper(SearchHelper::class);
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<script>
+    'use strict';
+
+    function initMiniSearch() {
+        return {
+            minSearchLength: <?= (int) $helper->getMinQueryLength() ?>,
+            suggestions: [],
+            suggest() {
+                const search = this.$refs.searchInput;
+                if (search.value.length >= this.minSearchLength) {
+                    search.setCustomValidity('');
+                    search.reportValidity();
+                    // Start Klevu customisation of default Hyvä template
+                    <?php if($configProvider->isSuggestionsAllowed()): ?>
+                        this.fetchSuggestions(search.value);
+                    <?php else: ?>
+                        this.suggestions = [];
+                    <?php endif; ?>
+                    // End Klevu customisation of default Hyvä template
+                } else {
+                    this.suggestions = [];
+                }
+            },
+            fetchSuggestions(term) {
+                fetch(
+                    window.BASE_URL + 'search/ajax/suggest?' + new URLSearchParams({q: term}),
+                    {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }
+                )
+                .then(response => response.json())
+                .then(result => this.suggestions = result);
+            },
+            search(term) {
+                const search = this.$refs.searchInput;
+                term = term || search.value;
+                if (term.length < this.minSearchLength) {
+                    search.setCustomValidity('<?= $escaper->escapeJs(
+                        __('Minimum Search query length is %1', $helper->getMinQueryLength())
+                    ) ?>');
+                    search.reportValidity();
+                } else {
+                    search.setCustomValidity('');
+                    search.value = term;
+                    this.$refs.form.submit();
+                }
+            },
+            focusElement(element) {
+                if (element && element.nodeName === "DIV") {
+                    element.focus();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+</script>
+<div class="container border-t border-white lg:border-0 pt-2.5 pb-[3px] px-[15px] lg:p-0 lg:px-6 mx-auto text-black relative w-full" x-data="initMiniSearch()">
+     <form class="form minisearch relative" id="search_mini_form" x-ref="form"
+           action="<?= $escaper->escapeUrl($helper->getResultUrl()) ?>" method="get">
+        <label class="hidden" for="search" data-role="minisearch-label">
+            <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+        </label>
+        <input id="search"
+               x-ref="searchInput"
+               type="search"
+               autocomplete="off"
+               name="<?= $escaper->escapeHtmlAttr($helper->getQueryParamName()) ?>"
+               value="<?= /** @noEscape */ $helper->getEscapedQueryText() ?>"
+               placeholder="<?= $escaper->escapeHtmlAttr(__('Search products & brands')) ?>"
+               maxlength="<?= $escaper->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
+               class="w-full py-1 lg:py-[6px] p-[10px] lg:px-5 text-sm font-serif font-bold	leading-normal transition appearance-none bg-[#F3F3FF] text-grey-900 focus:shadow-none focus:border-[white] lg:text-lg rounded-[30px] border-[3px] border-solid border-[#FFFFFF] lg:border-[#FF7E21]"
+        />
+         <template x-if="suggestions.length > 0">
+             <div class="w-full leading-normal transition appearance-none text-grey-800 flex flex-col mt-1">
+                 <template x-for="suggestion in suggestions">
+                     <div class="flex justify-between p-2 bg-container-lighter even:bg-container mb-1 cursor-pointer
+                                 border border-container hover:bg-container-darker"
+                          tabindex="0"
+                          @click="search(suggestion.title)"
+                          @keydown.enter="search(suggestion.title)"
+                          @keydown.arrow-up.prevent="
+                              focusElement($event.target.previousElementSibling) || $refs.searchInput.focus()
+                          "
+                          @keydown.arrow-down.prevent="focusElement($event.target.nextElementSibling)"
+                     >
+                         <span x-text="suggestion.title"></span>
+                         <span x-text="suggestion.num_results"></span>
+                     </div>
+                 </template>
+             </div>
+         </template>
+        <button type="submit"
+                title="<?= $escaper->escapeHtml(__('Search')) ?>"
+                class="action search absolute font-serif block right-0 top-0 rounded text-center text-base lg:text-lg flex text-[white] font-semibold bg-[#FF7E21] px-2.5 py-[5px] lg:px-2.5 lg:py-2"
+                aria-label="Search"
+        >
+            <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+            <?= $heroicons->searchHtml("w-[25px] w-[25px] lg:w-[27px] lg:h-[27px] text-white pl-1 ml-[1px]", 25, 25) ?>
+        </button>
+    </form>
+</div>

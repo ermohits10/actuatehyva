@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<preference for="AutifyDigital\V12Finance\Api\ApplicationRepositoryInterface" type="AutifyDigital\V12Finance\Model\ApplicationRepository"/>
+	<preference for="AutifyDigital\V12Finance\Api\Data\ApplicationInterface" type="AutifyDigital\V12Finance\Model\Data\Application"/>
+	<preference for="AutifyDigital\V12Finance\Api\Data\ApplicationSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+	<virtualType name="AutifyDigital\V12Finance\Model\ResourceModel\Application\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">autifydigital_v12finance_application</argument>
+			<argument name="resourceModel" xsi:type="string">AutifyDigital\V12Finance\Model\ResourceModel\Application\Collection</argument>
+		</arguments>
+	</virtualType>
+	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+		<arguments>
+			<argument name="collections" xsi:type="array">
+				<item name="autifydigital_v12finance_application_listing_data_source" xsi:type="string">AutifyDigital\V12Finance\Model\ResourceModel\Application\Grid\Collection</item>
+				<item name="autifydigital_v12finance_financeoptions_listing_data_source" xsi:type="string">AutifyDigital\V12Finance\Model\ResourceModel\FinanceOptions\Grid\Collection</item>
+				<item name="autifydigital_v12finance_priceoptions_listing_data_source" xsi:type="string">AutifyDigital\V12Finance\Model\ResourceModel\PriceOptions\Grid\Collection</item>
+			</argument>
+		</arguments>
+	</type>
+	<preference for="AutifyDigital\V12Finance\Api\FinanceOptionsRepositoryInterface" type="AutifyDigital\V12Finance\Model\FinanceOptionsRepository"/>
+	<preference for="AutifyDigital\V12Finance\Api\Data\FinanceOptionsInterface" type="AutifyDigital\V12Finance\Model\Data\FinanceOptions"/>
+	<preference for="AutifyDigital\V12Finance\Api\Data\FinanceOptionsSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+	<virtualType name="AutifyDigital\V12Finance\Model\ResourceModel\FinanceOptions\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">autifydigital_v12finance_financeoptions</argument>
+			<argument name="resourceModel" xsi:type="string">AutifyDigital\V12Finance\Model\ResourceModel\FinanceOptions\Collection</argument>
+		</arguments>
+	</virtualType>
+	<preference for="AutifyDigital\V12Finance\Api\PriceOptionsRepositoryInterface" type="AutifyDigital\V12Finance\Model\PriceOptionsRepository"/>
+	<preference for="AutifyDigital\V12Finance\Api\Data\PriceOptionsInterface" type="AutifyDigital\V12Finance\Model\Data\PriceOptions"/>
+	<preference for="AutifyDigital\V12Finance\Api\Data\PriceOptionsSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+	<virtualType name="AutifyDigital\V12Finance\Model\ResourceModel\PriceOptions\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">autifydigital_v12finance_priceoptions</argument>
+			<argument name="resourceModel" xsi:type="string">AutifyDigital\V12Finance\Model\ResourceModel\PriceOptions\Collection</argument>
+		</arguments>
+	</virtualType>
+	<type name="Magento\Sales\Api\OrderManagementInterface">
+        <plugin name="inventory_reservations_placement" disabled="true"/>
+    </type>
+	<type name="Magento\Sales\Api\OrderManagementInterface">
+        <plugin name="autifydigital_v12finance_inventory_reservations_placement" type="AutifyDigital\V12Finance\Plugin\Sales\Api\OrderManagement\AppendReservationsAfterOrderPlacementPlugin"/>
+    </type>
+    <type name="Magento\ConfigurableProduct\Block\Product\View\Type\Configurable">
+        <plugin disabled="false" name="AutifyDigital_V12Finance_Plugin_ConfigurableProduct_Block_Product_View_Type_Configurable" sortOrder="10" type="AutifyDigital\V12Finance\Plugin\ConfigurableProduct\Block\Product\View\Type\Configurable"/>
+    </type>
+</config>

@@ -1,0 +1,43 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Theme\Block\Html\Breadcrumbs;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Breadcrumbs $block */
+/** @var array $crumbs */
+?>
+<?php if ($crumbs && is_array($crumbs)): ?>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <div class="container">
+        <ol class="items list-reset py-4 flex flex-nowrap lg:flex-wrap text-base leading-6 font-medium text-gray-500">
+            <?php foreach ($crumbs as $crumbName => $crumbInfo): ?>
+                <?php if($crumbName == 'home' || $crumbInfo['last']): ?>
+                    <li class="item flex <?= $escaper->escapeHtmlAttr($crumbName) ?>">
+                <?php else: ?>
+                    <li class="item hidden md:block flex <?= $escaper->escapeHtmlAttr($crumbName) ?>">
+                <?php endif; ?>
+                <?php if (!$crumbInfo['first']): ?>
+                    <span aria-hidden="true" class="separator px-4">/</span>
+                <?php endif; ?>
+                <?php if ($crumbInfo['link']): ?>
+                    <a href="<?= $escaper->escapeUrl($crumbInfo['link']) ?>" class="no-underline" title="<?= $escaper->escapeHtmlAttr($crumbInfo['title']) ?>"><?= $escaper->escapeHtml($crumbInfo['label']) ?></a>
+                <?php elseif ($crumbInfo['last']): ?>
+                    <a href="<?= $escaper->escapeUrl($crumbInfo['link']) ?>" class="no-underline" aria-current="page"><?= $escaper->escapeHtml($crumbInfo['label']) ?></a>
+                <?php else: ?>
+                        <?= $escaper->escapeHtml($crumbInfo['label']) ?>
+                <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+</nav>
+<?php endif; ?>

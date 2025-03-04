@@ -1,0 +1,7 @@
+<?php
+$element = $this->getElement();
+$block   = $this->getChildElementBlock($element);
+?>
+<?php if ($block->isEnabled()) { ?>
+	<?= $block->toHtml() ?>
+<?php } ?>

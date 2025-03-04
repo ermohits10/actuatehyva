@@ -1,0 +1,69 @@
+#header {
+    @apply md:text-[white] font-serif bg-[#000d40];
+    [type=search]:focus {
+        offset: none;
+        --tw-ring-color: none;
+    }
+    .logo {
+        a {
+            @apply lg:inline flex justify-center;
+        }
+    }
+}
+.minisearch {
+    .search {
+        border-radius: 0 30px 30px 0;
+    }
+}
+.topmenu.navigation nav {
+    .bss-megamenu-fw {
+        .nav-link {
+            @apply py-2 h-16 flex items-center;
+            span {
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+            }
+        }
+    }
+}
+.bss-megamenu-fw {
+    .category-name {
+        @apply text-white text-base	uppercase text-center !leading-6 font-black;
+    }
+}
+#header-usps {
+    [data-content-type=row][data-appearance=contained] {
+        @apply max-w-full;
+    }
+    .swiper-wrapper {
+        @apply items-center;
+    }
+}
+.navigation > .ninjamenus.ninjamenus-desktop {
+    @apply !mx-0;
+}
+.ninjamenus-desktop.ninjamenus-top .level0 {
+    @apply w-[170px] text-center;
+    &.level0 {
+        > a {
+            @apply lg:leading-5 lg:flex lg:justify-center;
+            > span.title {
+                @apply py-3 font-black;
+            }
+        }
+    }
+}
+.header-top {
+    @apply w-full transition-transform duration-300 ease-in-out opacity-100;
+}
+.header-scrolling {
+    @apply fixed top-0 left-0 w-full opacity-0 bg-[#000d40] z-[999];
+}
+.header-scrollup {
+    @apply fixed top-0 left-0 w-full opacity-100 bg-[#000d40] z-[999] shadow-md;
+}
+.header-wrapper {
+    @apply min-h-[150px] md:min-h-[154px] lg:min-h-[200px] xl:min-h-[160px] 2xl:min-h-[138px];
+}

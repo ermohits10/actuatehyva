@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Plugins -->
+    <type name="Magento\Sales\Block\Adminhtml\Order\Create\Data">
+        <plugin name="mageworx_delivery_date_add_dd_form"
+                type="MageWorx\DeliveryDate\Plugin\AddDeliveryDateForm"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <!-- Adds Delivery Date data to the orders grid collection -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <plugin name="mageworx_delivery_date_add_dd_data_to_orders_grid"
+                type="MageWorx\DeliveryDate\Plugin\AddDeliveryDateDataToOrdersGrid"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <!-- Update sorting in orders collection -->
+    <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
+        <plugin name="mageworx_delivery_date_update_sorting_for_delivery_date"
+                type="MageWorx\DeliveryDate\Plugin\OrdersGrid\UpdateDeliveryDateSortingInOrdersGrid"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+    <virtualType name="MageWorx\DeliveryDate\Ui\Component\Listing\Columns\Store"
+                 type="Magento\Store\Ui\Component\Listing\Column\Store">
+        <arguments>
+            <argument name="storeKey" xsi:type="string">store_ids</argument>
+        </arguments>
+    </virtualType>
+    <type name="MageWorx\DeliveryDate\Ui\DataProvider\DeliveryOption\DeliveryOptionDataProvider">
+        <arguments>
+            <argument name="addFilterStrategies" xsi:type="array">
+                <item name="methods" xsi:type="object">MageWorx\DeliveryDate\Ui\DataProvider\DeliveryOption\ShippingMethodsFilterStrategy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageWorx\DeliveryDate\Ui\DataProvider\Queue\OrdersDataProvider">
+        <arguments>
+            <argument name="addFilterStrategies" xsi:type="array">
+                <item name="entity_id" xsi:type="object">MageWorx\DeliveryDate\Ui\DataProvider\Queue\FilterStrategy\OrderAddressIds</item>
+                <item name="created_at" xsi:type="object">MageWorx\DeliveryDate\Ui\DataProvider\Queue\FilterStrategy\OrderCreatedAt</item>
+                <item name="grand_total" xsi:type="object">MageWorx\DeliveryDate\Ui\DataProvider\Queue\FilterStrategy\GrandTotal</item>
+            </argument>
+            <argument name="addFieldStrategies" xsi:type="array">
+                <item name="created_at" xsi:type="object">MageWorx\DeliveryDate\Ui\DataProvider\Queue\Orders\FieldStrategy\AddOrderFieldToCollection</item>
+                <item name="grand_total" xsi:type="object">MageWorx\DeliveryDate\Ui\DataProvider\Queue\Orders\FieldStrategy\AddOrderFieldToCollection</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Admin order section blocks -->
+    <virtualType name="MageWorx\DeliveryDate\Block\Adminhtml\Order\View\DeliveryInfo" type="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryInfoAbstract">
+        <arguments>
+            <argument name="sourceType" xsi:type="string">order</argument>
+            <argument name="isEditable" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MageWorx\DeliveryDate\Block\Adminhtml\Shipment\View\DeliveryInfo" type="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryInfoAbstract">
+        <arguments>
+            <argument name="sourceType" xsi:type="string">shipment</argument>
+            <argument name="isEditable" xsi:type="boolean">false</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MageWorx\DeliveryDate\Block\Adminhtml\Invoice\View\DeliveryInfo" type="MageWorx\DeliveryDate\Block\Adminhtml\DeliveryInfoAbstract">
+        <arguments>
+            <argument name="sourceType" xsi:type="string">invoice</argument>
+            <argument name="isEditable" xsi:type="boolean">false</argument>
+        </arguments>
+    </virtualType>
+    <!-- Product Form Modifier -->
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="deliveryDate" xsi:type="array">
+                    <item name="class" xsi:type="string">MageWorx\DeliveryDate\Ui\Product\Form\DeliveryDateModifier</item>
+                    <item name="sortOrder" xsi:type="number">200</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+</config>

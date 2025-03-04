@@ -1,0 +1,12 @@
+.swatch-attribute {
+    .swatch-attribute-options {
+        @apply flex flex-row flex-wrap;
+
+        .swatch-option {
+            @apply px-2 py-1 flex border justify-center ml-[5px] mr-[7px] my-[5px] border-2 border-solid border-white;
+            outline: 1px solid #999999;
+            min-width: 40px;
+            min-height: 40px;
+        }
+    }
+}

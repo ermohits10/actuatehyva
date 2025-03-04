@@ -1,0 +1,113 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Checkout\ViewModel\Navigation;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var Navigation $viewModel */
+
+/** @var Template $block */
+
+$viewModel = $viewModels->require(Navigation::class);
+$next = $viewModel->getConfig()->getStepAfter();
+?>
+<nav x-data="initCheckoutNavigation()"
+     class="nav-main -mx-[30px] !mt-0 pt-4"
+>
+    <?php if ($next === null): ?>
+        <div id="amazon-pay-button" class="amazon-button-container pointer-events-none opacity-50" x-data="initAmazonPay()" x-init="checkoutConfig()">
+            <div class="amazon-button-column">
+                <div id="<?= $block->getAmazonId(); ?>"></div>
+            </div>
+        </div>
+    <?php endif ?>
+</nav>
+<script>
+    (() => {
+        window.addEventListener('checkout:payment:method-activate', event => {
+            if (document.querySelector('[id*=agreement]')
+                && document.querySelector('[id*=agreement]').checked) {
+                if (document.getElementById('amazon-pay-button').classList.contains('pointer-events-none')) {
+                    document.getElementById('amazon-pay-button').classList.remove('pointer-events-none')
+                    document.getElementById('amazon-pay-button').classList.remove('opacity-50')
+                }
+            }
+            if (document.querySelector('[id*=agreement]') === null) {
+                if (document.getElementById('amazon-pay-button').classList.contains('pointer-events-none')) {
+                    document.getElementById('amazon-pay-button').classList.remove('pointer-events-none')
+                    document.getElementById('amazon-pay-button').classList.remove('opacity-50')
+                }
+            }
+        }, { once: true })
+
+        document.querySelector('[id*=agreement]').addEventListener('click', function(event) {
+            if (event.target.checked) {
+                if (document.getElementById('amazon-pay-button').classList.contains('pointer-events-none')) {
+                    document.getElementById('amazon-pay-button').classList.remove('pointer-events-none')
+                    document.getElementById('amazon-pay-button').classList.remove('opacity-50')
+                }
+            } else {
+                if (!document.getElementById('amazon-pay-button').classList.contains('pointer-events-none')) {
+                    document.getElementById('amazon-pay-button').classList.add('pointer-events-none')
+                    document.getElementById('amazon-pay-button').classList.add('opacity-50')
+                }
+            }
+        })
+
+        window.initAmazonPay = function () {
+            return {
+                loadCheckoutComponent: function () {
+                    if (!document.querySelector("script[src*='https://static-eu.payments-amazon.com/checkout.js']")) {
+                        let scriptElem = document.createElement("script");
+                        scriptElem.setAttribute("src", "https://static-eu.payments-amazon.com/checkout.js");
+                        scriptElem.setAttribute("type", "text/javascript");
+                        scriptElem.setAttribute("async", true);
+                        document.body.appendChild(scriptElem);
+                    }
+                },
+
+                checkoutConfig: function(event) {
+                    this.loadCheckoutComponent();
+                    window.fetch('<?= $this->getUrl('amazon_pay/checkout/config') ?>', {
+                        method: "GET",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }).then((response) => {
+                        response.json().then((result) => {
+                            var payload = result['paynow_payload'] || result['checkout_payload'];
+                            var signature = result['paynow_signature'] || result['checkout_signature'];
+
+                            if (result && window.amazon) {
+                                const amazonPayButton = amazon.Pay.renderButton('#<?= $block->getAmazonId(); ?>', {
+                                    merchantId: result['merchant_id'],
+                                    publicKeyId: result['public_key_id'],
+                                    ledgerCurrency: result['currency'],
+                                    sandbox: result['sandbox'],
+                                    checkoutLanguage: result['language'],
+                                    productType: result['pay_only'] ? 'PayOnly' : 'PayAndShip',
+                                    placement: 'Checkout',
+                                    buttonColor: result['button_color'],
+                                    createCheckoutSessionConfig: {
+                                        payloadJSON: payload,
+                                        signature: signature,
+                                        publicKeyId: result['public_key_id']
+                                    }
+                                });
+                            }
+                        });
+                    }).catch((error) => {
+                        console.error(error);
+                    });
+                }
+            }
+        }
+    })()
+</script>

@@ -1,0 +1,334 @@
+<?php declare(strict_types=1);
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ * @category   BSS
+ * @package    Hyva_BssFBT
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2022 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+
+use Bss\FBT\Helper\Data as BssFBT;
+use Hyva\BssFBT\ViewModels\Helper as ModuleViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Hyva\Theme\Model\ViewModelRegistry $viewModels */
+/** @var Hyva\Theme\ViewModel\HeroiconsOutline $heroicons */
+
+/**  @var BssFBT $helper */
+
+$moduleViewModel = $viewModels->require(ModuleViewModel::class);
+
+$helper = $moduleViewModel->getHelper();
+
+$heroicons = $viewModels->require(\Hyva\Theme\ViewModel\HeroiconsOutline::class);
+/** @var \Magento\Catalog\Model\Product $product */
+$product = $block->getData('item');
+$urlAddToCart=$block->getUrl('fbt/cart/add');
+$imageUrl = $this->helper('Magento\Catalog\Helper\Image')
+    ->init($product, 'product_base_image')->getUrl();
+$abstractProductBlock = $block->getLayout()->createBlock('\Magento\Catalog\Block\Product\AbstractProduct');
+
+$branchesList = [];
+$depotslist = [];
+$depotAvailabilityArr = [];
+$ProductStockAvailabilityScheduleArr = [];
+
+$_outofstockallowbackorder = $product->getAttributeText('outofstockallowbackorder');
+
+$AvailabilityType = '';
+$IsExistingPO = '';
+$PSAQuantity = '';
+
+$UnallocatedBackOrdersArr = '';
+$UnallocatedBackOrders = '';
+$LocalStock = '';
+$TrueStock = '';
+
+$xmlArray = [];
+?>
+<?php if(null !== $product->getStockanalysis()):
+    $stockAnalysis = $product->getStockanalysis();
+    $xml = simplexml_load_string($stockAnalysis, "SimpleXMLElement", LIBXML_NOCDATA);
+    $xmlParse = json_decode(json_encode($xml),true);
+
+    $depotData          =  $xml->DepotAvailability->asXML();
+    $depotXml           = simplexml_load_string($depotData, "SimpleXMLElement", LIBXML_NOCDATA);
+    $depotAvailability  = json_decode(json_encode($depotXml),true);
+
+    $additionalData     =  $xml->AdditionalAvailability->asXML();
+    $additionalXml           = simplexml_load_string($additionalData, "SimpleXMLElement", LIBXML_NOCDATA);
+    $additionalAvailability  = json_decode(json_encode($additionalXml),true);
+
+
+    if(isset($xmlParse['DepotStockRequested'])):
+        $DepotStockRequested = $xmlParse['DepotStockRequested'];
+        if(isset($DepotStockRequested[0])):
+            $DepotStockRequestedState = $DepotStockRequested;
+        else:
+            array_push($DepotStockRequestedState, $DepotStockRequested);
+        endif;
+    endif;
+
+    if(isset($depotAvailability['GetProductAvailability_FromDepot'])):
+        $depotAvailability = $depotAvailability['GetProductAvailability_FromDepot'];
+        if(isset($depotAvailability[0])):
+            $depotslist = $depotAvailability;
+        else:
+            array_push($depotslist, $depotAvailability);
+        endif;
+    endif;
+
+
+    if(isset($additionalAvailability['ProductStockAvailabilitySchedule'])):
+        $additionalAvailability = $additionalAvailability['ProductStockAvailabilitySchedule'];
+        if(isset($additionalAvailability[0])):
+            $ProductStockAvailabilityScheduleArr = $additionalAvailability;
+        else:
+            array_push($ProductStockAvailabilityScheduleArr, $additionalAvailability);
+        endif;
+    endif;
+
+    if(isset($xmlParse['UnallocatedBackOrders'])):
+        $UnallocatedBackOrdersArr = $xmlParse['UnallocatedBackOrders'];
+        if(isset($UnallocatedBackOrdersArr[0])):
+            $UnallocatedBackOrders = $UnallocatedBackOrdersArr;
+        else:
+            array_push($UnallocatedBackOrders, $UnallocatedBackOrdersArr);
+        endif;
+    endif;
+
+    if(isset($xmlParse['LocalStock'])):
+        $LocalStock = $xmlParse['LocalStock'];
+        if(isset($LocalStock[0])):
+            $TrueStock = $LocalStock;
+        else:
+            array_push($TrueStock, $LocalStock);
+        endif;
+    endif;
+
+
+
+    $lastDepotcode = null;
+    $availableDate = 0;
+
+    foreach ($depotslist as $item ):
+        if ($item['DepotCode'] != $lastDepotcode):
+            $availabilityArr = [];
+            if($item['AvailabilityBreakdown']['AvailableOnline'] == 'true'):
+                $tmp = array('depotCode'=>$item['DepotCode'],'depotName'=>$item['DepotDescription'],'fromdepotCode'=>$item['FromDepotCode'],'stockAtDepot'=>$item['QuantityAtDepot'],'availableDate'=> $item['AvailableFromDateNum'],'isAvailableOnline'=> $item['AvailabilityBreakdown']['AvailableOnline']);
+                array_push($availabilityArr,$tmp);
+            endif;
+            $depot = new stdClass();
+            $depot->depotCode = $item['DepotCode'];
+            $depot->DepotDescription = $item['DepotDescription'];
+            $depot->Availability = $availabilityArr;
+            $depot->stockAtDepot = $item['QuantityAtDepot'];
+            $depot->availableDate = $item['AvailableFromDateNum'];
+            $depot->isAvailableOnline = $item['AvailabilityBreakdown']['AvailableOnline'];
+            $depot->isTrunked = $item['isTruncked'];
+            array_push($depotAvailabilityArr,$depot);
+        endif;
+        if ($item['DepotCode'] == $lastDepotcode):
+            if($item['AvailabilityBreakdown']['AvailableOnline'] == 'true'):
+                $tmp2 = array('depotCode'=>$item['DepotCode'],'depotName'=>$item['DepotDescription'],'fromdepotCode'=>$item['FromDepotCode'],'stockAtDepot'=>$item['QuantityAtDepot'],'availableDate'=> $item['AvailableFromDateNum'],'isAvailableOnline'=> $item['AvailabilityBreakdown']['AvailableOnline']);
+                array_push($availabilityArr,$tmp2);
+            endif;
+            $depot->Availability = $availabilityArr;
+            $depot->stockAtDepot = $depot->stockAtDepot + $item['QuantityAtDepot'];
+        endif;
+        $lastDepotcode = $item['DepotCode'];
+    endforeach;
+    if(null !== $lastDepotcode):
+        $buyOnline = $depotAvailabilityArr[0]->isAvailableOnline;
+    else :
+        $buyOnline = '';
+    endif;
+
+    $lastPSA = null;
+
+    foreach($ProductStockAvailabilityScheduleArr as $PSAItem):
+        $AvailabilityType = $PSAItem['AvailabilityType'];
+        $IsExistingPO = $PSAItem['IsExistingPO'];
+        $PSAQuantity = $PSAItem['Quantity'];
+    endforeach;
+endif; ?>
+<div id="preview_product_<?=$escaper->escapeHtmlAttr($product->getId()) ?>" class="preview_product text-left" name="<?=$escaper->escapeHtmlAttr($product->getTypeId()) ?>">
+    <a href="<?=$escaper->escapeUrl($product->getProductUrl())?>"
+       class="relative flex items-center bg-white w-80 pt-[100%] max-w-full"
+       tabindex="-1">
+       <span class="absolute top-0 left-0 flex flex-wrap content-center w-full h-full
+                    overflow-hidden align-center hover:shadow-sm">
+       <img class="self-center w-auto h-auto"
+            src="<?= $escaper->escapeUrl($imageUrl) ?>"
+            alt="<?= $escaper->escapeHtmlAttr($product->getName()) ?>"
+       />
+        </span>
+    </a>
+    <table class="fbt-preview1 w-full max-w-full mt-4">
+        <tbody>
+        <tr>
+            <th>
+                <strong class="product name product-item-name block mb-1"><a class="product-item-link text-base text-161A21 leading-6 font-normal block" title="<?=$escaper->escapeHtml($product->getName()) ?>">
+                    <?= $escaper->escapeHtml($product->getName()) ?></a>
+                </strong>
+            </th>
+        </tr>
+        <tr>
+            <th class="flex justify-center"> <?php echo $helper->isShowReview() ? /* @escapeNotVerified */ $abstractProductBlock->getReviewsSummaryHtml($product, true, false) : '' ?></th>
+        </tr>
+        <tr>
+            <th class="<?php echo $helper->isShowPrice() ? '' : $escaper->escapeHtmlAttr('hidden')?>">
+                <?php /* @escapeNotVerified */ echo $abstractProductBlock->getProductPrice($product); ?>
+            </th>
+        </tr>
+        <tr>
+            <td>
+
+                <div x-data="{
+                        qty:'1',
+                        open : false,
+                        content: '',
+
+                        closePopup : function () {
+                            this.open = false,
+                            location.reload();
+                        },
+
+                        fetchData : function (ele,qantity) {
+                            let id = ele;
+                            let qty = qantity;
+                            const urlAddtoCart = '<?=$escaper->escapeJs($urlAddToCart) ?>';
+                            fetch(urlAddtoCart, {
+                                method: 'POST',
+                                body: new URLSearchParams({
+                                form_key: hyva.getFormKey(),
+                                product: id,
+                                qty: qty,
+                            }),
+                        })
+                            .then(response => {
+                                return response.json();
+                            })
+                            .then(data => {
+                                let obj = data.popup.replace(/[\n\t'']+/g, '');
+                                this.content = obj;
+                                this.open = true;
+                            })
+
+                        }
+
+                        }" >
+                    <div>
+                        <?php if ($helper->getDisplaylist() != 1 && $product->getTypeId() != 'grouped'): ?>
+                            <?php if ($product->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $TrueStock >= 1): ?>
+                                <div class="ip-fbt py-4">
+                                    <input @change="{$dispatch('product<?=$escaper->escapeJs($product->getId()) ?>');$dispatch('calculateprice')}" type="checkbox" id="product_<?=$escaper->escapeHtmlAttr($product->getId()) ?>" class="fbt-product-select float-left mr-2 w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" value="<?=$escaper->escapeHtmlAttr($product->getId()) ?>" checked>
+                                    <input @change="{$dispatch('qty<?=$escaper->escapeJs($product->getId()) ?>');$dispatch('calculateprice')}" x-ref="qty" x-model="qty" type="text" class="fbt-qty form-control inline-block float-left w-10 text-center       h-6 px-3 py-1.5 text-sm font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" id="qty_<?=$escaper->escapeHtmlAttr($product->getId()) ?>" placeholder="0" value="1">
+                                    <input type="hidden" value="<?= (float) $product->getFinalPrice()?>" id="fbt-product-price-<?= $product->getId()?>"/>
+                                </div>
+                            <?php else: ?>
+                                <p>Call 0330 057 7142 for Availability</p>
+                                <div class="ip-fbt py-4 hidden">
+                                    <input @change="{$dispatch('product<?=$escaper->escapeJs($product->getId()) ?>');$dispatch('calculateprice')}" type="checkbox" id="product_<?=$escaper->escapeHtmlAttr($product->getId()) ?>" class="fbt-product-select" value="<?=$escaper->escapeHtmlAttr($product->getId()) ?>" disabled>
+                                    <input @change="{$dispatch('qty<?=$escaper->escapeJs($product->getId()) ?>');$dispatch('calculateprice')}" x-ref="qty" x-model="qty" type="text" class="fbt-qty w-16" id="qty_<?=$escaper->escapeHtmlAttr($product->getId()) ?>" placeholder="0" value="0">
+                                    <input type="hidden" value="<?= (float) $product->getFinalPrice()?>" id="fbt-product-price-<?= $product->getId()?>"/>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        <?php if ($product->getTypeId() != 'grouped' && $helper->getDisplaylist() != 1 && $helper->isShowAddtocartsgnbtn()): ?>
+                            <div class="product actions product-item-actions show-btn-atc ">
+                                <?php if ($helper->isShowAddtocartsgnbtn()): ?>
+                                    <div class="actions-primary">
+                                        <?php if ($product->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $TrueStock >= 1): ?>
+                                            <?php if ($product->getTypeInstance()->hasRequiredOptions($product)): ?>
+                                                <button @click="fetchData($refs.id.id,$refs.qty.value)" type="submit" class="btn btn-primary" title="<?=$escaper->escapeHtmlAttr(__('Add to Cart')) ?>">
+                                                    <?= $heroicons->shoppingCartHtml('w-6 h-6') ?>
+                                                    <span x-ref="id" id="<?=$escaper->escapeHtmlAttr($product->getId()) ?>"><?=$escaper->escapeHtmlAttr(__('Add to Cart')) ?></span>
+                                                </button>
+                                            <?php else: ?>
+                                                <?php $postDataHelper = $this->helper('Magento\Framework\Data\Helper\PostHelper');
+                                                $postData = $postDataHelper->getPostData($block->getAddToCartUrl($product), ['product' => $product->getEntityId()])
+                                                ?>
+                                                <button @click="fetchData($refs.id.id,$refs.qty.value)" type="submit" class="btn btn-primary" title="<?=$escaper->escapeHtmlAttr(__('Add to Cart')) ?>">
+                                                    <?= $heroicons->shoppingCartHtml('w-6 h-6') ?>
+                                                    <span x-ref="id" id="<?=$escaper->escapeHtmlAttr($product->getId()) ?>"><?=$escaper->escapeHtmlAttr(__('Add to Cart')) ?></span>
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <?php if ($product->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $TrueStock >= 1): ?>
+                                                <div class="stock available"><span><?=$escaper->escapeHtml(__('In stock')) ?></span></div>
+                                            <?php else: ?>
+                                                <div class="stock unavailable"><span><?=$escaper->escapeHtmlAttr(__('Out of stock')) ?></span></div>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                        <div id="popup_<?=$escaper->escapeHtmlAttr($product->getId()) ?>" @continue.window="closePopup()" @showpop<?=$escaper->escapeJs($product->getId()) ?>.window="{open = true,content=$event.detail}" @countdown.window="closePopup()" @closePop.window ="closePopup()" x-show="open" x-transition style="display: none;">
+                            <div class="fixed inset-0 flex items-center justify-center text-left bg-black bg-opacity-50 z-30">
+                                <div @click.away="closePopup()" class="inline-block max-h-screen overflow-auto bg-white shadow-xl rounded-lg p-10 text-gray-700">
+                                    <div class="xl:w-96" x-ref="popup " x-html="content"></div>
+                                    <input type="hidden" name="" id="currency-add" value="<?=$escaper->escapeHtmlAttr($block->getCurrentSymbol()) ?>">
+                                </div>
+                            </div
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    function productfail() {
+        return {
+            id : '<?=$escaper->escapeJs($product->getId()) ?>',
+            openPopup : false,
+            content: '',
+            doPostRequest(form) {
+
+                const action = form.action;
+                const formData = new FormData(form);
+                fetch(action, {
+                    headers: {
+                        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    body: formData,
+                    method: "POST",
+                    mode: "cors",
+                    credentials: "include",
+                })
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(response => {
+                        let obj = response.popup.replace(/[\n\t'']+/g, '');
+                        this.content = obj;
+                        this.openPopup = true;
+                        let event = new CustomEvent("showpop"+this.id, {bubbles: true,  detail: this.content}); // (2)
+                        document.getElementById('popup_'+this.id).dispatchEvent(event);
+                    })
+            }
+
+        };
+    }
+</script>
+
+
+
+
+
+

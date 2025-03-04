@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ * @category   BSS
+ * @package    Bss_HidePrice
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2018-2021 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!-- Add new Tab -->
+        <tab id="bss" translate="label" sortOrder="300">
+            <label>Bss Commerce</label>
+        </tab>
+        <section id="bss_hide_price" translate="label" type="text" sortOrder="140" showInDefault="1"
+                 showInWebsite="1" showInStore="1">
+            <label><![CDATA[Hide Price]]></label>
+            <tab>bss</tab>
+            <!-- resource tag name which we have to defined in the acl.xml -->
+            <resource>Bss_HidePrice::config_section</resource>
+            <group id="general" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label><![CDATA[General Config]]></label>
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label><![CDATA[Enabled]]></label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Version 1.2.2]]></comment>
+                </field>
+                <field id="selector" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA['Add to Cart' Button Selector]]></label>
+                    <comment><![CDATA[Magento default: '.action.tocart'. Change selector of 'Add to Cart' button according to theme/site.]]></comment>
+                </field>
+                <field id="disable_checkout" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[Checkout Controller]]></label>
+                    <comment><![CDATA[If you use custom checkout (Ex: one step checkout), fill custom checkout controller this here!]]></comment>
+                </field>
+            </group>
+            <group id="hideprice_global" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label><![CDATA[Hide Price Global Config]]></label>
+                <field id="action" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label><![CDATA[Hide Price Action]]></label>
+                    <source_model>Bss\HidePrice\Model\Config\Source\HidePriceActionSystem</source_model>
+                    <depends>
+                        <field id="bss_hide_price/general/enable">1</field>
+                    </depends>
+                </field>
+                <field id="text" translate="label comment" type="text" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label><![CDATA[Hide Price Message]]></label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="bss_hide_price/general/enable">1</field>
+                    </depends>
+                </field>
+                <field id="categories" translate="label comment" type="multiselect" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label><![CDATA[Apply for Categories]]></label>
+                    <source_model>Bss\HidePrice\Model\Config\Source\HidePriceCategories</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <depends>
+                        <field id="bss_hide_price/general/enable">1</field>
+                    </depends>
+                </field>
+                <field id="customers" translate="label comment" type="multiselect" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label><![CDATA[Apply for Customer Groups]]></label>
+                    <source_model>Bss\HidePrice\Model\Config\Source\ProductHidePriceCustomerGroupSystem</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <depends>
+                        <field id="bss_hide_price/general/enable">1</field>
+                    </depends>
+                </field>
+                <field id="hide_price_url" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[Hide Price Url]]></label>
+                    <depends>
+                        <field id="bss_hide_price/general/enable">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

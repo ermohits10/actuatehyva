@@ -1,0 +1,48 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\Form\EntityFieldInterface;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var EntityFieldInterface $field */
+/** @var HeroiconsOutline $iconsViewModel */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+$iconsViewModel = $viewModels->require(HeroiconsOutline::class);
+$element = $block->getData('element');
+?>
+<?php if ($element): ?>
+    <div class="flex gap-2 items-center tooltip"
+         x-data="{ tooltipVisible: false }"
+         role="tooltip"
+    >
+        <div x-on:mouseenter.self="tooltipVisible = true"
+             x-on:mouseleave.self="tooltipVisible = false"
+             x-on:click.outside.away="tooltipVisible = false"
+             class="relative hover:cursor-pointer"
+        >
+            <?= $iconsViewModel->questionMarkCircleHtml('w-8 h-8 opacity-75 hover:opacity-100 mt-1 icon') ?>
+
+            <template x-if="tooltipVisible">
+                <div class="absolute -right-3 px-3 pt-3 w-80">
+                    <div class="shadow-lg px-3 py-2 bg-gray-500 relative text-white rounded-md">
+                        <div class="h-3 w-3 bg-gray-500 rotate-45 transform origin-bottom-left absolute right-3 -top-3"></div>
+                        <?= $escaper->escapeHtml(__($element->getTooltip())) ?>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+<?php endif ?>

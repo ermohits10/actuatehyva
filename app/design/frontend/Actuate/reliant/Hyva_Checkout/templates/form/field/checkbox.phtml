@@ -1,0 +1,53 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\Model\Form\EntityFieldInterface;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magewirephp\Magewire\Component\Form as MagewireFormComponent;
+
+/** @var Template $block */
+/** @var EntityFieldInterface $element */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var MagewireFormComponent $magewire */
+
+$element = $block->getData('element');
+
+// Enforce the input type attribute to align with the specified template.
+$element->setAttribute('type', 'checkbox');
+?>
+<div class="font-medium text-gray-700 <?= $element->isRequired() ? 'required' : 'not-required' ?>">
+    <?= /* @noEscape */ $element->getRenderer()->renderBefore($element) ?>
+
+    <div class="flex">
+        <div class="flex items-center h-5">
+            <input class="<?= $escaper->escapeHtmlAttr($element->renderClass(['field checkbox w-4 h-4 renderer-checkbox'])) ?>"
+                <?php if ($element->hasAttributes()): ?>
+                    <?= /* @noEscape */ $element->renderAttributes($escaper) ?>
+                <?php endif ?>
+            />
+        </div>
+
+        <div class="ml-2 space-y-2">
+            <?= /* @noEscape */ $element->getRenderer()->renderLabel($element) ?>
+            <?= /* @noEscape */ $element->getRenderer()->renderAfter($element) ?>
+
+            <?php if ($element->hasRelatives()): ?>
+                <div class="space-y-2">
+                    <?php foreach ($element->getRelatives() as $relative): ?>
+                        <?= /* @noEscape */ $relative->render() ?>
+                    <?php endforeach ?>
+                </div>
+            <?php endif ?>
+        </div>
+    </div>
+</div>

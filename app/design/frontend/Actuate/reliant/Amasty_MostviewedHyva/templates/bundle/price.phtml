@@ -1,0 +1,109 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Most Viewed or Automatic Related Products Hyva Compatibility by Amasty
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+?>
+
+<div class="final-price">
+    <template x-if="packProduct.product.__typename === 'ConfigurableProduct'">
+        <div class="text-gray-600 text-sm"
+             :class="pack.getAdditionalClasses(3) ? 'text-left' : 'text-left lg:text-center'"
+        >
+            <?= $escaper->escapeHtml(__('As low as')) ?>
+        </div>
+    </template>
+    <template x-if="packProduct.product.__typename === 'BundleProduct'">
+        <div>
+            <template x-if="packProduct.product.price_range.minimum_price.final_price.value !==
+                    packProduct.product.price_range.maximum_price.final_price.value">
+                <div>
+                    <div class="mb-2">
+                        <?= $escaper->escapeHtml(__('From')) ?>
+                        <span x-html="hyva.formatPrice(
+                                packProduct.product.price_range.minimum_price.final_price.value
+                        ).replace(/\.00$/,'')"></span>
+
+                        <template x-if="packProduct.product.price_range.minimum_price.final_price.value !==
+                            packProduct.product.price_range.minimum_price.regular_price.value">
+                            <div class="rrp-price text-gray-600 text-sm">
+                                <?= $escaper->escapeHtml(__('RRP')) ?>
+                                <span x-html="hyva.formatPrice(
+                                        packProduct.product.price_range.minimum_price.regular_price.value
+                                ).replace(/\.00$/,'')"></span>
+                            </div>
+
+                            <div class="save-price">
+                                <span><?= $escaper->escapeHtml(__('Save')) ?></span>
+                                <span x-html="hyva.formatPrice(mainProduct.price_range.minimum_price.regular_price.value - mainProduct.price_range.minimum_price.final_price.value).replace(/\.00$/,'')"></span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div>
+                        <?= $escaper->escapeHtml(__('To')) ?>
+                        <span x-html="hyva.formatPrice(
+                                packProduct.product.price_range.maximum_price.final_price.value
+                        ).replace(/\.00$/,'')"></span>
+
+                        <template x-if="packProduct.product.price_range.maximum_price.final_price.value !==
+                                packProduct.product.price_range.maximum_price.regular_price.value">
+                            <div class="rrp-price text-gray-600 text-sm">
+                                <span><?= $escaper->escapeHtml(__('RRP')) ?></span>
+                                <span x-html="hyva.formatPrice(
+                                    packProduct.product.price_range.maximum_price.regular_price.value
+                                ).replace(/\.00$/,'')"></span>
+                            </div>
+
+                            <div class="save-price">
+                                <span><?= $escaper->escapeHtml(__('Save')) ?></span>
+                                <span x-html="hyva.formatPrice(mainProduct.price_range.minimum_price.regular_price.value - mainProduct.price_range.minimum_price.final_price.value).replace(/\.00$/,'')"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
+    <template x-if="packProduct.product.__typename !== 'BundleProduct'">
+    <div class="flex items-baseline flex-wrap">
+        <span class="final-price-value price-wrapper font-semibold text-base">
+            <span class="price price-value font-serif text-black"
+                x-html="hyva.formatPrice(packProduct.product.price_range
+                    .minimum_price.final_price.value).replace(/\.00$/,'')"></span>
+        </span>
+
+        <template
+            x-if="packProduct.product.price_range.minimum_price.final_price.value !==
+            packProduct.product.price_range.minimum_price.regular_price.value &&
+            packProduct.product.__typename !== 'ConfigurableProduct'"
+        >
+            <div class="rrp-price text-gray-600 text-sm font-serif text-black">
+                <span><?= $escaper->escapeHtml(__('RRP')) ?></span>
+                <span x-html="hyva.formatPrice(
+                    packProduct.product.price_range.minimum_price.regular_price.value
+                ).replace(/\.00$/,'')"></span>
+            </div>
+        </template>
+        <template
+            x-if="packProduct.product.price_range.minimum_price.final_price.value <
+            packProduct.product.price_range.minimum_price.regular_price.value &&
+            packProduct.product.__typename !== 'ConfigurableProduct'"
+        >
+            <div class="save-price">
+                <span><?= $escaper->escapeHtml(__('Save')) ?></span>
+                <span x-html="hyva.formatPrice(
+                    packProduct.product.price_range.minimum_price.regular_price.value - packProduct.product.price_range.minimum_price.final_price.value
+                ).replace(/\.00$/,'')"></span>
+            </div>
+        </template>
+        </div>
+    </template>
+</div>

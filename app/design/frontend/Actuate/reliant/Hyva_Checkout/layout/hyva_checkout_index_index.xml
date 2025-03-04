@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_modal"/>
+    <body>
+        <referenceBlock name="header-content">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Hyva_Checkout::page/header/checkout-header.phtml</argument>
+            </action>
+            <referenceBlock name="logo">
+                <action method="setTemplate">
+                    <argument name="template" xsi:type="string">Hyva_Checkout::page/header/logo.phtml</argument>
+                </action>
+                <arguments>
+                    <argument name="logo_width" xsi:type="number">240</argument>
+                    <argument name="logo_height" xsi:type="number">64</argument>
+                </arguments>
+            </referenceBlock>
+        </referenceBlock>
+
+        <referenceBlock name="footer-content">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Hyva_Checkout::page/header/checkout-footer.phtml</argument>
+            </action>
+        </referenceBlock>
+
+        <referenceBlock name="hyva-checkout-main">
+            <block name="checkout.main.title"
+                   template="Hyva_Checkout::section/main-title.phtml"
+                   before="-">
+                <action method="setTitle">
+                    <argument name="title" translate="true" xsi:type="string">Checkout</argument>
+                </action>
+            </block>
+        </referenceBlock>
+
+        <!-- Payment method place order button-->
+        <referenceBlock name="checkout.payment.method.applypay">
+            <block name="hyva.checkout.navigation.placeorder.button.applypay" template="Hyva_Checkout::custom-place-order.phtml" />
+        </referenceBlock>
+        <referenceBlock name="checkout.payment.method.banktransfer">
+            <block name="hyva.checkout.navigation.placeorder.button.banktransfer" template="Hyva_Checkout::custom-place-order.phtml" />
+        </referenceBlock>
+        <referenceBlock name="checkout.payment.method.amazon_payment_v2">
+            <block name="hyva.checkout.navigation.placeorder.button.amazon_payment_v2" template="Hyva_Checkout::amazonpay-place-order.phtml">
+                <arguments>
+                    <argument name="amazon_id" xsi:type="string">AmazonPayCheckoutButton</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="checkout.payment.method.v12finance">
+            <block name="hyva.checkout.navigation.placeorder.button.v12finance" template="Hyva_Checkout::custom-place-order.phtml" />
+        </referenceBlock>
+        <referenceBlock name="checkout.payment.method.checkmo">
+            <block name="hyva.checkout.navigation.placeorder.button.checkmo" template="Hyva_Checkout::custom-place-order.phtml" />
+        </referenceBlock>
+        <referenceBlock name="checkout.payment.method.purchaseorder">
+            <block name="hyva.checkout.navigation.placeorder.button.purchaseorder" template="Hyva_Checkout::custom-place-order.phtml" />
+        </referenceBlock>
+        <referenceBlock name="checkout.place-order" remove="true"/>
+
+        <referenceBlock name="hyva.checkout.breadcrumbs" remove="true" />
+        <referenceBlock name="footer-static-links" remove="true" />
+        <referenceBlock name="footer-cms-content" remove="true" />
+        <referenceBlock name="headerusp" remove="true" />
+    </body>
+</page>

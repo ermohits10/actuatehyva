@@ -1,0 +1,21 @@
+{
+  "name": "actuate/mirasvit-search-ultimate",
+  "version": "1.0.0",
+  "description": "N/A",
+  "type": "magento2-module",
+  "require": {
+    "magento/framework": "*",
+    "mirasvit/module-search-ultimate": "2.0.*"
+  },
+  "license": [
+    "Proprietary"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Actuate\\MirasvitSearchUltimate\\": ""
+    }
+  }
+}

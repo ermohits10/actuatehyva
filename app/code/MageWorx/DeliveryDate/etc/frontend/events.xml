@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Add delivery date info from request to address extension attributes on multishipping checkout -->
+    <event name="checkout_controller_multishipping_shipping_post">
+        <observer
+                name="mageworx_dd_transfer_data_from_request_to_address"
+                instance="MageWorx\DeliveryDate\Observer\Multishipping\SaveDeliveryDateInformationInAddress"
+                />
+    </event>
+</config>

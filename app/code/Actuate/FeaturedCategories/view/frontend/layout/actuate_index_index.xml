@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Creation form page</title>
+                     <!-- Add custom css start -->
+
+                  <!-- Add custom css end -->
+
+                   <!-- Add custom js start -->
+
+        
+	        <script src="Actuate_FeaturedCategories::js/common.js" async="async" />
+                    <!-- Add custom js end -->
+           
+
+            <!-- <css src="Vendor_Module::css/mycss.css" />
+            <script src="Vendor_Module::js/myjs.js"/> -->
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Actuate\FeaturedCategories\Block\Category" name="Actuate.featuredCategories.index" template="Actuate_FeaturedCategories::CategorySlider.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+      class="MageWorx\DeliveryDate\Ui\Component\UpdateQueueForm">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">change_delivery_date_customer_form.change_delivery_date_customer_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">General Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <namespace>change_delivery_date_customer_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>change_delivery_date_customer_form.change_delivery_date_customer_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="change_delivery_date_customer_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="mageworx_deliverydate/queue/update"/>
+        </settings>
+        <dataProvider class="MageWorx\DeliveryDate\Ui\DataProvider\Queue\CustomerQueue" name="change_delivery_date_customer_form_data_source">
+            <settings>
+                <requestFieldName>order_id</requestFieldName>
+                <primaryFieldName>order_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general"
+              component="MageWorx_DeliveryDate/js/view/delivery_info_form/fieldset"
+              template="MageWorx_DeliveryDate/delivery_info_form/fieldset">
+        <settings>
+            <label translate="true">Change</label>
+            <collapsible>true</collapsible>
+            <imports>
+                <link name="visible">${$.provider}:data.day_limits</link>
+            </imports>
+        </settings>
+        <field name="entity_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>queue.entity_id</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="order_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>queue.order_id</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="customer_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>queue.customer_id</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="delivery_option" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>queue.delivery_option</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="delivery_date"
+               formElement="date"
+               component="MageWorx_DeliveryDate/js/view/delivery_info_form/element/date/date"
+               template="MageWorx_DeliveryDate/delivery_info_form/element/date">
+            <settings>
+                <label>Delivery Day</label>
+                <dataType>text</dataType>
+                <visible>true</visible>
+                <dataScope>queue.delivery_date</dataScope>
+                <elementTmpl>MageWorx_DeliveryDate/delivery_info_form/element/date/calendar</elementTmpl>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="delivery_time"
+               formElement="select"
+               component="MageWorx_DeliveryDate/js/view/delivery_info_form/element/time/select"
+               template="MageWorx_DeliveryDate/delivery_info_form/element/time">
+            <settings>
+                <label>Delivery Time</label>
+                <dataType>text</dataType>
+                <visible>true</visible>
+                <dataScope>queue.delivery_time</dataScope>
+                <elementTmpl>MageWorx_DeliveryDate/delivery_info_form/element/time/select</elementTmpl>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="submit"
+               class="MageWorx\DeliveryDate\Block\DeliveryInfo\Edit\SaveButton"
+               component="MageWorx_DeliveryDate/js/view/delivery_info_form/save-button"
+               template="MageWorx_DeliveryDate/delivery_info_form/element/button"
+               formElement="button">
+            <settings>
+                <notice translate="true">This action will change delivery date for your order.</notice>
+                <dataScope>submit</dataScope>
+            </settings>
+            <formElements>
+                <button>
+                    <settings>
+                        <title translate="true">Save</title>
+                    </settings>
+                </button>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

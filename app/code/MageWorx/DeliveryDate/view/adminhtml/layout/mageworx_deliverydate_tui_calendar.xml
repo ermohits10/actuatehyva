@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+Copyright MageWorx. All rights reserved.
+See LICENSE.txt for license details.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="MageWorx_DeliveryDate::css/tui-calendar.css"/>
+        <css src="MageWorx_DeliveryDate::css/tui-date-picker.css"/>
+        <css src="MageWorx_DeliveryDate::css/tui-time-picker.css"/>
+        <css src="MageWorx_DeliveryDate::css/tui-doc.css"/>
+        <css src="MageWorx_DeliveryDate::css/bootstrap.css"/>
+        <css src="MageWorx_DeliveryDate::css/custom.css"/>
+        <css src="MageWorx_DeliveryDate::css/icons.css"/>
+    </head>
+</page>

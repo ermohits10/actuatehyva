@@ -1,0 +1,23 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+<?php if ($block->hasData('title')): ?>
+    <header class="section-title cursor-pointer">
+        <h2 class="text-[18px] md:text-[22px] text-[#363636] leading-[1.428] font-bold">
+            <?= $escaper->escapeHtml($block->getData('title')) ?>
+        </h2>
+    </header>
+<?php endif ?>

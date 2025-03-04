@@ -1,0 +1,42 @@
+<?php
+/**
+ * @var $block \Mirasvit\LayeredNavigation\Block\Renderer\SliderRenderer
+ */
+
+$attributeCode = $block->getAttributeCode();
+$style         = 'display: none;';
+$sliderData    = $block->getSliderData();
+
+if (!$sliderData) {
+    return;
+}
+
+$initParams = [
+    'paramTemplate' => $block->getSliderParamTemplate(),
+    'urlTemplate'   => $sliderData['url'],
+    'min'           => $sliderData['min'],
+    'max'           => $sliderData['max'],
+    'from'          => (float)$sliderData['from'],
+    'to'            => (float)$sliderData['to'],
+    'valueTemplate' => $block->getValueTemplate(),
+    'separator'     => $block->getSeparator(),
+    'rate'          => $block->getRate(),
+];
+?>
+
+<div class="mst-nav__slider px-4 -mt-4" data-mst-nav-filter="<?= $attributeCode ?>" x-data='renderRangeSlider(<?= \Laminas\Json\Json::encode($initParams) ?>)' x-init="initSlider">
+    <?php if ($block->isSlider()): ?>
+        <div class="mst-nav__slider-slider my-4 px-2" data-element="slider"></div>
+    <?php endif ?>
+    <?php if (!$block->isFromTo()): ?>
+        <div class="mst-nav__slider-text text-center flex justify-between font-sans text-sm leading-5 font-medium" data-element="text"></div>
+    <?php endif ?>
+    <?php if ($block->isFromTo()): ?>
+        <div class="mst-nav__slider-from-to flex items-center justify-between my-2">
+            <input type="number" class="mst-nav__slider-from" data-element="from" placeholder="<?= __('from') ?>">
+            <span class="mst-nav__slider-del">—</span>
+            <input type="number" class="mst-nav__slider-to" data-element="to" placeholder="<?= __('to') ?>">
+            <button class="btn" data-element="submit" @click="applyFilter"><?= __('OK') ?></button>
+        </div>
+    <?php endif ?>
+</div>

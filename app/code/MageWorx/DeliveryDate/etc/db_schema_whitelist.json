@@ -1,0 +1,91 @@
+{
+    "mageworx_dd_delivery_option": {
+        "column": {
+            "entity_id": true,
+            "name": true,
+            "methods": true,
+            "is_active": true,
+            "sort_order": true,
+            "future_days_limit": true,
+            "start_days_limit": true,
+            "active_from": true,
+            "active_to": true,
+            "limits_serialized": true,
+            "holidays_serialized": true,
+            "shipping_methods_choice_limiter": true,
+            "working_days": true,
+            "cut_off_time": true,
+            "quotes_scope": true,
+            "delivery_date_required_error_message": true,
+            "disable_selection": true,
+            "use_conditions": true,
+            "conditions_serialized": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "mageworx_dd_delivery_option_store_group": {
+        "column": {
+            "delivery_option_id": true,
+            "customer_group_id": true,
+            "store_id": true
+        },
+        "index": {
+            "MAGEWORX_DD_DELIVERY_OPTION_STORE_GROUP_CUSTOMER_GROUP_ID": true,
+            "MAGEWORX_DD_DELIVERY_OPTION_STORE_GROUP_STORE_ID": true,
+            "DO_STR_GRP_CUST_GRP_ID": true,
+            "DO_STR_GRP_STR_ID": true
+        },
+        "constraint": {
+            "FK_C1BA0D1EFC641AE08463CF2AEB1CC197": true,
+            "FK_4A691E60204DB15F1602644C20708DA8": true,
+            "MAGEWORX_DD_DELIVERY_OPTION_STORE_GROUP_STORE_ID_STORE_STORE_ID": true,
+            "UNQ_5EB6D2A4761BEB8C452A3750D44051F9": true,
+            "STR_GRP_DO_ID_DO_ID": true,
+            "STR_GRP_DO_CUST_GRP_ID_CUST_GRP_ID": true,
+            "DO_STR_GRP_DO_ID_CUST_GRP_STR_ID": true
+        }
+    },
+    "mageworx_dd_queue": {
+        "column": {
+            "entity_id": true,
+            "quote_address_id": true,
+            "order_address_id": true,
+            "delivery_day": true,
+            "delivery_hours_from": true,
+            "delivery_hours_to": true,
+            "delivery_minutes_from": true,
+            "delivery_minutes_to": true,
+            "shipping_method": true,
+            "carrier": true,
+            "delivery_option": true,
+            "store_id": true,
+            "delivery_comment": true
+        },
+        "index": {
+            "MAGEWORX_DD_QUEUE_STORE_ID": true,
+            "MAGEWORX_DD_QUEUE_DELIVERY_DAY": true,
+            "MAGEWORX_DD_QUEUE_DELIVERY_HOURS_FROM": true,
+            "MAGEWORX_DD_QUEUE_DELIVERY_HOURS_TO": true,
+            "MAGEWORX_DD_QUEUE_DELIVERY_OPTION": true,
+            "MAGEWORX_DD_QUEUE_ORDER_ADDRESS_ID_DELIVERY_DAY": true,
+            "DD_QUEUE_STORE_ID": true,
+            "DD_QUEUE_DELIVERY_DAY": true,
+            "DD_QUEUE_DELIVERY_HOURS_FROM": true,
+            "DD_QUEUE_DELIVERY_HOURS_TO": true,
+            "DD_QUEUE_DELIVERY_OPTION": true,
+            "DD_QUEUE_ORDER_ADDRESS_ID_DELIVERY_DAY": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MAGEWORX_DD_QUEUE_STORE_ID_STORE_STORE_ID": true,
+            "MAGEWORX_DD_QUEUE_DELIVERY_OPT_MAGEWORX_DD_DELIVERY_OPT_ENTT_ID": true,
+            "MAGEWORX_DD_QUEUE_QUOTE_ADDRESS_ID": true,
+            "MAGEWORX_DD_QUEUE_ORDER_ADDRESS_ID": true,
+            "DD_QUEUE_DELIVERY_OPTION_DELIVERY_OPTION_ENTITY_ID": true,
+            "DD_QUEUE_QUOTE_ADDRESS_ID": true,
+            "DD_QUEUE_ORDER_ADDRESS_ID": true
+        }
+    }
+}

@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">autifydigital_v12finance_application_listing.autifydigital_v12finance_application_listing_data_source</item>
+		</item>
+	</argument>
+	<settings>
+		<spinner>autifydigital_v12finance_application_columns</spinner>
+		<deps>
+			<dep>autifydigital_v12finance_application_listing.autifydigital_v12finance_application_listing_data_source</dep>
+		</deps>
+		<buttons>
+			<button name="financeoptions">
+                <url path="autifydigital_v12finance/financeoptions/index"/>
+                <class>primary</class>
+                <label translate="true">View Finance Options</label>
+                <aclResource>AutifyDigital_V12Finance::Application_view</aclResource>
+            </button>
+		</buttons>
+	</settings>
+	<dataSource component="Magento_Ui/js/grid/provider" name="autifydigital_v12finance_application_listing_data_source">
+		<settings>
+			<storageConfig>
+                <param name="indexField" xsi:type="string">application_id</param>
+            </storageConfig>
+			<updateUrl path="mui/index/render"/>
+		</settings>
+		<aclResource>AutifyDigital_V12Finance::Application_view</aclResource>
+		<dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="autifydigital_v12finance_application_listing_data_source">
+			<settings>
+				<requestFieldName>id</requestFieldName>
+				<primaryFieldName>application_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<listingToolbar name="listing_top">
+		<settings>
+			<sticky>true</sticky>
+		</settings>
+		<bookmark name="bookmarks"/>
+		<columnsControls name="columns_controls"/>
+		<filters name="listing_filters"/>
+		<paging name="listing_paging"/>
+		<exportButton name="export_button" />
+	</listingToolbar>
+	<columns name="autifydigital_v12finance_application_columns">
+		<selectionsColumn name="ids">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="resizeEnabled" xsi:type="boolean">false</item>
+                    <item name="resizeDefaultWidth" xsi:type="string">55</item>
+                    <item name="indexField" xsi:type="string">application_id</item>
+                    <item name="visible" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </selectionsColumn>
+		<column name="application_id">
+			<settings>
+				<filter>text</filter>
+				<sorting>desc</sorting>
+				<label translate="true">ID</label>
+			</settings>
+		</column>
+		<column name="order_increment_id" class="AutifyDigital\V12Finance\Ui\Component\Listing\Column\OrderIdLink">
+			<settings>
+				<bodyTmpl>ui/grid/cells/html</bodyTmpl>
+				<filter>text</filter>
+				<label translate="true">Order ID</label>
+			</settings>
+		</column>
+		<column name="customer_email">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Email</label>
+			</settings>
+		</column>
+		<column name="finance_application_id">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Finance Application ID</label>
+			</settings>
+		</column>
+		<column name="finance_length">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Finance Length</label>
+			</settings>
+		</column>
+		<column name="order_amount" class="Magento\Catalog\Ui\Component\Listing\Columns\Price">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Order Amount</label>
+			</settings>
+		</column>
+		<column name="deposit_amount" class="Magento\Catalog\Ui\Component\Listing\Columns\Price">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Deposit</label>
+			</settings>
+		</column>
+		<column name="interest_amount" class="Magento\Catalog\Ui\Component\Listing\Columns\Price">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Interest</label>
+			</settings>
+		</column>
+		<column name="finance_amount" class="Magento\Catalog\Ui\Component\Listing\Columns\Price">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Finance Amount</label>
+			</settings>
+		</column>
+		<column name="total_amount_payable" class="Magento\Catalog\Ui\Component\Listing\Columns\Price">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Total Amount Payable</label>
+			</settings>
+		</column>
+		<column name="card_summary">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Card Summary</label>
+				<visible>false</visible>
+			</settings>
+		</column>
+		<column name="application_status" component="Magento_Ui/js/grid/columns/select">
+			<settings>
+                <options class="AutifyDigital\V12Finance\Model\Config\Source\GetApplicationStatus"/>
+                <filter>select</filter>
+                <editor>
+                    <editorType>select</editorType>
+                </editor>
+                <dataType>select</dataType>
+                <label translate="true">Application Status</label>
+            </settings>
+		</column>
+		<column name="created_at">
+            <argument name="data" xsi:type="array">
+                <item name="js_config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="align" xsi:type="string">left</item>
+                    <item name="label" xsi:type="string" translate="true">Finance Date</item>
+                </item>
+            </argument>
+        </column>
+        <actionsColumn class="AutifyDigital\V12Finance\Ui\Component\Listing\Column\RequestPaymentActions" name="actions">
+			<settings>
+				<indexField>application_id</indexField>
+				<resizeEnabled>false</resizeEnabled>
+				<resizeDefaultWidth>107</resizeDefaultWidth>
+			</settings>
+		</actionsColumn>
+	</columns>
+</listing>

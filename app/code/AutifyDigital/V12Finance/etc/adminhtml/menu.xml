@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+	<menu>
+		<add id="AutifyDigital::finance_menu" module="AutifyDigital_V12Finance" resource="AutifyDigital_V12Finance::Menu_view" sortOrder="50" title="Autify Digital" />
+		<add action="autifydigital_v12finance/application/index" id="AutifyDigital_V12Finance::autifydigital_v12finance_application" module="AutifyDigital_V12Finance" parent="AutifyDigital::finance_menu" resource="AutifyDigital_V12Finance::Application_view" sortOrder="10" title="V12 Application Report"/>
+		<add action="autifydigital_v12finance/financeoptions/index" id="AutifyDigital_V12Finance::autifydigital_v12finance_financeoptions" module="AutifyDigital_V12Finance" parent="AutifyDigital::finance_menu" resource="AutifyDigital_V12Finance::FinanceOptions_menu" sortOrder="20" title="View Store V12 Finance Options"/>
+		<add action="autifydigital_v12finance/priceoptions/index" id="AutifyDigital_V12Finance::autifydigital_v12finance_priceoptions" module="AutifyDigital_V12Finance" parent="AutifyDigital::finance_menu" resource="AutifyDigital_V12Finance::PriceOptions_menu" sortOrder="30" title="Price Based V12 Finance Options"/>
+		<add action="admin/system_config/edit/section/v12finance" id="AutifyDigital_V12Finance::autifydigital_v12finance_config" module="AutifyDigital_V12Finance" parent="AutifyDigital::finance_menu" resource="AutifyDigital_V12Finance::config_autifydigital_v12finance" sortOrder="40" title="V12 General Configuration"/>
+	</menu>
+</config>

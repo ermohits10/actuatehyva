@@ -1,0 +1,232 @@
+<?php
+/**
+ * @var $block \Mirasvit\LayeredNavigation\Block\Css
+ */
+$css = $block->getCss();
+
+?>
+<?php if ($css): ?>
+    <style><?= $css ?></style>
+<?php endif ?>
+
+
+<style>
+    .mst-nav__label .mst-nav__label-item._mode-link input[type="checkbox"] {
+        display: none;
+    }
+    .mst-nav__label .mst-nav__label-item._mode-checkbox input[type="checkbox"] {
+        position: relative;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: #ffffff;
+        width: 1.7rem;
+        height: 1.7rem;
+        min-width: 1.7rem;
+        min-height: 1.7rem;
+        display: inline-block;
+        border: .1rem solid #cacaca;
+        border-radius: 0.2rem;
+        cursor: pointer;
+    }
+    .mst-nav__label .mst-nav__label-item._mode-checkbox input[type="checkbox"]:checked:before {
+        content: "";
+        position: absolute;
+        display: inline-block;
+        width: .9rem;
+        height: .9rem;
+        margin: .3rem;
+        border-radius: 0.2rem;
+        background: rgba(29,78,216,1);
+    }
+    .mst-nav__label .mst-nav__label-item._mode-circle input[type="checkbox"] {
+        position: relative;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: #ffffff;
+        width: 1.7rem;
+        height: 1.7rem;
+        min-width: 1.7rem;
+        min-height: 1.7rem;
+        display: inline-block;
+        border: .1rem solid #cacaca;
+        border-radius: 1rem;
+        cursor: pointer;
+    }
+    .mst-nav__label .mst-nav__label-item._mode-circle input[type="checkbox"]:checked:before {
+        content: "";
+        position: absolute;
+        display: inline-block;
+        width: .9rem;
+        height: .9rem;
+        margin: .3rem;
+        border-radius: 1rem;
+        background: rgba(29,78,216,1);
+    }
+
+    [x-data="initLayeredNavigation()"] .count {
+        float: right;
+    }
+
+    [x-data="initLayeredNavigation()"] .filter-count-label {
+        padding-left: 5px;
+    }
+
+    .mst-nav__label .mst-nav__label-item__label {
+        padding-right: 1rem;
+    }
+
+    .mst-nav__label-item {
+        line-height: 1.5rem;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+    }
+
+    .mst-nav__label-item:hover {
+        cursor: pointer;
+    }
+
+    .mst-nav__label-item *:hover {
+        cursor: pointer;
+    }
+
+    .mst-nav__label-item a {
+        display: flex;
+        align-items: center;
+    }
+
+    .mst-nav__label-item a label {
+        margin-left: .5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-grow: 1;
+    }
+
+    .mst-nav__horizontal-bar .block-title {
+        display: none;
+    }
+
+    .mst-nav__horizontal-bar>[x-data="initLayeredNavigation()"] {
+        margin: 0;
+    }
+
+    .mst-nav__horizontal-bar .block-content {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .mst-nav__horizontal-bar .block-content .filter-option {
+        margin: .5rem;
+        position: relative;
+    }
+    .mst-nav__horizontal-bar .filter-options-title {
+        padding-bottom: 0!important;
+        border-bottom: none;
+    }
+
+    .mst-nav__horizontal-bar .block-content .filter-option .title {
+        margin: 0 .5rem;
+    }
+
+    .mst-nav__horizontal-bar .block-content .filter-options-content {
+        position: absolute;
+        width: max-content;
+        background-color: #fff;
+        padding: 1rem;
+        left: 0;
+        margin-top: 1rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        z-index: 1;
+    }
+
+    .mst-nav__horizontal-bar .block-content .mst-nav__search-suggestion {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .mst-nav__horizontal-bar .block-content .mst-nav__search-suggestion .filter-options-content {
+        position: relative;
+        width: 100%;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    .mst-nav__sizeLimiter {
+        cursor: pointer;
+    }
+
+    .mst-nav__slider-slider {
+        height: 1px;
+    }
+
+    .mst-nav__slider-slider .noUi-handle {
+        right: -12px !important;
+        position: absolute !important;
+        left: unset !important;
+    }
+
+    .mst-nav__slider-slider .noUi-handle:before {
+        left: 8px!important;
+    }
+
+    .mst-nav__slider-slider .noUi-handle:after {
+        left: 10px!important;
+    }
+
+    .mst-nav__slider-slider .noUi-connect {
+        background-color: rgba(29,78,216,1);
+    }
+
+    .mst-nav__slider-text {
+        @apply font-sans text-sm leading-5 font-medium mt-2;
+    }
+
+    .mst-nav__slider-from-to input {
+        width: 30%;
+        padding: 0.25rem 0.125rem;
+    }
+
+    .mst-nav__slider-from-to button {
+        margin-left: 0.5rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    @media screen and (max-width: 767px){
+        .mst-nav__horizontal-bar .block {
+            padding: 0;
+        }
+
+        .mst-nav__horizontal-bar .block-content {
+            padding: 0;
+            position: relative;
+        }
+
+        .mst-nav__horizontal-bar .block-content .filter-option,
+        .mst-nav__horizontal-bar .block-content .filter-current {
+            margin: .125rem;
+            position: static;
+        }
+
+        .mst-nav__horizontal-bar .block-content .filter-options-content {
+            width: auto;
+            right: .125rem;
+            left: .125rem;
+        }
+    }
+    .noUi-horizontal .noUi-handle {
+        width: 18px;
+        height: 18px;
+        right: -9px;
+        top: -9px;
+    }
+    .noUi-handle {
+        border: 2px solid #E8983F;
+        border-radius: 100%;
+        background: #FFF;
+        cursor: default;
+        box-shadow: none;
+    }
+    .noUi-handle::after, .noUi-handle::before {
+        display: none;
+    }
+</style>

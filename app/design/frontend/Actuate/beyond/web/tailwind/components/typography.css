@@ -1,0 +1,13 @@
+@layer utilities {
+    .text-sans-serif {
+        font-family: 'Open Sans', sans-serif;
+    }
+}
+
+html {
+    @apply antialiased;
+}
+
+body {
+    @apply text-black text-sans-serif leading-normal text-base tracking-normal;
+}

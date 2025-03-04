@@ -1,0 +1,54 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\OfflinePayments\Model\Checkmo;
+use ReliantDirect\Checkout\Block\TermAndCondition;
+
+/** @var Template $block */
+/** @var Checkmo $method */
+/** @var Escaper $escaper */
+/** @var TermAndCondition $termAndCondition */
+
+$method = $block->getData('method');
+$payableTo = $method->getPayableTo();
+$checkTo = $method->getMailingAddress();
+$termAndCondition = $block->getLayout()->createBlock(TermAndCondition::class);
+?>
+<?php if (! empty($payableTo) || ! empty($checkTo)): ?>
+    <div class="xl:flex xl:space-x-4 xl:space-y-0 space-y-4">
+        <?php if (! empty($payableTo)): ?>
+            <div class="xl:w-1/2 w-full p-4 bg-gray-100 rounded-lg">
+                <header class="font-bold w-full mb-2">
+                    <?= $escaper->escapeHtml(__('Make Check payable to:')) ?>
+                </header>
+
+                <p>
+                    <?= $escaper->escapeHtml($payableTo) ?>
+                </p>
+            </div>
+        <?php endif ?>
+
+        <?php if (! empty($checkTo)): ?>
+            <div class="xl:w-1/2 w-full p-4 bg-gray-100 rounded-lg">
+                <header class="font-bold w-full mb-2">
+                    <?= $escaper->escapeHtml(__('Send Check to:')) ?>
+                </header>
+
+                <address>
+                    <?= /* @noEscape */ nl2br($escaper->escapeHtml($checkTo)) ?>
+                </address>
+            </div>
+        <?php endif ?>
+    </div>
+<?php endif ?>
+<?= $termAndCondition->toHtml() ?>
+<?= $block->getChildHtml('hyva.checkout.navigation.placeorder.button.checkmo') ?>

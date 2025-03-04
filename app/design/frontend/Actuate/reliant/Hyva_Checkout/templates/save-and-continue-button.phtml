@@ -1,0 +1,34 @@
+<?php
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+$step = $block->getStep();
+$dovalidation = $block->getData('dovalidation');
+$nextStep = "";
+if ($step == "checkout.shipping-details.address-form") {
+    $nextStep = "checkout.shipping.methods";
+} elseif ($step == "checkout.shipping.methods") {
+    $nextStep = "checkout.payment.methods";
+}
+?>
+<div x-data="window.continueButton()">
+    <button type="button"
+        class="action action-save-continue amcheckout-button"
+        data-step="<?= $step ?>"
+        data-nextstep="<?= $nextStep ?>"
+        data-dovalidation="<?= $dovalidation ?>"
+        @click="stepValidate($el)">
+        <?php if ($nextStep === 'checkout.shipping.methods'): ?>
+            <span><?= $escaper->escapeHtml(__ ("Choose Your Delivery Method")) ?></span>
+        <?php elseif ($nextStep === 'checkout.payment.methods'): ?>
+            <span><?= $escaper->escapeHtml(__ ("Proceed to Payment")) ?></span>
+        <?php else: ?>
+            <span><?= $escaper->escapeHtml(__ ("Save & Continue")) ?></span>
+        <?php endif; ?>
+    </button>
+</div>

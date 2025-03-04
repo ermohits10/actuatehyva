@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ * @category   BSS
+ * @package    Bss_HidePrice
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2018-2019 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_collection_load_after">
+        <observer name="bss_hideprice_collection_list" instance="Bss\HidePrice\Model\Observer\ApplyHideOnCollectionAfterLoadObserver"/>
+    </event>
+    <event name="catalog_product_load_after">
+        <observer name="bss_hideprice_product" instance="Bss\HidePrice\Model\Observer\ApplyHideOnProductAfterLoadObserver"/>
+    </event>
+    <event name="bss_prepare_product_price">
+        <observer name="bss_hideprice_prepare_product" instance="Bss\HidePrice\Model\Observer\PrepareProductPrice"/>
+    </event>
+    <event name="controller_action_predispatch">
+        <observer name="bss_hideprice_disable_checkout" instance="Bss\HidePrice\Model\Observer\DisableCheckout"/>
+    </event>
+</config>

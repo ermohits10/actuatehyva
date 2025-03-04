@@ -1,0 +1,166 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+<script>
+    function initComponentMessenger(messagesListener, options = {}) {
+        return {
+            messages: [],
+
+            options: Object.assign({
+                onEmptyMessageText: '<?= $escaper->escapeJs(__('Something went wrong.')) ?>',
+                onEmptyMessageType: 'error',
+                messagesSuccessListener: `${ messagesListener }:success`,
+                maxAttempts: 4
+            }, options),
+
+            initialize() {
+                if (typeof messagesListener !== 'string') {
+                    return hyvaCheckout.message.console(
+                        `Component messenger listener can only be of type string. ${ typeof messagesListener } given.`
+                    )
+                }
+
+                window.addEventListener(messagesListener, event => {
+                    if (! event.detail || ! event.detail.message) {
+                        return hyvaCheckout.message.console('Messenger could not dispatch the message.');
+                    }
+
+                    let message = this.setMessage(
+                        event.detail.component || null,
+                        event.detail.message.text || options.onEmptyMessageText,
+                        event.detail.message.type || options.onEmptyMessageType,
+                        event.detail.message.duration || null,
+                        event.detail.message.metadata || {}
+                    )
+
+                    <?php /* Listen for subsequent Magewire message responses to determine if certain messages can be hidden. */ ?>
+                    Magewire.hook('message.received', (wireMessage, wireComponent) => {
+                        if (wireComponent.id === (event.detail && event.detail.component && event.detail.component.id)) {
+                            this.resetMessage(message.id)
+                        }
+                    })
+
+                    <?php /* Listen for a success event to provide a counterbalance, enabling the reset of the message. */ ?>
+                    window.addEventListener(options.messagesSuccessListener, event => {
+                        this.resetMessage(message.id)
+                    })
+                })
+            },
+
+            setMessage(component, text, type, duration = null, metadata = {}) {
+                <?php /* Generate a non-unique hash based on a text and type combination. */ ?>
+                const hash = btoa(decodeURIComponent(encodeURIComponent(text + type)))
+                <?php /* See if a similar message were set earlier (array length can only be 0 or 1). */ ?>
+                const messages = this.getMessagesByHash(hash)
+                <?php /* Try and locate the message index based on the first from the messages. */ ?>
+                let index = messages.length ? this.getMessageIndex(messages[0].id) : null
+                <?php /* Predefine the final message. */ ?>
+                let message = this.messages[index]
+
+                if (message) {
+                    this.resetMessage(message)
+                } else {
+                    const id = `${ hash }_${ messages.length }`
+
+                    this.messages.push({
+                        id: id,
+                        hash: hash,
+                        component: component,
+                        dispatched: 0,
+                        timeoutID: null,
+                        show: true,
+                        type: type,
+                        text: text,
+                        metadata: metadata
+                    })
+
+                    index = this.getMessageIndex(id)
+                    message = this.messages[index]
+                }
+
+                this.modifyMessage(message.id, {
+                    dispatched: message.dispatched + 1,
+                    show: true,
+                    metadata: metadata
+                })
+
+                <?php /* Transform message into a general flash message for better visibility. */ ?>
+                if (this.options.maxAttempts && message.dispatched === this.options.maxAttempts) {
+                    this.resetMessage(message.id)
+                    hyvaCheckout.message.send(message.text, message.type, duration)
+                }
+
+                if (duration) {
+                    this.messages[index].timeoutID = setTimeout(
+                        () => this.messages[index].show = false, message.dispatched === 0 ? duration : duration * message.dispatched
+                    )
+                }
+
+                return this.messages[index]
+            },
+
+            getMessages() {
+                return this.messages.filter(message => message.show)
+            },
+
+            getMessagesByHash(hash) {
+                return this.messages.filter(message => message.hash === hash)
+            },
+
+            getMessage(id) {
+                return this.messages[this.getMessageIndex(id)]
+            },
+
+            getMessageIndex(id) {
+                const message = this.messages.findIndex(message => id === message.id)
+
+                return message === -1 ? null : message
+            },
+
+            resetMessage(id) {
+                const message = this.getMessage(id)
+
+                if (message) {
+                    clearTimeout(this.messages[this.getMessageIndex(message.id)].timeoutID)
+
+                    message.dispatched = 0
+                    message.show = false
+                }
+
+                return this.messages
+            },
+
+            modifyMessage(id, data) {
+                const index = this.getMessageIndex(id)
+
+                if (index === null) {
+                    return hyvaCheckout.message.console(`No message found for id: ${ id }`);
+                }
+
+                // Preventing a change of id.
+                data.id = id
+
+                return Object.assign(this.messages[index], data);
+            },
+
+            getOptions() {
+                return this.options
+            }
+        }
+    }
+</script>
+
+<?= $this->getChildHtml('after') ?>

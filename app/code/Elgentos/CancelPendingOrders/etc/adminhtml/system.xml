@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="sales" sortOrder="999" translate="label">
+            <label>sales</label>
+        </tab>
+        <section id="elgentos_cancel_pending_orders" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+            <label>Cancel Pending Orders</label>
+            <tab>sales</tab>
+            <resource>Elgentos_CancelPendingOrders::config_elgentos_cancelpendingorders</resource>
+            <group id="order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+                <label>Automatically cancel pending orders</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enable Automatically Cancel pending orders</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment/>
+                </field>
+                <field id="days" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Cancel orders older than</label>
+                    <comment>Days</comment>
+                </field>
+                <field id="order_statuses" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="multiselect">
+                    <label>With Order Status</label>
+                    <source_model>Magento\Sales\Model\ResourceModel\Order\Status\Collection</source_model>
+                    <comment/>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

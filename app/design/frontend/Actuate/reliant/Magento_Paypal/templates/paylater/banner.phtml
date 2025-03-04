@@ -1,0 +1,71 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var $block \Magento\Paypal\Block\PayLater\Banner */
+/** @var $cartBlock Magento\Checkout\Block\Cart */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Model\Product;
+
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+$commonViewModel = $viewModels->require(\Actuate\ReliantDirectTheme\ViewModel\CommonViewModel::class);
+
+/** @var Product $product */
+$product = $productViewModel->getProduct();
+
+$jsLayoutConfig = json_decode($block->getJsLayout(), true);
+$attributes = (isset($jsLayoutConfig['components'])
+    && isset($jsLayoutConfig['components']['payLater'])
+    && isset($jsLayoutConfig['components']['payLater']['config'])
+    && isset($jsLayoutConfig['components']['payLater']['config']['attributes']))
+    ? $jsLayoutConfig['components']['payLater']['config']['attributes']
+    : [];
+$uniqueId = uniqid();
+?>
+<?php $cartBlock = $block->getLayout()->getBlock('checkout.cart'); ?>
+<?php if ($block->getData('placement') !== 'cart'
+    || is_object($cartBlock) && $cartBlock->getItemsCount()): ?>
+    <div x-init="initializePaypal()" x-data="initPayLater_<?= $uniqueId;?>_<?= (int)$product->getId() ?>()" @update-pp-amount.window="updatePPAmount($event.detail);"
+         x-bind:data-pp-amount="finalProductPrice"
+         class="pay-later-message mt-2" data-pp-message
+         data-pp-placement="<?= $attributes['data-pp-placement'] ?? ''; ?>"
+         data-pp-style-layout="<?= $attributes['data-pp-style-layout'] ?? ''; ?>"
+         data-pp-style-logo-type="<?= $attributes['data-pp-style-logo-type'] ?? ''; ?>"
+         data-pp-style-logo-position="<?= $attributes['data-pp-style-logo-position'] ?? ''; ?>"
+         data-pp-style-text-color="<?= $attributes['data-pp-style-text-color'] ?? ''; ?>"
+         data-pp-style-text-size="<?= $attributes['data-pp-style-text-size'] ?? ''; ?>"
+         data-pp-style-color="<?= $attributes['data-pp-style-color'] ?? ''; ?>"
+         data-pp-style-ratio="<?= $attributes['data-pp-style-ratio'] ?? ''; ?>"></div>
+<?php endif; ?>
+<script>
+    function initPayLater_<?= $uniqueId;?>_<?= (int)$product->getId() ?>() {
+        return {
+            initialFinalPrice: <?= (float)$product->getFinalPrice() ?>,
+            finalProductPrice: <?= (float)$product->getFinalPrice() ?>,
+            sdkUrl: '<?= $commonViewModel->getPaypalSdkUrl(); ?>',
+            cartSection: false,
+            initializePaypal() {
+                this.createScriptLoadPromise(this.sdkUrl);
+            },
+            createScriptLoadPromise(url) {
+                if (!document.querySelector("script[src*='" + url + "']")) {
+                    let scriptEle = document.createElement("script");
+                    scriptEle.setAttribute("src", url);
+                    scriptEle.setAttribute("type", "text/javascript");
+                    scriptEle.setAttribute("async", true);
+                    document.body.appendChild(scriptEle);
+                }
+            },
+            updatePPAmount(qty) {
+                this.finalProductPrice = qty * this.initialFinalPrice;
+                console.log('this.finalProductPrice', this.finalProductPrice);
+            }
+        }
+    }
+</script>

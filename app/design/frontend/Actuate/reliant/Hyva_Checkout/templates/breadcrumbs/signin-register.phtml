@@ -1,0 +1,37 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2022-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Checkout\ViewModel\Breadcrumbs\SigninRegister;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var SigninRegister $viewModel */
+
+$viewModel = $viewModels->require(SigninRegister::class);
+?>
+<?php if ($viewModel->getCustomerSession()->isLoggedIn() === false): ?>
+<div class="text-base leading-8">
+    <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login', ['referer' => base64_encode($block->getUrl('checkout'))])) ?>">
+        <?= $escaper->escapeHtml(__('Sign in')) ?>
+    </a>
+
+    <span class="separator mx-2">
+        &frasl;
+    </span>
+
+    <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create', ['referer' => base64_encode($block->getUrl('checkout'))])) ?>">
+        <?= $escaper->escapeHtml(__('Create an Account')) ?>
+    </a>
+</div>
+<?php endif ?>

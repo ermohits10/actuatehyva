@@ -1,0 +1,87 @@
+.minicart {
+    .minicart-price {
+        .price {
+            font-size: 1.25rem;
+        }
+    }
+}
+.amazonpay-button-view1-gold {
+    background: #fcc439;
+    border:  1px solid #000;
+}
+
+.table-row-items > div.table-row-item {
+
+    @apply bg-container-darker;
+
+    &:nth-child(2n + 1) {
+        @apply bg-container-lighter;
+    }
+}
+.product-item .old-price .price-container {
+    @apply first:mr-1.5;
+    .save-upto {
+        .price {
+            @apply md:text-base text-sm font-bold;
+        }
+    }
+    &.price-final_price {
+        @apply text-black;
+        .price {
+            @apply md:text-base text-sm line-through;
+        }
+        .price::before {
+            content: 'RRP ';
+        }
+    }
+}
+.catalog-product-view, .cms-page-view, .catalog-category-view {
+    .product-item .old-price .price-container {
+        &.price-final_price {
+            @apply text-black;
+        }
+    }
+}
+.catalog-product-view .price-block .old-price .price-wrapper .price::before {
+    content: 'RRP ';
+}
+.catalog-product_compare-index .old-price .price-final_price .price-wrapper .price {
+    @apply text-sm line-through mr-1 font-normal;
+}
+.catalog-product_compare-index .old-price .price-wrapper .price::before {
+    content: 'RRP ';
+}
+.catalog-product_compare-index .price-final_price .price-wrapper .price {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 700;
+}
+.checkout-cart-index {
+    #maincontent {
+        @apply my-2.5 md:my-7;
+    }
+    .main-title {
+        @apply text-base md:text-3xl my-1 md:my-6 font-semibold md:font-bold;
+    }
+    .page-title {
+        span {
+            @apply uppercase;
+        }
+    }
+}
+@media only screen and (max-width: 767px) {
+    .home-banner {
+        @apply overflow-hidden rounded;
+        .pagebuilder-banner-wrapper .pagebuilder-overlay.pagebuilder-poster-overlay {
+            min-height: auto !important;
+            border-radius: 5px !important;
+            @apply pb-0 pt-[71%];
+        }
+    }
+}
+.mst-gdpr__cookie-bar {
+    @apply bg-white border border-gray-200 fixed flex flex-col md:flex-row items-center max-w-4xl md:max-w-2xl lg:max-w-3xl md:rounded-full px-8 py-4 rounded-xl shadow-md z-50 left-1/2 top-1/2 -translate-y-2/4 -translate-x-2/4;
+}
+.magezon-builder .nav-item.nav-item-static > .item-submenu {
+    width: 99vw !important;
+}

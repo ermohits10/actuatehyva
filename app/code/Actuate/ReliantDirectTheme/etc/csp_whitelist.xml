@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="gtm-facebook-script" type="hash" algorithm="sha256">wQYIsJcWNUJOroNeSJ9zSryB7+H/qj1oFeNaZL01FGU=</value>
+                <value id="gtm-zend-desk-script" type="hash" algorithm="sha256">Rvt+ATFZ+9XN8nxsgjHYTOtEtrMxNPlLNa+9JykbORI=</value>
+                <value id="visualizer-script" type="hash" algorithm="sha256">dFsGNNDBCRXXl1YQpdBQC6yUlAxunpAbom22wOA8igc=</value>
+                <value id="gtm-beyond-clarity-script" type="hash" algorithm="sha256">xDnGrOUcpIiG5c2gsD0IMqcyK1IjdABEcVgjiaKNluY=</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

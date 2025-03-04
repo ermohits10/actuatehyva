@@ -1,0 +1,295 @@
+"Source type must be defined in class %1. For additional reference see class %2","Source type must be defined in class %1. For additional reference see class %2"
+"We can't get the %1 instance right now.","We can't get the %1 instance right now."
+"Unable to locate delivery date","Unable to locate delivery date"
+"Delivery date was not set.","Delivery date was not set."
+"Comment: ","Comment: "
+Submit,Submit
+Back,Back
+Delete,Delete
+"Are you sure you want to do this?","Are you sure you want to do this?"
+Reset,Reset
+"Save and Continue Edit","Save and Continue Edit"
+Save,Save
+"""Delivery Date Required"" error message","""Delivery Date Required"" error message"
+"View Queue Grid","View Queue Grid"
+"Delivery Day","Delivery Day"
+"Time From","Time From"
+"Time To","Time To"
+Comment,Comment
+"Back to the Delivery Option","Back to the Delivery Option"
+"Select Delivery Date","Select Delivery Date"
+"Delivery Options","Delivery Options"
+"Requested model no longer exists.","Requested model no longer exists."
+"The entity that had the id %1 was deleted successfully","The entity that had the id %1 was deleted successfully"
+"Requested entity no longer exists.","Requested entity no longer exists."
+"Something went wrong.","Something went wrong."
+"New Delivery Option","New Delivery Option"
+"A total of %1 record(s) were deleted.","A total of %1 record(s) were deleted."
+"A total of %1 record(s) were updated.","A total of %1 record(s) were updated."
+"Queue %1","Queue %1"
+"You saved the delivery option.","You saved the delivery option."
+"Something went wrong while saving the delivery option data. Please review the error log.","Something went wrong while saving the delivery option data. Please review the error log."
+Queue,Queue
+"Queue block should be instance of \MageWorx\DeliveryDate\Block\Adminhtml\Queue","Queue block should be instance of \MageWorx\DeliveryDate\Block\Adminhtml\Queue"
+"Store Switcher block should be instance of \Magento\Backend\Block\Store\Switcher , %1 given","Store Switcher block should be instance of \Magento\Backend\Block\Store\Switcher , %1 given"
+"Unable to locate delivery info data in request","Unable to locate delivery info data in request"
+"Delivery info successfully updated.","Delivery info successfully updated."
+"Something went wrong while saving the delivery info data. Please review the error log.","Something went wrong while saving the delivery info data. Please review the error log."
+"Invalid source id %1","Invalid source id %1"
+"Unknown source type %1","Unknown source type %1"
+"Required parameter `%1` missed.","Required parameter `%1` missed."
+"Order with id %1 does not exists.","Order with id %1 does not exists."
+"Queue with id %1 does not exists.","Queue with id %1 does not exists."
+"Queue %1 successfully updated.","Queue %1 successfully updated."
+"Empty order id.","Empty order id."
+"Unauthorized access.","Unauthorized access."
+"Delivery Date was set automatically","Delivery Date was set automatically"
+Today,Today
+Tomorrow,Tomorrow
+"End Date should not be less than Start Date.","End Date should not be less than Start Date."
+"Delivery Date Exception: get and set methods must be provided for the field %1","Delivery Date Exception: get and set methods must be provided for the field %1"
+"Delivery Date Exception: setter method ""%1"" does not exist in the conditions model.","Delivery Date Exception: setter method ""%1"" does not exist in the conditions model."
+"Limits is unavailable for the whole date %1","Limits is unavailable for the whole date %1"
+"Sorry, selected date is not available, please select another delivery date","Sorry, selected date is not available, please select another delivery date"
+"Compatible time limit not found","Compatible time limit not found"
+"Compatible time limit has no quote limits","Compatible time limit has no quote limits"
+"Time limit is not available","Time limit is not available"
+"Shipping method is not set. Please, select shipping method and try again.","Shipping method is not set. Please, select shipping method and try again."
+"The selected delivery date is not available. Please select a different date and try again.","The selected delivery date is not available. Please select a different date and try again."
+"Entity must be instance of \Magento\Framework\Model\AbstractModel","Entity must be instance of \Magento\Framework\Model\AbstractModel"
+"Could not save the entity: %1","Could not save the entity: %1"
+"Could not delete the entity: %1","Could not delete the entity: %1"
+"Entity with id ""%1"" does not exist.","Entity with id ""%1"" does not exist."
+"Default (%1)","Default (%1)"
+"Custom Format","Custom Format"
+Format,Format
+Description,Description
+Example,Example
+"More info","More info"
+Global,Global
+"Per Delivery Option","Per Delivery Option"
+Active,Active
+Inactive,Inactive
+January,January
+February,February
+March,March
+April,April
+May,May
+June,June
+"July ","July "
+August,August
+September,September
+October,October
+November,November
+December,December
+"Each Month","Each Month"
+Yes,Yes
+No,No
+"Global (Unlimited)","Global (Unlimited)"
+"Per Day","Per Day"
+"Per Day of Week","Per Day of Week"
+"All Methods","All Methods"
+"Specific Methods","Specific Methods"
+"Display Nothing","Display Nothing"
+"Display Error Message","Display Error Message"
+Sunday,Sunday
+Monday,Monday
+Tuesday,Tuesday
+Wednesday,Wednesday
+Thursday,Thursday
+Friday,Friday
+Saturday,Saturday
+"Delivery date is required. Please select delivery date and proceed.","Delivery date is required. Please select delivery date and proceed."
+"Selected Delivery Date is not available right now.
+                        Please select another Delivery Date and try again.","Selected Delivery Date is not available right now.
+                        Please select another Delivery Date and try again."
+"Same day delivery is not available after %1","Same day delivery is not available after %1"
+"Selected Delivery Date is a holiday.
+                        Please select another Delivery Date and try again.","Selected Delivery Date is a holiday.
+                        Please select another Delivery Date and try again."
+"Selected Delivery Date (%1) is not available right now.
+                        Please select another Delivery Date and try again.","Selected Delivery Date (%1) is not available right now.
+                        Please select another Delivery Date and try again."
+"Unable to locate an order: transport is empty","Unable to locate an order: transport is empty"
+"Unable to proceed: instance of the OrderInterface expected, got: %1","Unable to proceed: instance of the OrderInterface expected, got: %1"
+"%1 selected for the delivery.","%1 selected for the delivery."
+"Quote Address was not detected","Quote Address was not detected"
+"The address must be instance of QuoteAddressInterface or OrderAddressInterface.
+                    Instance of %1 provided.","The address must be instance of QuoteAddressInterface or OrderAddressInterface.
+                    Instance of %1 provided."
+"Unable to locate suitable delivery option.","Unable to locate suitable delivery option."
+"Delivery Date:","Delivery Date:"
+"Delivery Time:","Delivery Time:"
+"Delivery Comment:","Delivery Comment:"
+"There was no items in request - unable to locate quote.","There was no items in request - unable to locate quote."
+"All Groups","All Groups"
+"Unknown group: %1","Unknown group: %1"
+Empty,Empty
+Edit,Edit
+"All Shipping Methods","All Shipping Methods"
+"No Time","No Time"
+"View Order","View Order"
+"Unable to locate the order with id %1","Unable to locate the order with id %1"
+"Delivery Date","Delivery Date"
+"Delivery Information","Delivery Information"
+"Date: ","Date: "
+"Time: ","Time: "
+"No delivery information available","No delivery information available"
+"View all","View all"
+Dropdown,Dropdown
+Daily,Daily
+Weekly,Weekly
+Month,Month
+"2 weeks","2 weeks"
+"3 weeks","3 weeks"
+"Show weekends","Show weekends"
+"This won't take long . . .","This won't take long . . ."
+"Select Day","Select Day"
+"Select Time","Select Time"
+"Changes have been made to this section that have not been saved.","Changes have been made to this section that have not been saved."
+"This tab contains invalid data. Please resolve this before saving.","This tab contains invalid data. Please resolve this before saving."
+From:,From:
+"Delivery date:","Delivery date:"
+"Incorrect date format. Please use MM/dd/YY format. Example: 12/24/2024","Incorrect date format. Please use MM/dd/YY format. Example: 12/24/2024"
+"Incorrect time format. Please use hh:mm format. Example: 12:30","Incorrect time format. Please use hh:mm format. Example: 12:30"
+"This is a required field.","This is a required field."
+"Delivery Date is required","Delivery Date is required"
+"Selected date is not available","Selected date is not available"
+Unavailable,Unavailable
+Available,Available
+"Please, select a desired delivery date from the list of available","Please, select a desired delivery date from the list of available"
+"Select Delivery Time","Select Delivery Time"
+"Delivery is unavailable.","Delivery is unavailable."
+"Please, select all required options to calculate the nearest delivery date.","Please, select all required options to calculate the nearest delivery date."
+"Selected date is not available. Please, select another date.","Selected date is not available. Please, select another date."
+"Please, select delivery date.","Please, select delivery date."
+"Delivery Date Configuration","Delivery Date Configuration"
+Enabled,Enabled
+"Allow Delivery Queue Overloading","Allow Delivery Queue Overloading"
+"This setting allows delivery queue overloading even if the number of orders exceeds the quotes for specific day/time interval.","This setting allows delivery queue overloading even if the number of orders exceeds the quotes for specific day/time interval."
+"Delivery Queue","Delivery Queue"
+"Display Comment Field on the Checkout","Display Comment Field on the Checkout"
+"Comment Field Label","Comment Field Label"
+"Delivery Date Required","Delivery Date Required"
+"Pre-select Delivery Date","Pre-select Delivery Date"
+"If enabled, the next available delivery date will be pre-selected during the checkout","If enabled, the next available delivery date will be pre-selected during the checkout"
+"Reserve Delivery Date Automatically","Reserve Delivery Date Automatically"
+"If enabled, the next available delivery date will be pre-selected during the place order process (for orders without manually selected delivery date).","If enabled, the next available delivery date will be pre-selected during the place order process (for orders without manually selected delivery date)."
+"Allow Customers to change Delivery Date","Allow Customers to change Delivery Date"
+"This setting enabled the possibility for your customers to change the delivery date from their accounts before the shipments.","This setting enabled the possibility for your customers to change the delivery date from their accounts before the shipments."
+"Display the dates with extra charge","Display the dates with extra charge"
+"This setting allows you to hide the delivery dates with extra charge if your customers want to change the delivery info after the order is placed.","This setting allows you to hide the delivery dates with extra charge if your customers want to change the delivery info after the order is placed."
+"Include non-working days in processing period","Include non-working days in processing period"
+"This setting includes the non-working days to the order processing period. If disabled, the processing period will be calculated by the working days only for the certain delivery configuration ('Working Days' multi-select). If enabled, the days, which are not selected as the working days, will be added to the order processing period calculation. It might be helpful if you can process your orders during the non-working days.","This setting includes the non-working days to the order processing period. If disabled, the processing period will be calculated by the working days only for the certain delivery configuration ('Working Days' multi-select). If enabled, the days, which are not selected as the working days, will be added to the order processing period calculation. It might be helpful if you can process your orders during the non-working days."
+"Reload shipping rates after extra charge applied","Reload shipping rates after extra charge applied"
+"Front-end Configuration","Front-end Configuration"
+"Date Display Mode","Date Display Mode"
+"Display today and tomorrow as words","Display today and tomorrow as words"
+"Date Format","Date Format"
+"Custom Date Format","Custom Date Format"
+"Delivery Date Placeholder","Delivery Date Placeholder"
+"This text will be shown as the placeholder for the Delivery Date field on the front-end if the calendar mode is used and the setting ""Pre-select Delivery Date"" is disabled.","This text will be shown as the placeholder for the Delivery Date field on the front-end if the calendar mode is used and the setting ""Pre-select Delivery Date"" is disabled."
+"Time Intervals Display Mode","Time Intervals Display Mode"
+"Time Intervals Label Template","Time Intervals Label Template"
+"You can use any string to represent a delivery time interval. List of available variables are: {{from_time_24}}, {{to_time_24}}, {{from_time_12}}, {{to_time_12}}
+                    where the 12/24 at the ending means a time format. When the 12-hours format is used, a time will be displayed with the AM/PM suffix.","You can use any string to represent a delivery time interval. List of available variables are: {{from_time_24}}, {{to_time_24}}, {{from_time_12}}, {{to_time_12}}
+                    where the 12/24 at the ending means a time format. When the 12-hours format is used, a time will be displayed with the AM/PM suffix."
+"Delivery Date Title","Delivery Date Title"
+"Leave blank to hide the text above the delivery dates on the checkout.","Leave blank to hide the text above the delivery dates on the checkout."
+"Delivery Time Title","Delivery Time Title"
+"Leave blank to hide the text above the delivery time intervals on the checkout.","Leave blank to hide the text above the delivery time intervals on the checkout."
+"Default Delivery Date Output in Emails","Default Delivery Date Output in Emails"
+"Display empty delivery date block in order view page","Display empty delivery date block in order view page"
+"Estimated Delivery Date by Products","Estimated Delivery Date by Products"
+"Enable Delivery Date Restrictions","Enable Delivery Date Restrictions"
+"Hides the delivery date feature on the checkout if at least one product with disabled ""Allow Delivery Date"" attribute is added to the cart.","Hides the delivery date feature on the checkout if at least one product with disabled ""Allow Delivery Date"" attribute is added to the cart."
+"Use the 'From' Product Estimated Delivery Period","Use the 'From' Product Estimated Delivery Period"
+"This setting defines whether to use the 'From' or 'To' product estimated delivery period to calculate the available dates in the delivery date functionality on the checkout.","This setting defines whether to use the 'From' or 'To' product estimated delivery period to calculate the available dates in the delivery date functionality on the checkout."
+"Use the 'To' Product Estimated Delivery Period as limit for max calculation days","Use the 'To' Product Estimated Delivery Period as limit for max calculation days"
+"When enabled the max calculation days will be taken from the product configuration.","When enabled the max calculation days will be taken from the product configuration."
+"Estimated Delivery Text","Estimated Delivery Text"
+"This setting allows you to specify a estimated delivery message, which appears on the product pages. List of available variables are: {{days_from_number}} , {{days_to_number}} , {{days_from_calendar}} , {{days_to_calendar}} , {{month_from}} , {{month_to}}","This setting allows you to specify a estimated delivery message, which appears on the product pages. List of available variables are: {{days_from_number}} , {{days_to_number}} , {{days_from_calendar}} , {{days_to_calendar}} , {{month_from}} , {{month_to}}"
+"Same Day Delivery Text","Same Day Delivery Text"
+"This message will be shown on the product page if same-day-delivery is available for the product. Leave blank if you wish to use default text, specified in the ""Estimated Delivery Text"" setting.","This message will be shown on the product page if same-day-delivery is available for the product. Leave blank if you wish to use default text, specified in the ""Estimated Delivery Text"" setting."
+"Next Day Delivery Text","Next Day Delivery Text"
+"This message will be shown on the product page if next-day-delivery is available for the product. Leave blank if you wish to use default text, specified in the ""Estimated Delivery Text"" setting.","This message will be shown on the product page if next-day-delivery is available for the product. Leave blank if you wish to use default text, specified in the ""Estimated Delivery Text"" setting."
+"If Delivery Date is Unavailable","If Delivery Date is Unavailable"
+"This setting determines what should be displayed on a configurable product if the delivery date is not available for the selected configuration. The delivery date can be unavailable in 2 cases: 1) if the setting ""Allow Delivery Date"" is disabled for the selected child product; 2) if the salable quantity of the selected child product equals or less than 0 (if the setting ""Use Product Salable Quantity"" is enabled).","This setting determines what should be displayed on a configurable product if the delivery date is not available for the selected configuration. The delivery date can be unavailable in 2 cases: 1) if the setting ""Allow Delivery Date"" is disabled for the selected child product; 2) if the salable quantity of the selected child product equals or less than 0 (if the setting ""Use Product Salable Quantity"" is enabled)."
+"Error Message","Error Message"
+"This setting allows you to specify what message should be displayed on a configurable product if the delivery is unavailable for the selected configuration.","This setting allows you to specify what message should be displayed on a configurable product if the delivery is unavailable for the selected configuration."
+"Display 'Select Options' Message","Display 'Select Options' Message"
+"This setting allows you to display a custom message on a configurable product to notify your customers to select the configuration to see the estimated delivery period if specified.","This setting allows you to display a custom message on a configurable product to notify your customers to select the configuration to see the estimated delivery period if specified."
+"'Select Options' Message","'Select Options' Message"
+Calendar,Calendar
+"General Information","General Information"
+"Enable Delivery Option","Enable Delivery Option"
+"Delivery Option Title","Delivery Option Title"
+"Store View","Store View"
+"Customer Groups","Customer Groups"
+"Leave blank for all groups","Leave blank for all groups"
+"Working Days","Working Days"
+"Leave blank for all days","Leave blank for all days"
+"Cutoff Time","Cutoff Time"
+"Shipping Methods Limit","Shipping Methods Limit"
+"Shipping Methods","Shipping Methods"
+"Processing Order Period","Processing Order Period"
+"This setting defines a number of days you need to process the order and prepare it for shipment. Leave blank if you can ship the same day.","This setting defines a number of days you need to process the order and prepare it for shipment. Leave blank if you can ship the same day."
+"Max Delivery Period","Max Delivery Period"
+"This setting defines a number of days you restrict for the customers to choose as a delivery date starting from current date.","This setting defines a number of days you restrict for the customers to choose as a delivery date starting from current date."
+"Disable Delivery Date Selection by Customer","Disable Delivery Date Selection by Customer"
+"The global setting ""Pre-select Delivery Date"" must be enabled to correct work of this feature.","The global setting ""Pre-select Delivery Date"" must be enabled to correct work of this feature."
+"Active From","Active From"
+"Active To","Active To"
+"Sort Order","Sort Order"
+"Zip/Postal Codes List","Zip/Postal Codes List"
+"Please specify Zip/Postal codes separated by commas.","Please specify Zip/Postal codes separated by commas."
+"Zip/Postal Codes Ranges","Zip/Postal Codes Ranges"
+"If you specify any Zip/Postal codes or ranges delivery option will be available only for these Zip/Postal codes.","If you specify any Zip/Postal codes or ranges delivery option will be available only for these Zip/Postal codes."
+Add,Add
+From,From
+To,To
+"Delivery Quotes & Time Intervals Scope","Delivery Quotes & Time Intervals Scope"
+"Daily Quote","Daily Quote"
+"Leave blank if unlimited","Leave blank if unlimited"
+"Extra Charge","Extra Charge"
+"Add Time Interval","Add Time Interval"
+"From Time","From Time"
+"To Time","To Time"
+"Quote Limit","Quote Limit"
+"Daily Quotes","Daily Quotes"
+"Add New Holiday","Add New Holiday"
+Title,Title
+Day,Day
+Year,Year
+Annual,Annual
+Labels,Labels
+"All Store Views","All Store Views"
+"Delete selected items?","Delete selected items?"
+"Delete items","Delete items"
+"Change status","Change status"
+Enable,Enable
+Disable,Disable
+ID,ID
+Name,Name
+"Shipping Method","Shipping Method"
+"Processing Days","Processing Days"
+"Max Days","Max Days"
+Status,Status
+"Quote Address Id","Quote Address Id"
+"Order Address Id","Order Address Id"
+"Delivery Option Id","Delivery Option Id"
+Carrier,Carrier
+"Order Id","Order Id"
+"Purchase Date","Purchase Date"
+"Grand Total (Purchased)","Grand Total (Purchased)"
+Customer,Customer
+Country,Country
+Region,Region
+City,City
+Street,Street
+Postcode,Postcode
+"Delivery Time","Delivery Time"
+"Delivery Comment","Delivery Comment"
+Change,Change
+"This action will change delivery date for your order.","This action will change delivery date for your order."
+"Date must be of type DateTimeInterface","Date must be of type DateTimeInterface"

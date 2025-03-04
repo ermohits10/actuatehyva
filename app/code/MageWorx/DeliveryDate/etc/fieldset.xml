@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:DataObject/etc/fieldset.xsd">
+    <scope id="global">
+        <fieldset id="sales_convert_quote_address">
+            <field name="delivery_day">
+                <aspect name="to_order_address" />
+                <aspect name="shipping_address_data" targetField="extension_attribute_delivery_day_delivery_day"/>
+                <aspect name="to_in_store_pickup_shipping_address" targetField="extension_attribute_delivery_day_delivery_day"/>
+            </field>
+            <field name="delivery_hours_from">
+                <aspect name="to_order_address" />
+                <aspect name="shipping_address_data" targetField="extension_attribute_delivery_hours_from_delivery_hours_from"/>
+                <aspect name="to_in_store_pickup_shipping_address" targetField="extension_attribute_delivery_hours_from_delivery_hours_from"/>
+            </field>
+            <field name="delivery_minutes_from">
+                <aspect name="to_order_address" />
+                <aspect name="shipping_address_data" targetField="extension_attribute_delivery_minutes_from_delivery_minutes_from"/>
+                <aspect name="to_in_store_pickup_shipping_address" targetField="extension_attribute_delivery_minutes_from_delivery_minutes_from"/>
+            </field>
+            <field name="delivery_hours_to">
+                <aspect name="to_order_address" />
+                <aspect name="shipping_address_data" targetField="extension_attribute_delivery_hours_to_delivery_hours_to"/>
+                <aspect name="to_in_store_pickup_shipping_address" targetField="extension_attribute_delivery_hours_to_delivery_hours_to"/>
+            </field>
+            <field name="delivery_minutes_to">
+                <aspect name="to_order_address" />
+                <aspect name="shipping_address_data" targetField="extension_attribute_delivery_minutes_to_delivery_minutes_to"/>
+                <aspect name="to_in_store_pickup_shipping_address" targetField="extension_attribute_delivery_minutes_to_delivery_minutes_to"/>
+            </field>
+            <field name="delivery_time">
+                <aspect name="to_order_address" />
+                <aspect name="shipping_address_data" targetField="extension_attribute_delivery_time_delivery_time"/>
+                <aspect name="to_in_store_pickup_shipping_address" targetField="extension_attribute_delivery_time_delivery_time"/>
+            </field>
+            <field name="delivery_option_id">
+                <aspect name="to_order_address" />
+                <aspect name="shipping_address_data" targetField="extension_attribute_delivery_option_id_delivery_option_id"/>
+                <aspect name="to_in_store_pickup_shipping_address" targetField="extension_attribute_delivery_option_id_delivery_option_id"/>
+            </field>
+            <field name="delivery_comment">
+                <aspect name="to_order_address" />
+                <aspect name="shipping_address_data" targetField="extension_attribute_delivery_comment_delivery_comment"/>
+                <aspect name="to_in_store_pickup_shipping_address" targetField="extension_attribute_delivery_comment_delivery_comment"/>
+            </field>
+        </fieldset>
+    </scope>
+</config>

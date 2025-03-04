@@ -1,0 +1,29 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2022 Amasty (https://www.amasty.com)
+ * @package GDPR Cookie Hyva Compatibility (System)
+ */
+?>
+<?php
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+?>
+
+<div class="amgdprcookie-buttons-bar flex flex-wrap items-center justify-center mt-4">
+    <template x-for="(button, index) in buttons" :key="index">
+        <button class="amgdprcookie-button w-full mb-2 px-4 py-4 mb-2 bg-primary rounded-sm
+                       align-center text-sm md:w-auto focus:drop-shadow hover:drop-shadow"
+                :class="isSidebar ? 'md:max-w-full' : 'md:max-w-[30%]'"
+                x-html="button.title"
+                :style="button.styles"
+                :aria-label="button.title"
+                :onMouseOver="button.onMouseOver"
+                :onMouseOut="button.onMouseOut"
+                @click="button.action($el)">
+        </button>
+    </template>
+</div>

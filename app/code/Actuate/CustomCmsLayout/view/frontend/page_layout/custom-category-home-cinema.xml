@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_layout.xsd">
+    <update handle="2columns-left"/>
+    <referenceContainer name="content" >
+		<referenceBlock name="page.main.title" >
+            <block class="Magento\Cms\Block\Block" name="our.top.deals">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">our-top-deals</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Cms\Block\Block" name="home.cinema.content.block">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">home-cinema-content-block</argument>
+                </arguments>
+            </block>
+            
+            <block class="Actuate\CategoryProductFinder\Block\Category" after="home.cinema.content.block" name="Actuate.CategoryProductFinder.index" template="Actuate_CategoryProductFinder::productfinder.phtml"/>
+            <block class="Actuate\CustomCmsLayout\Block\CustomHeading" after="page.main.title" name="home.cinema.text" template="Actuate_CustomCmsLayout::homecinematext.phtml"/> 
+		</referenceBlock>
+		<referenceBlock name="Actuate.CategoryProductFinder.index" remove="true"/>
+			<referenceBlock name="actuate.subcategories.index" remove="true"/>
+	</referenceContainer>
+   	<move element="home.cinema.text" destination="main.content" before="columns"/>
+</layout>

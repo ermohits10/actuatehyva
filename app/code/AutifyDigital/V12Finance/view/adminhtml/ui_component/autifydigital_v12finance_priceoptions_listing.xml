@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<!--
+  ~ This program is the CONFIDENTIAL and PROPRIETARY property of Autify digital Ltd.
+  ~ Any unauthorized use, reproduction or transfer of this computer program is strictly prohibited.
+  ~ Copyright (c) 2020-2022 Autify digital Ltd.
+  ~ This is an unpublished work, and is subject to limited distribution and restricted disclosure only.
+  ~ ALL RIGHTS RESERVED.
+  ~
+  -->
+
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">autifydigital_v12finance_priceoptions_listing.autifydigital_v12finance_priceoptions_listing_data_source</item>
+		</item>
+	</argument>
+	<settings>
+		<spinner>autifydigital_v12finance_priceoptions_columns</spinner>
+		<deps>
+			<dep>autifydigital_v12finance_priceoptions_listing.autifydigital_v12finance_priceoptions_listing_data_source</dep>
+		</deps>
+		<buttons>
+			<button name="add">
+				<url path="*/*/new"/>
+				<class>primary</class>
+				<label translate="true">Add New Price Options</label>
+				<aclResource>AutifyDigital_V12Finance::PriceOptions_save</aclResource>
+			</button>
+		</buttons>
+	</settings>
+	<dataSource component="Magento_Ui/js/grid/provider" name="autifydigital_v12finance_priceoptions_listing_data_source">
+		<settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">priceoptions_id</param>
+            </storageConfig>
+			<updateUrl path="mui/index/render"/>
+		</settings>
+		<aclResource>AutifyDigital_V12Finance::PriceOptions_view</aclResource>
+		<dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="autifydigital_v12finance_priceoptions_listing_data_source">
+			<settings>
+				<requestFieldName>id</requestFieldName>
+				<primaryFieldName>priceoptions_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<listingToolbar name="listing_top">
+		<settings>
+			<sticky>true</sticky>
+		</settings>
+		<bookmark name="bookmarks"/>
+		<columnsControls name="columns_controls"/>
+		<filters name="listing_filters"/>
+		<paging name="listing_paging"/>
+	</listingToolbar>
+	<columns name="autifydigital_v12finance_priceoptions_columns">
+		<settings>
+			<editorConfig>
+				<param name="selectProvider" xsi:type="string">autifydigital_v12finance_priceoptions_listing.autifydigital_v12finance_priceoptions_listing.autifydigital_v12finance_priceoptions_columns.ids</param>
+				<param name="enabled" xsi:type="boolean">false</param>
+				<param name="indexField" xsi:type="string">priceoptions_id</param>
+			</editorConfig>
+			<childDefaults>
+				<param name="fieldAction" xsi:type="array">
+					<item name="provider" xsi:type="string">autifydigital_v12finance_priceoptions_listing.autifydigital_v12finance_priceoptions_listing.autifydigital_v12finance_priceoptions_columns_editor</item>
+					<item name="target" xsi:type="string">startEdit</item>
+					<item name="params" xsi:type="array">
+						<item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+						<item name="1" xsi:type="boolean">true</item>
+					</item>
+				</param>
+			</childDefaults>
+		</settings>
+		<column name="price_from">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Price From</label>
+			</settings>
+		</column>
+		<column name="price_to">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Price To</label>
+			</settings>
+		</column>
+		<column name="finance_options" class="AutifyDigital\V12Finance\Ui\Component\Listing\Column\GetPriceFinanceOptions">
+			<argument name="data" xsi:type="array">
+				<item name="config" xsi:type="array">
+					<item name="filter" xsi:type="string">false</item>
+					<item name="label" xsi:type="string" translate="true">Finance Options</item>
+				</item>
+			</argument>
+		</column>
+		<actionsColumn class="AutifyDigital\V12Finance\Ui\Component\Listing\Column\PriceOptionsActions" name="actions">
+			<settings>
+				<indexField>priceoptions_id</indexField>
+				<resizeEnabled>false</resizeEnabled>
+				<resizeDefaultWidth>107</resizeDefaultWidth>
+			</settings>
+		</actionsColumn>
+	</columns>
+</listing>

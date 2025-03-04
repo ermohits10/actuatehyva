@@ -1,0 +1,153 @@
+<?php
+
+use ReliantDirect\Checkout\ViewModel\Checkout;
+use Hyva\Checkout\ViewModel\Breadcrumbs\SigninRegister;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+/** @var CheckoutConfig $actuateCheckoutViewModel */
+$actuateCheckoutViewModel = $viewModels->require(Checkout::class);
+
+/** @var Magento\Framework\View\TemplateEngine\Php $this */
+$craftyConfig = $this->helper('Fetchify\Fetchify\Helper\Data');
+
+/** @var  SigninRegister $signInViewModel */
+$signInViewModel = $viewModels->require(SigninRegister::class);
+
+if ($actuateCheckoutViewModel->isUkPostCodeLookUpEnabled()): ?>
+    <script>
+        (() => {
+            'use strict';
+
+            const c2a_config = <?php echo $craftyConfig->getFrontendCfg(); ?>;
+            const isLogin = <?= (int) $signInViewModel->getCustomerSession()->isLoggedIn() ?>;
+
+            if (c2a_config.main.enable_extension && c2a_config.postcodelookup.enabled) {
+
+                // Initialize postcode lookup JS library when Magewire is loaded
+                document.addEventListener('magewire:load', () => {
+                    initCraftyClicksJS()
+                }, { once: true });
+
+                // Re-init postcode lookup when billing as shipping is toggled
+                window.addEventListener('billing-as-shipping-toggled', () => { bindPostcodeLookupToInputs(true) });
+
+                function initCraftyClicksJS () {
+                    // Add postcode lookup JS library
+                    const script = document.createElement('script');
+                    script.src = '<?= $this->getViewFileUrl('Craftyclicks_Ukpostcodelookup::crafty_postcode.class.js')?>';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    document.head.append(script);
+
+                    setTimeout(function() { bindPostcodeLookupToInputs() }, 2000);
+                }
+
+                /**
+                 * Bind Postcode Lookup to the form
+                 * @param reInit
+                 */
+                function bindPostcodeLookupToInputs(reInit = false) {
+                    if (reInit === false) {
+                        let shippingForm = document.getElementById('shipping');
+                        if (shippingForm) {
+                            let lookUpBtnId = shippingForm.querySelector('.lookup-btn').getAttribute('id');
+                            let lookUpResult = shippingForm.querySelector('.lookup-result').getAttribute('id');
+
+                            let cpObjShipping = CraftyPostcodeCreate();
+                            cpObjShipping.set("access_token", c2a_config.main.key);
+                            cpObjShipping.set("result_elem_id", lookUpResult);
+
+                            cpObjShipping.set("form", "");
+                            cpObjShipping.set("elem_company", "shipping-company");
+                            cpObjShipping.set("elem_street1", "shipping-street-0");
+                            cpObjShipping.set("elem_street2", "shipping-street-1");
+                            cpObjShipping.set("elem_town", "shipping-city");
+                            cpObjShipping.set("elem_county", "shipping-region");
+                            cpObjShipping.set("elem_postcode", "shipping-postcode");
+                            cpObjShipping.set("busy_img_url", '<?= $escaper->escapeUrl($this->getViewFileUrl('images/loader-1.gif')) ?>');
+                            cpObjShipping.set("on_result_selected", function(){
+                                updateCheckoutAddressFields('shipping');
+                            });
+
+                            document.getElementById(lookUpBtnId).addEventListener("click", function() {
+                                cpObjShipping.doLookup();
+                            })
+                        }
+                    }
+
+                    let billingForm = document.getElementById('billing');
+                    if (billingForm) {
+                        let billingLookUpBtnId = billingForm.querySelector('.lookup-btn').getAttribute('id');
+                        let billingLookUpResult = billingForm.querySelector('.lookup-result').getAttribute('id');
+
+                        let cpObjBilling = CraftyPostcodeCreate();
+                        cpObjBilling.set("access_token", c2a_config.main.key);
+                        cpObjBilling.set("result_elem_id", billingLookUpResult);
+
+                        cpObjBilling.set("form", "");
+                        cpObjBilling.set("elem_company", "billing-company");
+                        cpObjBilling.set("elem_street1", "billing-street-0");
+                        cpObjBilling.set("elem_street2", "billing-street-1");
+                        cpObjBilling.set("elem_town", "billing-city");
+                        cpObjBilling.set("elem_county", "billing-region");
+                        cpObjBilling.set("elem_postcode", "billing-postcode");
+                        cpObjBilling.set("busy_img_url", '<?= $escaper->escapeUrl($this->getViewFileUrl('images/loader-1.gif')) ?>');
+                        cpObjBilling.set("on_result_selected", function(){
+                            updateCheckoutAddressFields('billing');
+                        });
+
+                        document.getElementById(billingLookUpBtnId).addEventListener("click", function() {
+                            cpObjBilling.doLookup();
+                        })
+                    }
+                }
+
+                /**
+                 * Update MageWire Component with postcode lookup result
+                 * @param addressType
+                 */
+                function updateCheckoutAddressFields(addressType) {
+                    let fieldMappings = ['company', 'street-0', 'street-1', 'city', 'region', 'postcode'];
+                    console.debug(`Updating address fields for ${addressType}`);
+
+                    if (isLogin === 1) {
+                        const component = Magewire.find(`checkout.${addressType}-details.address-list.form`);
+                        if (!component) {
+                            console.error(`Cannot find Magewire component checkout.${addressType}-details.address-list.form`);
+                            return;
+                        }
+                        fieldMappings.forEach((field, key) => {
+                            let value = document.getElementById(addressType + '-' + field).value;
+                            let identifier = `address.${field}`;
+
+                            identifier = identifier.replace('-', '.');
+                            component.set(identifier, value ?? "");
+                        });
+                        component.save();
+                    } else {
+                        const component = Magewire.find(`checkout.${addressType}-details.address-form`);
+                        console.log(component);
+                        if (!component) {
+                            console.error(`Cannot find Magewire component checkout.${addressType}-details.address-form`);
+                            return;
+                        }
+                        fieldMappings.forEach((field, key) => {
+                            let value = document.getElementById(addressType + '-' + field).value;
+                            let identifier = `address.${field}`;
+
+                            identifier = identifier.replace('-', '.');
+                            console.log(identifier, value ?? "");
+                            component.set(identifier, value ?? "");
+                        });
+                        component.save();
+                    }
+                }
+            }
+
+        })();
+    </script>
+<?php endif; ?>

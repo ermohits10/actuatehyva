@@ -1,0 +1,15 @@
+<?php
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use ReliantDirect\Checkout\Block\TermAndCondition;
+
+/** @var Template $block */
+/** @var TermAndCondition $termAndCondition */
+
+$termAndCondition = $block->getLayout()->createBlock(TermAndCondition::class);
+?>
+<div>
+    <?= $termAndCondition->toHtml() ?>
+    <?= $block->getChildHtml('hyva.checkout.navigation.placeorder.button.v12finance') ?>
+</div>

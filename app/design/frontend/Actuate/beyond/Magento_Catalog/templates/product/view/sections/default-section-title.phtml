@@ -1,0 +1,24 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+/** @var AbstractBlock $sectionBlock */
+/** @var Escaper $escaper */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\AbstractBlock;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\SvgIcons;
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+$hyvaicons = $viewModels->require(SvgIcons::class);
+?>
+<h2 class="w-full">
+    <button @click="expanded = ! expanded" class="flex items-center justify-between w-full text-left text-lg md:text-2xl leading-6 font-medium font-serif lg:leading-8 text-[#000d40]"><?= $sectionBlock->getTitle() ? $escaper->escapeHtml($sectionBlock->getTitle()) : '&nbsp;' ?> <?= $heroicons->chevronDownHtml('inline-block float-right w-10 h-6 text-[#FF7E21] transition-transform transform duration-300 ease-in-out', 32,16,[":class" => "{ 'rotate-180': expanded }"]); ?></button>
+</h2>

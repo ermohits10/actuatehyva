@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Block\Product\View\Gallery">
+        <plugin name="actuate-product-view-gallery" type="Actuate\ReliantDirectTheme\Plugin\Product\View\GalleryPlugin" sortOrder="1"/>
+    </type>
+    <preference for="Magento\Catalog\Model\Product\Option\Type\Select"
+                type="Actuate\ReliantDirectTheme\Model\Product\Option\Type\Select"/>
+
+    <preference for="Scommerce\TrackingBase\Controller\Index\SaveImpression"
+                type="Actuate\ReliantDirectTheme\Controller\Index\SaveImpression"/>
+
+    <type name="Magento\Catalog\Helper\Product\Configuration">
+        <plugin name="allow-tags" type="Actuate\ReliantDirectTheme\Plugin\Helper\Product\ConfigurationOptionPlugin" />
+    </type>
+
+    <type name="Magento\Checkout\Block\Onepage">
+        <arguments>
+            <argument name="layoutProcessors" xsi:type="array">
+                <item name="ac_postcode_processor" sortOrder="190" xsi:type="object">Actuate\ReliantDirectTheme\Block\Checkout\PostcodeProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\GdprCookieHyva\Observer\MovePopupInLayout">
+        <plugin name="remove-cookie-consent" type="Actuate\ReliantDirectTheme\Plugin\MovePopupInLayoutPlugin" />
+    </type>
+    <preference for="Magento\CheckoutAgreements\Model\AgreementsConfigProvider"
+                type="Actuate\ReliantDirectTheme\Model\AgreementsConfigProvider" />
+    <!--<type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="billing_address_checkout_layout_processor" type="Actuate\ReliantDirectTheme\Plugin\Block\LayoutProcessor" sortOrder="1"/>
+    </type>-->
+    <!--<type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="actuate_default_payment" xsi:type="object">Actuate\ReliantDirectTheme\Model\DefaultPaymentConfigProvider</item>
+                <item name="actuate_express_paypal" xsi:type="object">Actuate\ReliantDirectTheme\Model\ExpressPaypaConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>-->
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="telephone_address_issue" type="Actuate\ReliantDirectTheme\Plugin\Block\LayoutProcessorPlugin" />
+    </type>
+    <type name="Magento\Directory\Model\PriceCurrency">
+        <plugin name="price-currency-format" type="Actuate\ReliantDirectTheme\Plugin\PriceCurrencyPlugin" disabled="false"/>
+    </type>
+</config>

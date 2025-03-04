@@ -1,0 +1,87 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Checkout\Helper\Data;
+
+?>
+
+<?php
+/** @var \Magento\Catalog\Pricing\Render\FinalPriceBox $block */
+
+/** ex: \Magento\Catalog\Pricing\Price\RegularPrice */
+/** @var \Magento\Framework\Pricing\Price\PriceInterface $priceModel */
+$priceModel = $block->getPriceType('regular_price');
+
+/** ex: \Magento\Catalog\Pricing\Price\FinalPrice */
+/** @var \Magento\Framework\Pricing\Price\PriceInterface $finalPriceModel */
+$finalPriceModel = $block->getPriceType('final_price');
+$idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
+$schema = ($block->getZone() == 'item_view') ? true : false;
+
+/** @var Data $checkoutHelper */
+$checkoutHelper = $this->helper(Data::class);
+
+/** @var ViewModelRegistry $viewModels */
+$commonViewModel = $viewModels->require(\Actuate\ReliantDirectTheme\ViewModel\CommonViewModel::class);
+$manufacturer = $block->getSaleableItem()->getAttributeText('manufacturer') ?? null;
+?>
+<?php if ($block->hasSpecialPrice()) :?>
+    <span class="special-price inline-block mr-3">
+        <?= /* @noEscape */ $block->renderAmount($finalPriceModel->getAmount(), [
+            'display_label'     => __('Special Price'),
+            'price_id'          => $block->getPriceId('product-price-' . $idSuffix),
+            'price_type'        => 'finalPrice',
+            'include_container' => true,
+            'schema' => $schema
+        ]); ?>
+    </span>
+    <span class="inline-flex flex-wrap old-price font-sans leading-6">
+        <?= /* @noEscape */ $block->renderAmount($priceModel->getAmount(), [
+            'display_label'     => __(''),
+            'price_id'          => $block->getPriceId('old-price-' . $idSuffix),
+            'price_type'        => 'oldPrice',
+            'include_container' => true,
+            'skip_adjustments'  => true
+        ]); ?>
+        <?php if ($priceModel->getAmount()->getValue() - $finalPriceModel->getAmount()->getValue() > 0): ?>
+        <div class="price-container">
+            <span class="save-upto text-[#D30202] text-base leading-6">
+                <?= __('<strong>Save %1</strong>', $commonViewModel->formatPrice($priceModel->getAmount()->getValue() - $finalPriceModel->getAmount()->getValue())); ?>
+            </span>
+        </div>
+        <?php endif; ?>
+    </span>
+<?php else :?>
+    <?= /* @noEscape */ $block->renderAmount($finalPriceModel->getAmount(), [
+        'price_id'          => $block->getPriceId('product-price-' . $idSuffix),
+        'price_type'        => 'finalPrice',
+        'include_container' => true,
+        'schema' => $schema
+    ]); ?>
+<?php endif; ?>
+
+<?php if ($commonViewModel->exVatPriceVisible($manufacturer)):?>
+    <div class="normal-incl-vat flex font-semibold items-baseline text-base font-serif w-full">
+        (<span class="price-container price-final_price tax weee">
+            <span class="price-label"></span>
+            <span id="product-price-<?= $block->getSaleableItem()->getId()?>" data-price-amount="<?= $finalPriceModel->getAmount()->getValue()?>" data-price-type="finalPrice" class="price-wrapper ">
+            <span class="price"><?= /** @noEscape */ str_replace('.00', '', $commonViewModel->convertPriceWithPrecision(($finalPriceModel->getAmount()->getValue()/1.2), 2)) ?></span></span>
+        </span>&nbsp;ex VAT)
+    </div>
+<?php endif; ?>
+
+<?php if ($block->showMinimalPrice()) :?>
+    <?php if ($block->getUseLinkForAsLowAs()) :?>
+        <a href="<?= $block->escapeUrl($block->getSaleableItem()->getProductUrl()) ?>" class="minimal-price-link">
+            <?= /* @noEscape */ $block->renderAmountMinimal() ?>
+        </a>
+    <?php else :?>
+        <span class="minimal-price-link">
+            <?= /* @noEscape */ $block->renderAmountMinimal() ?>
+        </span>
+    <?php endif?>
+<?php endif; ?>

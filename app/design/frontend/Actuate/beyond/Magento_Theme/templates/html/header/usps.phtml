@@ -1,0 +1,28 @@
+<div id="header-usps" class="bg-[#FF7E21] py-1">
+    <?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('header-usps')->toHtml(); ?>
+    <script>
+        var swiper = Swiper;
+        var init = false;
+        function swiperMode() {
+            if (!init) {
+                init = true;
+                swiper = new Swiper('#header-usps .swiper-container', {
+                    slidesPerView: 1,
+                    autoplay: {
+                        delay: 8000,
+                    },
+                    loop: true,
+                    spaceBetween: 0,
+                    direction: 'horizontal',
+                    centeredSlides: true,
+                });
+            }
+        }
+        window.addEventListener('load', function() {
+            swiperMode();
+        });
+        window.addEventListener('resize', function() {
+            swiperMode();
+        });
+    </script>
+</div>

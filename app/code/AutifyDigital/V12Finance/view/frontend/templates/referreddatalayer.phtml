@@ -1,0 +1,65 @@
+<?php
+
+use \AutifyDigital\V12Finance\Helper\Data;
+
+$financeData = $this->getV12FinanceSuccessView();
+$autifyDigitalHelper = $this->helper(\AutifyDigital\V12Finance\Helper\Data::class);
+$googleTagManagerEnable = $autifyDigitalHelper->getConfig('autifydigital/v12finance/referred_active');
+$v12OrderStatusVar = $autifyDigitalHelper->getConfig('autifydigital/v12finance/referred_v12finance_ads_aw_code_label');
+
+if($googleTagManagerEnable) {
+    $orderId = $financeData['order_id'];
+    $order = $autifyDigitalHelper->getOrder($orderId);
+    $storeName = $autifyDigitalHelper->getConfig('general/store_information/name');
+    $i = 0;
+    $cartProducts = [];
+    $countItems = count($order->getAllVisibleItems());
+    foreach ($order->getAllVisibleItems() as $item) {
+        if ($i+1<$countItems) {
+    		$cartProducts[$i] = "
+    		{
+    		'sku': '" . $item->getSku() . "',
+    		'name': '" . $item->getName() . "',
+    		'price': " . $item->getPrice() . ",
+    		'quantity': " . number_format($item->getQtyOrdered()) . "
+    		},";
+    	} else {
+    	    $cartProducts[$i] = "
+    		{
+    		'sku': '" . $item->getSku() . "',
+    		'name': '" . $item->getName() . "',
+    		'price': " . $item->getPrice() . ",
+    		'quantity': " . number_format($item->getQtyOrdered()) . "
+    		}";
+    	}
+        $i++;
+    }
+    $v12OrderStatus = Data::V12_STATUS_ARRAY[$financeData['application_status']];
+    if($financeData['application_status'] == '2'): 
+?>
+<script>
+    // Send transaction data with a pageview if available
+    // when the page loads. Otherwise, use an event when the transaction
+    // data becomes available.
+    dataLayer.push({ ecommerce: null }); // Clear the previous ecommerce object.
+    dataLayer.push({
+        'ecommerce': {
+            'purchase': {
+                'actionField': {
+                    'id': '<?= $order->getIncrementId(); ?>', // Transaction ID. Required for purchases and refunds.
+                    'affiliation': '<?= $this->escapeJsQuote($storeName) ?>',
+                    'revenue': '<?= number_format($order->getBaseGrandTotal(), 2, ".", ""); ?>', // Total transaction value (incl. tax and shipping)
+                    'tax':'<?= number_format($order->getTaxAmount(), 2, ".", ""); ?>',
+                    <?php if($order->getCouponCode()) { ?>
+                    'coupon': '<?= $order->getCouponCode() ?>',
+                    <?php } ?>
+                    'shipping': '<?= number_format($order->getBaseShippingAmount(), 2, ".", ""); ?>'
+                },
+                'products': [<?php foreach ($cartProducts as $row) {echo $row;}?>],
+                'V12_App_Status': 'referred'
+            }
+        },
+        'event': 'referred'
+    });
+</script>
+<?php endif; } ?>

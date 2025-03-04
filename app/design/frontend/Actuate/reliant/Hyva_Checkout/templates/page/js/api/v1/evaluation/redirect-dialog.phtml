@@ -1,0 +1,98 @@
+<?php
+/**
+ * @author Hyvä Themes <info@hyva.io>
+ *
+ * For the full copyright and license information, please view the LICENSE.txt
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var HeroiconsOutline $iconsViewModel */
+?>
+<div x-data="initEvaluationRedirectDialog()"
+     x-init="initialize()"
+     x-cloak
+     x-spread="overlay()"
+     x-bind="overlay()"
+     x-on:click.outside="() => {}"
+     class="fixed inset-0 flex items-center justify-center text-left bg-black bg-opacity-50 p-4"
+>
+    <div x-ref="dialog"
+         role="dialog"
+         aria-labelledby="evaluation-redirect"
+         class="inline-block max-w-2xl max-h-screen overflow-auto bg-white shadow-xl rounded-lg p-6 text-gray-700"
+    >
+        <template x-if="title">
+            <header class="border-b border-gray-400 pb-1 mb-6">
+                <h2 x-text="title" class="flex items-center text-gray-800 text-xl font-medium">
+                    <!-- Title placeholder -->
+                </h2>
+            </header>
+        </template>
+
+        <?= $block->getChildHtml('before') ?>
+
+        <div class="text-center space-y-4">
+            <p x-text="message" class="px-4 py-2 md:text-xl">
+                <!-- Message placeholder -->
+            </p>
+
+            <template x-if="url">
+                <p x-text="url" class="text-sm text-gray-700 font-bold px-4 py-2 bg-gray-100 rounded-md">
+                    <!-- URL placeholder -->
+                </p>
+            </template>
+        </div>
+
+        <?= $block->getChildHtml('after') ?>
+
+        <template x-if="! secure">
+            <p class="message error">
+                <?= $escaper->escapeHtml(__('Attention: The website you are attempting to access is not secure,
+                and your connection may not be private. Continuing is at your own risk, and we are not responsible for
+                any issues that may arise.')) ?>
+            </p>
+        </template>
+
+        <template x-if="actions && actions.length !== 0">
+            <nav class="flex flex-col-reverse justify-between md:flex-row
+                        gap-y-2 md:gap-x-2 mt-6
+                        w-full
+                        md:items-center"
+            >
+                <template x-if="actions.decline">
+                    <div class="flex flex-col-reverse gap-4 sm:flex-row sm:justify-end">
+                        <button type="button"
+                                x-spread="buttonDecline()"
+                                x-bind="buttonDecline()"
+                                class="btn btn-secondary"
+                        >
+                            <?= $escaper->escapeHtml(__('Decline')) ?>
+                        </button>
+                    </div>
+                </template>
+
+                <template x-if="actions.confirm">
+                    <div class="flex flex-col-reverse gap-4 sm:flex-row sm:justify-end">
+                        <button type="button"
+                                x-spread="buttonRedirect()"
+                                x-bind="buttonRedirect()"
+                                class="btn btn-primary"
+                        >
+                            <?= $escaper->escapeHtml(__('Confirm')) ?>
+                        </button>
+                    </div>
+                </template>
+            </nav>
+        </template>
+    </div>
+</div>

@@ -1,0 +1,254 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="MageWorx_DeliveryDate::css/styles.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="MageWorx\DeliveryDate\Block\JsConfig"
+                   name="mageworx.delivery_date.js_config"
+                   as="delivery_date_js_config"
+                   template="MageWorx_DeliveryDate::js_config.phtml" />
+        </referenceContainer>
+        <referenceBlock name="checkout.root">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="deliveryDateProvider" xsi:type="array">
+                            <item name="component" xsi:type="string">uiComponent</item>
+                        </item>
+                        <item name="ddConditionsListener" xsi:type="array">
+                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/conditions/listener</item>
+                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                            <item name="children" xsi:type="array">
+                                <item name="ddListenersList" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiComponent</item>
+                                    <item name="children" xsi:type="array">
+                                        <item name="shippingMethodListener" xsi:type="array">
+                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/conditions/listeners/checkout/shipping-method-listener</item>
+                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                        </item>
+                                        <item name="rawShippingAddressListener" xsi:type="array">
+                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/conditions/listeners/checkout/shipping-address-listener</item>
+                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                        </item>
+                                        <item name="savedShippingAddressListener" xsi:type="array">
+                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/conditions/listeners/checkout/saved-shipping-address-listener</item>
+                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                        </item>
+                                        <item name="quoteId" xsi:type="array">
+                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/conditions/listeners/checkout/quote-id-listener</item>
+                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                        </item>
+                                        <item name="guestQuoteId" xsi:type="array">
+                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/conditions/listeners/checkout/guest-quote-id-listener</item>
+                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                        <item name="ddDeliveryOptions" xsi:type="array">
+                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/delivery-options</item>
+                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                        </item>
+                        <item name="ddDeliveryDataSaveUpdate" xsi:type="array">
+                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/action/save-update-delivery-data</item>
+                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                        </item>
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="steps" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="shipping-step" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="shippingAddress" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="shippingAdditional" xsi:type="array">
+                                                            <item name="component" xsi:type="string">uiComponent</item>
+                                                            <item name="displayArea" xsi:type="string">shippingAdditional</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- address-list-additional-addresses -->
+                                                                <item name="delivery_date" xsi:type="array">
+                                                                    <item name="sortOrder" xsi:type="string">35</item>
+                                                                    <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery-date-container</item>
+                                                                    <item name="deliveryOptionsStorage" xsi:type="string">ddDeliveryOptions</item>
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/container/delivery-date</item>
+                                                                    </item>
+                                                                    <item name="children" xsi:type="array">
+                                                                        <item name="datetime_container" xsi:type="array">
+                                                                            <item name="sortOrder" xsi:type="string">10</item>
+                                                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/datetime-container</item>
+                                                                            <item name="config" xsi:type="array">
+                                                                                <item name="template" xsi:type="string">MageWorx_DeliveryDate/container/datetime</item>
+                                                                            </item>
+                                                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                                            <item name="visible" xsi:type="boolean">true</item>
+                                                                            <item name="templateElementNames" xsi:type="array">
+                                                                                <item name="deliveryDay" xsi:type="string">delivery_day</item>
+                                                                                <item name="deliveryTime" xsi:type="string">delivery_time</item>
+                                                                            </item>
+                                                                            <item name="childTemplates" xsi:type="array">
+                                                                                <!-- Component must have main part and element inside with different renderer according the settings (config) -->
+                                                                                <item name="delivery_day" xsi:type="array">
+                                                                                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/date/date</item>
+                                                                                    <item name="deliveryOptionsStorage" xsi:type="string">ddDeliveryOptions</item>
+                                                                                    <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                                                    <item name="dataScope" xsi:type="string">delivery_date.delivery_day</item>
+                                                                                    <item name="sortOrder" xsi:type="string">10</item>
+                                                                                    <item name="config" xsi:type="array">
+                                                                                        <item name="customScope" xsi:type="string">delivery_date</item>
+                                                                                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/date</item>
+                                                                                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/date/calendar</item>
+                                                                                    </item>
+                                                                                </item>
+                                                                                <!-- Component must have main part and element inside with different renderer according the settings (config) -->
+                                                                                <!-- Depend on date component -->
+                                                                                <item name="delivery_time" xsi:type="array">
+                                                                                    <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/time/time_range</item>
+                                                                                    <item name="dataScope" xsi:type="string">delivery_date.delivery_time</item>
+                                                                                    <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                                                    <item name="sortOrder" xsi:type="string">20</item>
+                                                                                    <item name="config" xsi:type="array">
+                                                                                        <item name="customScope" xsi:type="string">delivery_date</item>
+                                                                                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/time</item>
+                                                                                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/time/dropdown</item>
+                                                                                    </item>
+                                                                                </item>
+                                                                            </item>
+                                                                            <item name="children" xsi:type="array">
+                                                                                <!-- Rendered dynamically using uiLayout in datetime_container ^^ -->
+                                                                            </item>
+                                                                        </item>
+                                                                        <item name="comment_container" xsi:type="array">
+                                                                            <item name="sortOrder" xsi:type="string">30</item>
+                                                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/comment-container</item>
+                                                                            <item name="config" xsi:type="array">
+                                                                                <item name="template" xsi:type="string">MageWorx_DeliveryDate/container/comment</item>
+                                                                            </item>
+                                                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                                            <item name="visible" xsi:type="boolean">true</item>
+                                                                            <item name="children" xsi:type="array">
+                                                                                <item name="delivery_comment" xsi:type="array">
+                                                                                    <item name="sortOrder" xsi:type="string">30</item>
+                                                                                    <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/comment-textarea</item>
+                                                                                    <item name="label" xsi:type="string">Delivery Comment</item>
+                                                                                    <item name="dataScope" xsi:type="string">delivery_date.delivery_comment</item>
+                                                                                    <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                                                    <item name="visible" xsi:type="boolean">true</item>
+                                                                                    <item name="config" xsi:type="array">
+                                                                                        <item name="customScope" xsi:type="string">delivery_date</item>
+                                                                                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/comment</item>
+                                                                                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/comment</item>
+                                                                                    </item>
+                                                                                </item>
+                                                                            </item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="store-pickup" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="delivery_date" xsi:type="array">
+                                                    <item name="sortOrder" xsi:type="string">35</item>
+                                                    <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery-date-container</item>
+                                                    <item name="deliveryOptionsStorage" xsi:type="string">ddDeliveryOptions</item>
+                                                    <item name="displayArea" xsi:type="string">store-selector</item>
+                                                    <item name="config" xsi:type="array">
+                                                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/container/delivery-date</item>
+                                                    </item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="datetime_container" xsi:type="array">
+                                                            <item name="sortOrder" xsi:type="string">10</item>
+                                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/datetime-container</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="template" xsi:type="string">MageWorx_DeliveryDate/container/datetime</item>
+                                                            </item>
+                                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                            <item name="visible" xsi:type="boolean">true</item>
+                                                            <item name="templateElementNames" xsi:type="array">
+                                                                <item name="deliveryDay" xsi:type="string">delivery_day</item>
+                                                                <item name="deliveryTime" xsi:type="string">delivery_time</item>
+                                                            </item>
+                                                            <item name="childTemplates" xsi:type="array">
+                                                                <!-- Component must have main part and element inside with different renderer according the settings (config) -->
+                                                                <item name="delivery_day" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/date/date</item>
+                                                                    <item name="deliveryOptionsStorage" xsi:type="string">ddDeliveryOptions</item>
+                                                                    <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                                    <item name="dataScope" xsi:type="string">delivery_date.delivery_day</item>
+                                                                    <item name="sortOrder" xsi:type="string">10</item>
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="customScope" xsi:type="string">delivery_date</item>
+                                                                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/date</item>
+                                                                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/date/calendar</item>
+                                                                    </item>
+                                                                </item>
+                                                                <!-- Component must have main part and element inside with different renderer according the settings (config) -->
+                                                                <!-- Depend on date component -->
+                                                                <item name="delivery_time" xsi:type="array">
+                                                                    <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/time/time_range</item>
+                                                                    <item name="dataScope" xsi:type="string">delivery_date.delivery_time</item>
+                                                                    <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                                    <item name="sortOrder" xsi:type="string">20</item>
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="customScope" xsi:type="string">delivery_date</item>
+                                                                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/time</item>
+                                                                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/time/dropdown</item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="children" xsi:type="array">
+                                                                <!-- Rendered dynamically using uiLayout in datetime_container ^^ -->
+                                                            </item>
+                                                        </item>
+                                                        <item name="comment_container" xsi:type="array">
+                                                            <item name="sortOrder" xsi:type="string">30</item>
+                                                            <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/comment-container</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="template" xsi:type="string">MageWorx_DeliveryDate/container/comment</item>
+                                                            </item>
+                                                            <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                            <item name="visible" xsi:type="boolean">true</item>
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="delivery_comment" xsi:type="array">
+                                                                    <item name="sortOrder" xsi:type="string">30</item>
+                                                                    <item name="component"  xsi:type="string">MageWorx_DeliveryDate/js/view/delivery_date/element/comment-textarea</item>
+                                                                    <item name="label" xsi:type="string">Delivery Comment</item>
+                                                                    <item name="dataScope" xsi:type="string">delivery_date.delivery_comment</item>
+                                                                    <item name="provider" xsi:type="string">deliveryDateProvider</item>
+                                                                    <item name="visible" xsi:type="boolean">true</item>
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="customScope" xsi:type="string">delivery_date</item>
+                                                                        <item name="template" xsi:type="string">MageWorx_DeliveryDate/delivery_date/field/comment</item>
+                                                                        <item name="elementTmpl" xsi:type="string">MageWorx_DeliveryDate/delivery_date/element/comment</item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

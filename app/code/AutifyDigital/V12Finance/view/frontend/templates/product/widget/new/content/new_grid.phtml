@@ -1,0 +1,76 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Block\Product\ListProduct;
+use Magento\Catalog\Block\Product\ReviewRendererInterface;
+use Magento\Framework\Escaper;
+
+/** @var ListProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$productViewModel         = $viewModels->require(ProductPage::class);
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+
+/**
+ * Template for displaying new products widget
+ *
+ * @var $block \Magento\Catalog\Block\Product\Widget\NewWidget
+ */
+
+// phpcs:disable Magento2.Files.LineLength.MaxExceeded
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+
+if ($exist = ($block->getProductCollection() && $block->getProductCollection()->getSize())) {
+    $type = 'widget-new-grid';
+
+    $mode = 'grid';
+
+    $image = 'new_products_content_widget_grid';
+    $title = __('New Products');
+    $items = $block->getProductCollection()->getItems();
+
+    $showWishlist = true;
+    $showCompare = true;
+    $showCart = true;
+    $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::DEFAULT_VIEW;
+    $description = false;
+}
+?>
+
+<?php if ($exist) :?>
+    <div class="block widget block-new-products <?= /* @noEscape */ $mode ?> my-12">
+        <?php if ($block->getTitle()): ?>
+            <div class="block-title flex flex-col items-center pt-6 pb-3 mx-auto mb-6 border-b-2 border-gray-300 md:flex-row w-full">
+                <div class="text-2xl font-medium text-gray-900 title-font">
+                    <strong><?= $escaper->escapeHtml(__($block->getTitle())) ?></strong>
+                </div>
+            </div>
+        <?php endif ?>
+        <div class="block-content">
+            <div class="mx-auto grid gap-4 <?= $mode === 'grid' ? 'sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1' ?>">
+                <?php foreach ($items as $item): ?>
+                    <?= $productListItemViewModel->getItemHtml(
+                        $item,
+                        $block,
+                        $mode,
+                        $templateType,
+                        $image,
+                        $description
+                    ) ?>
+                <?php endforeach ?>
+            </div>
+            <?= $block->getPagerHtml() ?>
+        </div>
+    </div>
+<?php endif ?>

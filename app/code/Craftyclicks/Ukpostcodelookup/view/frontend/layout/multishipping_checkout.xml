@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+		<script src="Craftyclicks_Ukpostcodelookup::crafty_postcode.class.js"/>
+		<script src="Craftyclicks_Ukpostcodelookup::form_integrations/cc_multishipping_address.js"/>
+		<css src="Craftyclicks_Ukpostcodelookup::cc_rapid2.css"/>
+	</head>
+	<body>
+		<referenceContainer name="content.top">
+			<block class="Magento\Framework\View\Element\Template"
+				   name="craftyclicks.ukpostcodelookup.configpass"
+				   template="Craftyclicks_Ukpostcodelookup::config.phtml">
+			</block>
+		</referenceContainer>
+	</body>
+</page>

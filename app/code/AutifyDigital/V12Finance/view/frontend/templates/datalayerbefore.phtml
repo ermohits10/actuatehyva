@@ -1,0 +1,23 @@
+<?php
+$financeData = $this->getV12FinanceSuccessView();
+$autifyDigitalHelper = $this->helper(\AutifyDigital\V12Finance\Helper\Data::class);
+$googleTagManagerEnable = $autifyDigitalHelper->getConfig('autifydigital/v12finance/tagmanagers_enable');
+$googleTagManagerAccount = $autifyDigitalHelper->getConfig('autifydigital/v12finance/tagmanagers_id');
+if ($googleTagManagerEnable && $googleTagManagerAccount) {
+    if ($financeData['application_status'] == "5") {
+        ?>
+        <script>(function (w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({
+                    'gtm.start':
+                        new Date().getTime(), event: 'gtm.js'
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src =
+                    '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', '<?= $googleTagManagerAccount ?>');</script>
+    <?php }
+} ?>

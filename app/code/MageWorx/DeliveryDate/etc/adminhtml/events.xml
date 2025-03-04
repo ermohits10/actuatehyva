@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="adminhtml_sales_order_create_process_data_before">
+        <observer
+                name="mageworx_dd_submit_order_update_dd_info_in_request"
+                instance="MageWorx\DeliveryDate\Observer\UpdateDeliveryInfoInRequestWhenSubmitOrder"
+                />
+    </event>
+</config>

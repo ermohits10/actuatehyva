@@ -1,0 +1,656 @@
+<?php
+
+use Bss\FBT\Helper\Data as BssFBT;
+use Hyva\BssFBT\ViewModels\Helper as ModuleViewModel;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Model\Product;
+use Magento\Checkout\Helper\Data;
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Hyva\Theme\Model\ViewModelRegistry $viewModels */
+/** @var \Hyva\Theme\ViewModel\Slider $sliderViewModel */
+/**  @var BssFBT $helper */
+
+$moduleViewModel = $viewModels->require(ModuleViewModel::class);
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+/** @var Product $product */
+$product = $productViewModel->getProduct();
+
+$helper = $moduleViewModel->getHelper();
+
+$sliderViewModel = $viewModels->require(\Hyva\Theme\ViewModel\Slider::class);
+$itemsTemplate   = 'Hyva_BssFBT::slider.phtml';
+
+$checkoutHelper = $this->helper(Data::class);
+$priceIncludesTax = $block->priceIncludesTax();
+
+$branchesList = [];
+$depotslist = [];
+$depotAvailabilityArr = [];
+$ProductStockAvailabilityScheduleArr = [];
+
+$_outofstockallowbackorder = $product->getAttributeText('outofstockallowbackorder');
+
+$AvailabilityType = '';
+$IsExistingPO = '';
+$PSAQuantity = '';
+
+$UnallocatedBackOrdersArr = '';
+$UnallocatedBackOrders = [];
+$LocalStock = '';
+$TrueStock = [];
+
+$xmlArray = [];
+if (null !== $product->getStockanalysis()):
+    $stockAnalysis = $product->getStockanalysis();
+    $xml = simplexml_load_string($stockAnalysis, "SimpleXMLElement", LIBXML_NOCDATA);
+    $xmlParse = json_decode(json_encode($xml), true);
+
+    $depotData          =  $xml->DepotAvailability->asXML();
+    $depotXml           = simplexml_load_string($depotData, "SimpleXMLElement", LIBXML_NOCDATA);
+    $depotAvailability  = json_decode(json_encode($depotXml), true);
+
+    $additionalData     =  $xml->AdditionalAvailability->asXML();
+    $additionalXml           = simplexml_load_string($additionalData, "SimpleXMLElement", LIBXML_NOCDATA);
+    $additionalAvailability  = json_decode(json_encode($additionalXml), true);
+
+    if (isset($xmlParse['DepotStockRequested'])):
+        $DepotStockRequested = $xmlParse['DepotStockRequested'];
+        if (isset($DepotStockRequested[0])):
+            $DepotStockRequestedState = $DepotStockRequested;
+        else:
+            array_push($DepotStockRequestedState, $DepotStockRequested);
+        endif;
+    endif;
+
+    if (isset($depotAvailability['GetProductAvailability_FromDepot'])):
+        $depotAvailability = $depotAvailability['GetProductAvailability_FromDepot'];
+        if (isset($depotAvailability[0])):
+            $depotslist = $depotAvailability;
+        else:
+            array_push($depotslist, $depotAvailability);
+        endif;
+    endif;
+
+    if (isset($additionalAvailability['ProductStockAvailabilitySchedule'])):
+        $additionalAvailability = $additionalAvailability['ProductStockAvailabilitySchedule'];
+        if (isset($additionalAvailability[0])):
+            $ProductStockAvailabilityScheduleArr = $additionalAvailability;
+        else:
+            array_push($ProductStockAvailabilityScheduleArr, $additionalAvailability);
+        endif;
+    endif;
+
+    if (isset($xmlParse['UnallocatedBackOrders'])):
+        $UnallocatedBackOrdersArr = $xmlParse['UnallocatedBackOrders'];
+        if (isset($UnallocatedBackOrdersArr[0])):
+            $UnallocatedBackOrders = $UnallocatedBackOrdersArr;
+        else:
+            array_push($UnallocatedBackOrders, $UnallocatedBackOrdersArr);
+        endif;
+    endif;
+
+    if (isset($xmlParse['LocalStock'])):
+        $LocalStock = $xmlParse['LocalStock'];
+        if (isset($LocalStock[0])):
+            $TrueStock = $LocalStock;
+        else:
+            array_push($TrueStock, $LocalStock);
+        endif;
+    endif;
+
+    $lastDepotcode = null;
+    $availableDate = 0;
+
+    foreach ($depotslist as $item):
+        if ($item['DepotCode'] != $lastDepotcode):
+            $availabilityArr = [];
+            if ($item['AvailabilityBreakdown']['AvailableOnline'] == 'true'):
+                $tmp = [
+                    'depotCode' => $item['DepotCode'],
+                    'depotName' => $item['DepotDescription'],
+                    'fromdepotCode' => $item['FromDepotCode'],
+                    'stockAtDepot' => $item['QuantityAtDepot'],
+                    'availableDate' => $item['AvailableFromDateNum'],
+                    'isAvailableOnline'=> $item['AvailabilityBreakdown']['AvailableOnline']
+                ];
+                array_push($availabilityArr, $tmp);
+            endif;
+            $depot = new stdClass();
+            $depot->depotCode = $item['DepotCode'];
+            $depot->DepotDescription = $item['DepotDescription'];
+            $depot->Availability = $availabilityArr;
+            $depot->stockAtDepot = $item['QuantityAtDepot'];
+            $depot->availableDate = $item['AvailableFromDateNum'];
+            $depot->isAvailableOnline = $item['AvailabilityBreakdown']['AvailableOnline'];
+            $depot->isTrunked = $item['isTruncked'];
+            array_push($depotAvailabilityArr, $depot);
+        endif;
+        if ($item['DepotCode'] == $lastDepotcode):
+            if ($item['AvailabilityBreakdown']['AvailableOnline'] == 'true'):
+                $tmp2 = [
+                    'depotCode' => $item['DepotCode'],
+                    'depotName' => $item['DepotDescription'],
+                    'fromdepotCode' => $item['FromDepotCode'],
+                    'stockAtDepot' => $item['QuantityAtDepot'],
+                    'availableDate' => $item['AvailableFromDateNum'],
+                    'isAvailableOnline'=> $item['AvailabilityBreakdown']['AvailableOnline']
+                ];
+                array_push($availabilityArr, $tmp2);
+            endif;
+            $depot->Availability = $availabilityArr;
+            $depot->stockAtDepot = $depot->stockAtDepot + $item['QuantityAtDepot'];
+        endif;
+        $lastDepotcode = $item['DepotCode'];
+    endforeach;
+    if (null !== $lastDepotcode):
+        $buyOnline = $depotAvailabilityArr[0]->isAvailableOnline;
+    else :
+        $buyOnline = '';
+    endif;
+
+    $lastPSA = null;
+
+    foreach ($ProductStockAvailabilityScheduleArr as $PSAItem):
+        $AvailabilityType = $PSAItem['AvailabilityType'];
+        $IsExistingPO = $PSAItem['IsExistingPO'];
+        $PSAQuantity = $PSAItem['Quantity'];
+    endforeach;
+endif;
+?>
+<?php
+$type = 'fbt';
+$class = $type;
+$image = 'related_products_list';
+$title = $helper->getLTitle();
+$limit = 0;
+$shuffle = 0;
+$canItemsAddToCart = true;
+$showAddTo = true;
+$showCart = true;
+$templateType = $helper->isShowReview();
+$description = false;
+$productcurrent = $block->getCurrentProduct();
+$items = $block->getItemsFbt();
+$limit = $helper->getLLimitProduct();
+$countItem = 0;
+foreach ($items as $key => $brand) {
+    $limit --;
+    if ($limit < 0) {
+        $items->removeItemByKey($key);
+    }
+}
+$urlAddMultiToCart=$block->getUrl('fbt/cart/addMultiple');
+$kj = [];
+$items->addItem($productcurrent);
+?>
+<?php if ($helper->isActive()
+    && (($product->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $TrueStock >= 1)
+    || ($AvailabilityType == 'CurrentPO' && $IsExistingPO == true && $PSAQuantity >= 1 && $_outofstockallowbackorder != ''))): ?>
+    <?php if ($items && $block->countItem($items) > 1):?>
+    <script>
+        function bssFBT() {
+            return {
+                qty:'1',
+                contentPop:'',
+                openPop: false,
+                selectAll: true,
+                show : true,
+                totalPrice : 0,
+                updatePrice() {
+                    let self = this;
+                    let numberProduct = document.querySelectorAll('.fbt-product-select');
+                    this.totalPrice = 0;
+                    numberProduct.forEach(function (element){
+                        if(element.checked === true){
+                            let priceElement = document.querySelector('#fbt-product-price-' + element.value);
+                            let qty = document.querySelector('#qty_' + element.value);
+                            self.totalPrice = self.totalPrice + (parseFloat(priceElement.value) * parseFloat(qty.value));
+                        }
+                    })
+                },
+                toggleCheckboxProducts() {
+                    this.selectAll = !this.selectAll
+                    checkboxes = document.querySelectorAll('.fbt-product-select');
+                    [...checkboxes].map((el) => {
+                        el.checked = this.selectAll;
+                    })
+                },
+                validate : function(formData) {
+                    return formData.get('fbt-product-select[]') === null;
+
+                },
+
+                closePopup : function () {
+                    this.openPop = false,
+                        location.reload();
+                },
+
+                addProduct : function (form,url){
+                    const formData = new FormData(form);
+                    if(this.validate(formData)){
+                        alert('Please select product');
+                    } else {
+                        fetch(url,{
+                            headers:{
+                                contentType: `application/x-www-form-urlencoded; charset=UTF-8`,
+                            },
+                            body: formData,
+                            method: `POST`,
+                            mode: `cors`,
+                            credentials: `include`
+                        })
+                            .then(response => {
+                                return response.json();
+                            })
+                            .then(response => {
+                                let obj = response.popup.replace(/[\n\t'']+/g, '');
+                                this.contentPop = obj;
+                                this.openPop = true;
+                            })
+                    }
+                },
+                changeProduct(ele){
+                    document.getElementById("preview_"+ ele.id).parentNode.parentNode.style.display = ele.checked ? "flex" : "none";
+                    let numberProduct = document.querySelectorAll('.fbt-product-select');
+                    let groupedProduct = 0;
+                    let countProduct = 0;
+                    document.querySelectorAll('.preview_product').forEach(function (element){
+                        if(element.getAttribute("name") === 'grouped'){
+                            groupedProduct++;
+                        }
+                    })
+                    numberProduct.forEach(function (element){
+                        if(element.checked === true){
+                            countProduct++;
+                        }
+                    })
+                    this.show= groupedProduct + countProduct > 0 ? true : false;
+                },
+                changeAllProduct(ele){
+                    let groupedProduct = false;
+                    document.querySelectorAll('.preview_product').forEach(function (element){
+                        if(element.getAttribute("name") !== 'grouped'){
+                            element.parentNode.parentNode.style.display = ele.checked ? "flex" : "none";
+                        } else {
+                            groupedProduct = true;
+                        }
+                    })
+                    this.show= !groupedProduct ? ele.checked : true;
+                }
+            }
+
+        }
+    </script>
+    <div x-data="bssFBT()" x-init="updatePrice()">
+        <div id="slideFBT" x-show="show">
+            <?=
+            $sliderViewModel->getSliderForItems($itemsTemplate, $items, 'Hyva_BssFBT::slider-php.phtml')
+                ->setData('title', $title)
+                ->toHtml()
+            ?>
+        </div>
+        <form x-ref="form" action="<?= $escaper->escapeUrl($block->getUrl('fbt/wishlist/Add'))?>" method="post" id="product_fbt_form_popup">
+            <?php /* @escapeNotVerified */ echo $block->getBlockHtml('formkey') ?>
+            <?php if ($helper->isShowAddalltocartbtn() || $helper->isShowAddalltowishlistbtn()): ?>
+                <div class="hidden" @calculateprice.window="updatePrice()">
+                    <?php if ($helper->getDisplaylist() == 1): ?>
+                        <table class="fbt-preview1 max-w-lg">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <?php if ($helper->isShowAddalltocartbtn() || $helper->isShowAddalltowishlistbtn()): ?>
+                                        <input x-ref="allProduct" type="checkbox" name="" value="" class="fbt-add-all-product" @click="toggleCheckboxProducts()" @change="changeAllProduct($event.target)"
+                                               type="checkbox"
+                                               x-bind:checked="selectAll"
+                                               autocomplete="off"
+                                        >
+                                    <?php endif ?>
+                                </th>
+                                <th><?= $escaper->escapeHtml(__('Products Name'))?></th>
+                                <th><?= $escaper->escapeHtml(__('Qty'))?></th>
+                                <th><?= $escaper->escapeHtml(__('Unit Price'))?></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($items as $item): ?>
+                                <?php
+                                if(null !== $item->getStockanalysis()):
+                                    $stockAnalysis = $item->getStockanalysis();
+                                    $xml = simplexml_load_string($stockAnalysis, "SimpleXMLElement", LIBXML_NOCDATA);
+                                    $xmlParse = json_decode(json_encode($xml),true);
+
+                                    $depotData          =  $xml->DepotAvailability->asXML();
+                                    $depotXml           = simplexml_load_string($depotData, "SimpleXMLElement", LIBXML_NOCDATA);
+                                    $depotAvailability  = json_decode(json_encode($depotXml),true);
+
+                                    $additionalData     =  $xml->AdditionalAvailability->asXML();
+                                    $additionalXml           = simplexml_load_string($additionalData, "SimpleXMLElement", LIBXML_NOCDATA);
+                                    $additionalAvailability  = json_decode(json_encode($additionalXml),true);
+
+
+                                    if(isset($xmlParse['DepotStockRequested'])):
+                                        $DepotStockRequested = $xmlParse['DepotStockRequested'];
+                                        if(isset($DepotStockRequested[0])):
+                                            $DepotStockRequestedState = $DepotStockRequested;
+                                        else:
+                                            array_push($DepotStockRequestedState, $DepotStockRequested);
+                                        endif;
+                                    endif;
+
+                                    if(isset($depotAvailability['GetProductAvailability_FromDepot'])):
+                                        $depotAvailability = $depotAvailability['GetProductAvailability_FromDepot'];
+                                        if(isset($depotAvailability[0])):
+                                            $depotslist = $depotAvailability;
+                                        else:
+                                            array_push($depotslist, $depotAvailability);
+                                        endif;
+                                    endif;
+
+
+                                    if(isset($additionalAvailability['ProductStockAvailabilitySchedule'])):
+                                        $additionalAvailability = $additionalAvailability['ProductStockAvailabilitySchedule'];
+                                        if(isset($additionalAvailability[0])):
+                                            $ProductStockAvailabilityScheduleArr = $additionalAvailability;
+                                        else:
+                                            array_push($ProductStockAvailabilityScheduleArr, $additionalAvailability);
+                                        endif;
+                                    endif;
+
+                                    if(isset($xmlParse['UnallocatedBackOrders'])):
+                                        $UnallocatedBackOrdersArr = $xmlParse['UnallocatedBackOrders'];
+                                        if(isset($UnallocatedBackOrdersArr[0])):
+                                            $UnallocatedBackOrders = $UnallocatedBackOrdersArr;
+                                        else:
+                                            array_push($UnallocatedBackOrders, $UnallocatedBackOrdersArr);
+                                        endif;
+                                    endif;
+
+                                    if(isset($xmlParse['LocalStock'])):
+                                        $LocalStock = $xmlParse['LocalStock'];
+                                        if(isset($LocalStock[0])):
+                                            $TrueStock = $LocalStock;
+                                        else:
+                                            array_push($TrueStock, $LocalStock);
+                                        endif;
+                                    endif;
+
+
+
+                                    $lastDepotcode = null;
+                                    $availableDate = 0;
+
+                                    foreach ($depotslist as $ditem ):
+                                        if ($ditem['DepotCode'] != $lastDepotcode):
+                                            $availabilityArr = [];
+                                            if($ditem['AvailabilityBreakdown']['AvailableOnline'] == 'true'):
+                                                $tmp = array('depotCode'=>$ditem['DepotCode'],'depotName'=>$ditem['DepotDescription'],'fromdepotCode'=>$ditem['FromDepotCode'],'stockAtDepot'=>$ditem['QuantityAtDepot'],'availableDate'=> $ditem['AvailableFromDateNum'],'isAvailableOnline'=> $ditem['AvailabilityBreakdown']['AvailableOnline']);
+                                                array_push($availabilityArr,$tmp);
+                                            endif;
+                                            $depot = new stdClass();
+                                            $depot->depotCode = $ditem['DepotCode'];
+                                            $depot->DepotDescription = $ditem['DepotDescription'];
+                                            $depot->Availability = $availabilityArr;
+                                            $depot->stockAtDepot = $ditem['QuantityAtDepot'];
+                                            $depot->availableDate = $ditem['AvailableFromDateNum'];
+                                            $depot->isAvailableOnline = $ditem['AvailabilityBreakdown']['AvailableOnline'];
+                                            $depot->isTrunked = $ditem['isTruncked'];
+                                            array_push($depotAvailabilityArr,$depot);
+                                        endif;
+                                        if ($ditem['DepotCode'] == $lastDepotcode):
+                                            if($ditem['AvailabilityBreakdown']['AvailableOnline'] == 'true'):
+                                                $tmp2 = array('depotCode'=>$ditem['DepotCode'],'depotName'=>$ditem['DepotDescription'],'fromdepotCode'=>$ditem['FromDepotCode'],'stockAtDepot'=>$ditem['QuantityAtDepot'],'availableDate'=> $ditem['AvailableFromDateNum'],'isAvailableOnline'=> $ditem['AvailabilityBreakdown']['AvailableOnline']);
+                                                array_push($availabilityArr,$tmp2);
+                                            endif;
+                                            $depot->Availability = $availabilityArr;
+                                            $depot->stockAtDepot = $depot->stockAtDepot + $ditem['QuantityAtDepot'];
+                                        endif;
+                                        $lastDepotcode = $ditem['DepotCode'];
+                                    endforeach;
+                                    if(null !== $lastDepotcode):
+                                        $buyOnline = $depotAvailabilityArr[0]->isAvailableOnline;
+                                    else :
+                                        $buyOnline = '';
+                                    endif;
+
+                                    $lastPSA = null;
+
+                                    foreach($ProductStockAvailabilityScheduleArr as $PSAItem):
+                                        $AvailabilityType = $PSAItem['AvailabilityType'];
+                                        $IsExistingPO = $PSAItem['IsExistingPO'];
+                                        $PSAQuantity = $PSAItem['Quantity'];
+                                    endforeach;
+                                endif;
+                                ?>
+                                <tr class="h-16">
+                                    <td>
+                                        <?php if ($item->getTypeId() != 'grouped'):?>
+                                            <?php if ($item->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $TrueStock >= 1): ?>
+                                                <input @change="changeProduct($event.target)" type="checkbox" name="fbt-product-select[]" id="product_<?=$escaper->escapeHtmlAttr($item->getId()) ?>" class="fbt-product-select" value="<?=$escaper->escapeHtmlAttr($item->getId()) ?>" checked>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="w-8/12"><span class="product name product-item-name"><a class="product-item-link" title="<?=$escaper->escapeHtmlAttr($item->getName()) ?>" href="<?= $escaper->escapeUrl($block->getProductUrl($item)) ?>">
+                                            <?= $escaper->escapeHtml($item->getName()) ?></a>
+                                    </span></td>
+                                    <td class="text-center">
+                                        <?php if ($item->getTypeId() != 'grouped'):?>
+                                            <?php if ($item->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $TrueStock >= 1): ?>
+                                                <input type="text" class="fbt-qty w-[60px] rounded-xl text-center" name="<?=$escaper->escapeHtmlAttr($item->getId()) ?>_qty" placeholder="0" value="1">
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-center w-full"><?php /* @escapeNotVerified */ echo $block->getProductPrice($item) ?></td>
+                                </tr>
+                            <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <table class="fbt-preview2 max-w-lg">
+                            <thead>
+                            <tr>
+                                <th><?= $escaper->escapeHtml(__('Products Name'))?></th>
+                                <th><?= $escaper->escapeHtml(__('Qty'))?></th>
+                                <th><?= $escaper->escapeHtml(__('Unit Price'))?></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($items as $item): ?>
+                                <?php
+                                if(null !== $item->getStockanalysis()):
+                                    $stockAnalysis = $item->getStockanalysis();
+                                    $xml = simplexml_load_string($stockAnalysis, "SimpleXMLElement", LIBXML_NOCDATA);
+                                    $xmlParse = json_decode(json_encode($xml),true);
+
+                                    $depotData          =  $xml->DepotAvailability->asXML();
+                                    $depotXml           = simplexml_load_string($depotData, "SimpleXMLElement", LIBXML_NOCDATA);
+                                    $depotAvailability  = json_decode(json_encode($depotXml),true);
+
+                                    $additionalData     =  $xml->AdditionalAvailability->asXML();
+                                    $additionalXml           = simplexml_load_string($additionalData, "SimpleXMLElement", LIBXML_NOCDATA);
+                                    $additionalAvailability  = json_decode(json_encode($additionalXml),true);
+
+
+                                    if(isset($xmlParse['DepotStockRequested'])):
+                                        $DepotStockRequested = $xmlParse['DepotStockRequested'];
+                                        if(isset($DepotStockRequested[0])):
+                                            $DepotStockRequestedState = $DepotStockRequested;
+                                        else:
+                                            array_push($DepotStockRequestedState, $DepotStockRequested);
+                                        endif;
+                                    endif;
+
+                                    if(isset($depotAvailability['GetProductAvailability_FromDepot'])):
+                                        $depotAvailability = $depotAvailability['GetProductAvailability_FromDepot'];
+                                        if(isset($depotAvailability[0])):
+                                            $depotslist = $depotAvailability;
+                                        else:
+                                            array_push($depotslist, $depotAvailability);
+                                        endif;
+                                    endif;
+
+
+                                    if(isset($additionalAvailability['ProductStockAvailabilitySchedule'])):
+                                        $additionalAvailability = $additionalAvailability['ProductStockAvailabilitySchedule'];
+                                        if(isset($additionalAvailability[0])):
+                                            $ProductStockAvailabilityScheduleArr = $additionalAvailability;
+                                        else:
+                                            array_push($ProductStockAvailabilityScheduleArr, $additionalAvailability);
+                                        endif;
+                                    endif;
+
+                                    if(isset($xmlParse['UnallocatedBackOrders'])):
+                                        $UnallocatedBackOrdersArr = $xmlParse['UnallocatedBackOrders'];
+                                        if(isset($UnallocatedBackOrdersArr[0])):
+                                            $UnallocatedBackOrders = $UnallocatedBackOrdersArr;
+                                        else:
+                                            array_push($UnallocatedBackOrders, $UnallocatedBackOrdersArr);
+                                        endif;
+                                    endif;
+
+                                    if(isset($xmlParse['LocalStock'])):
+                                        $LocalStock = $xmlParse['LocalStock'];
+                                        if(isset($LocalStock[0])):
+                                            $TrueStock = $LocalStock;
+                                        else:
+                                            array_push($TrueStock, $LocalStock);
+                                        endif;
+                                    endif;
+
+
+
+                                    $lastDepotcode = null;
+                                    $availableDate = 0;
+
+                                    foreach ($depotslist as $ditem ):
+                                        if ($ditem['DepotCode'] != $lastDepotcode):
+                                            $availabilityArr = [];
+                                            if($ditem['AvailabilityBreakdown']['AvailableOnline'] == 'true'):
+                                                $tmp = array('depotCode'=>$ditem['DepotCode'],'depotName'=>$ditem['DepotDescription'],'fromdepotCode'=>$ditem['FromDepotCode'],'stockAtDepot'=>$ditem['QuantityAtDepot'],'availableDate'=> $ditem['AvailableFromDateNum'],'isAvailableOnline'=> $ditem['AvailabilityBreakdown']['AvailableOnline']);
+                                                array_push($availabilityArr,$tmp);
+                                            endif;
+                                            $depot = new stdClass();
+                                            $depot->depotCode = $ditem['DepotCode'];
+                                            $depot->DepotDescription = $ditem['DepotDescription'];
+                                            $depot->Availability = $availabilityArr;
+                                            $depot->stockAtDepot = $ditem['QuantityAtDepot'];
+                                            $depot->availableDate = $ditem['AvailableFromDateNum'];
+                                            $depot->isAvailableOnline = $ditem['AvailabilityBreakdown']['AvailableOnline'];
+                                            $depot->isTrunked = $ditem['isTruncked'];
+                                            array_push($depotAvailabilityArr,$depot);
+                                        endif;
+                                        if ($ditem['DepotCode'] == $lastDepotcode):
+                                            if($ditem['AvailabilityBreakdown']['AvailableOnline'] == 'true'):
+                                                $tmp2 = array('depotCode'=>$ditem['DepotCode'],'depotName'=>$ditem['DepotDescription'],'fromdepotCode'=>$ditem['FromDepotCode'],'stockAtDepot'=>$ditem['QuantityAtDepot'],'availableDate'=> $ditem['AvailableFromDateNum'],'isAvailableOnline'=> $ditem['AvailabilityBreakdown']['AvailableOnline']);
+                                                array_push($availabilityArr,$tmp2);
+                                            endif;
+                                            $depot->Availability = $availabilityArr;
+                                            $depot->stockAtDepot = $depot->stockAtDepot + $ditem['QuantityAtDepot'];
+                                        endif;
+                                        $lastDepotcode = $ditem['DepotCode'];
+                                    endforeach;
+                                    if(null !== $lastDepotcode):
+                                        $buyOnline = $depotAvailabilityArr[0]->isAvailableOnline;
+                                    else :
+                                        $buyOnline = '';
+                                    endif;
+
+                                    $lastPSA = null;
+
+                                    foreach($ProductStockAvailabilityScheduleArr as $PSAItem):
+                                        $AvailabilityType = $PSAItem['AvailabilityType'];
+                                        $IsExistingPO = $PSAItem['IsExistingPO'];
+                                        $PSAQuantity = $PSAItem['Quantity'];
+                                    endforeach;
+                                endif;
+                                ?>
+                                <tr class="h-12" x-data="{product<?=$escaper->escapeJs($item->getId()) ?>: true}" x-show="product<?=$escaper->escapeJs($item->getId()) ?>" @product<?=$escaper->escapeJs($item->getId()) ?>.window="{product<?=$escaper->escapeJs($item->getId())?> = $event.target.checked}" @allproduct.window="{product<?=$escaper->escapeJs($item->getId())?> = $event.target.checked}">
+                                    <?php if ($item->getTypeId() != 'grouped'):?>
+                                        <td class="px-6 w-8/12">
+                                        <span class="product name product-item-name"><a class="product-item-link" title="<?= $escaper->escapeHtmlAttr($item->getName()) ?>" href="<?= $escaper->escapeUrl($block->getProductUrl($item))?>">
+                                                <?= $escaper->escapeHtml($item->getName()) ?></a>
+                                        </span>
+                                        </td>
+                                    <?php endif; ?>
+
+                                    <td>
+                                        <?php if ($item->getTypeId() != 'grouped'):?>
+                                            <?php if ($item->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $TrueStock >= 1): ?>
+                                                <div x-data="{qty<?=$escaper->escapeJs($item->getId())?> : 1}">
+                                                    <span x-text="qty<?=$escaper->escapeJs($item->getId())?>" @qty<?=$escaper->escapeJs($item->getId())?>.window="{qty<?=$escaper->escapeJs($item->getId())?> =$event.target.value}" class="fbt-qty" name="<?=$escaper->escapeHtmlAttr($item->getId()) ?>_qty" >1</span>
+                                                    <input style="display: none" type="text" class="fbt-qty" name="<?=$escaper->escapeHtmlAttr($item->getId()) ?>_qty" placeholder="0" :value="qty<?=$escaper->escapeHtmlAttr($item->getId())?>">
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <?php if ($item->getTypeId() != 'grouped'):?>
+                                        <td class="text-center w-full"> <?php /* @escapeNotVerified */ echo $block->getProductPrice($item)?></td>
+                                    <?php endif; ?>
+
+                                    <td class="hidden">
+                                        <?php if ($item->getTypeId() != 'grouped'):?>
+                                            <?php if ($item->isSaleable() && count($depotslist) >= 1 && $buyOnline == true && $TrueStock >= 1): ?>
+                                                <input type="checkbox" name="fbt-product-select[]" id="product_<?=$escaper->escapeHtmlAttr($item->getId()) ?>" class="fbt-product-select12" value="<?=$escaper->escapeHtmlAttr($item->getId()) ?>" :checked="product<?=$escaper->escapeJs($item->getId()) ?>">
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    <?php endif ?>
+                </div>
+                <div class="fbt-action">
+                    <?php if ($helper->isShowAddalltocartbtn()): ?>
+                        <div class="fbt-action bg-F2F6FA py-3 px-4 border border border-[#D1D5DB] border-t-0 mb-10 rounded-b-md">
+                            <div class="flex justify-between flex-wrap text-xl text-[#161A21] items-center">
+                                <strong class="flex justify-between w-full md:w-auto" x-text="'Total Price: ' + hyva.formatPrice(totalPrice)"></strong>
+                                <button class="rounded-md bg-126366 w-full max-w-[320px] mt-4 md:mt-0 py-0 h-12 text-base font-bold text-center" @click.prevent="addProduct($refs.form,'<?=$escaper->escapeUrl($urlAddMultiToCart)?>')" type="button" title="Add all products to Cart" style="  background: #<?php echo $helper->getLBackgroundBtnCart() ?>; border:1px solid #<?php echo $helper->getLBackgroundBtnCart() ?>;color: #<?php echo $helper->getLColorBtnCart();?>" class="action fbtaddtocart primary"><span><?=$escaper->escapeHtml(__($helper->getLTextBtnCart())) ?></span><span class="total_products"></span></button>
+                            </div>
+                        </div>
+                    <?php endif ?>
+                    <?php if ($helper->isShowAddalltowishlistbtn()): ?>
+                        <div class="py-0.5">
+                            <button class="rounded-lg py-0.5 px-1.5" type="submit" title="Add all products to Wishlist" style="background: #<?=$escaper->escapeHtmlAttr($helper->getLBackgroundBtnWl()) ?>; border:1px solid #<?=$escaper->escapeHtmlAttr($helper->getLBackgroundBtnWl()) ?>;color: #<?=$escaper->escapeHtmlAttr($helper->getLColorBtnWl())?>" class="action fbtaddtowishlist primary"><span><?=$escaper->escapeHtmlAttr(__($helper->getLTextBtnWl())) ?></span><span class="total_products"></span></button>
+                        </div>
+                    <?php endif ?>
+                </div>
+            <?php endif ?>
+        </form>
+        <div id="popup" x-show="openPop" @continue.window="closePopup()" @closePop.window ="closePopup()" @countdown.window="closePopup()" x-transition style="display: none;">
+            <div class="fixed inset-0 flex items-center justify-center text-left bg-black bg-opacity-50 z-30">
+                <div @click.away="closePopup()" class="inline-block max-h-96 overflow-auto bg-white shadow-xl rounded-lg p-10 text-gray-700">
+                    <div x-ref="popup" x-html="contentPop" class="max-h-96"></div>
+                    <input type="hidden" name="" id="currency-add" value="<?php echo $block->getCurrentSymbol() ?>">
+
+                </div>
+            </div
+        </div>
+    </div>
+    <?php endif;?>
+<?php endif ?>
+<script>
+    function actionPopup() {
+        return {
+            countdown : <?=$escaper->escapeJs($helper->getPCountdowntime()) ?>,
+            init(){
+                var Interval =  window.setInterval(() => {
+                    if(this.countdown > 0)
+                    {this.countdown = this.countdown - 1;}
+                    else {
+                        <?php if ($helper->getPActivecountdown() == '2') :?>
+                        location.href = '<?=$escaper->escapeUrl($block->getUrl('checkout/cart'))  ?>';
+                        <?php endif; ?>
+                        <?php if ($helper->getPActivecountdown() == '1') :?>
+                        location.reload();
+                        <?php endif; ?>
+
+                        window.clearInterval(Interval);}
+                }, 1000)
+            }
+        }
+    }
+</script>

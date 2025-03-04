@@ -1,0 +1,106 @@
+<?php
+/** @var $block \Awin\AdvertiserTracking\Block\Success */
+
+use Actuate\AwinAdvertiserTracking\ViewModel\AwinTrackingViewModel;
+
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+
+$helper = $this->helper('Awin\AdvertiserTracking\Helper\Data');
+$advertiserId = $helper->getAdvertiserId();
+if ($advertiserId > 0) {
+    /** @var AwinTrackingViewModel $awinViewModel */
+    $awinViewModel = $block->getData('awin_view_model');
+
+    $order = $block->getOrderItemsDetails();
+
+    $couponCode = $order->getCouponCode();
+    if ($couponCode == null || $couponCode == '') {
+        $couponCode = $order->getDiscountDescription();
+    }
+
+    $orderId = $order->getRealOrderId();
+    $grandTotal = $order->getGrandTotal();
+    $taxTotal = $order->getTaxAmount();
+    $shippingCost = $order->getShippingAmount();
+    $totalAmount = $grandTotal - $shippingCost - $taxTotal;
+    $channel = $block->getChannelParameterValue();
+
+    $voucher = "";
+    if ($couponCode) {
+        $voucher = urlencode($couponCode);
+    }
+
+    $customerFirstOrder = $block->isFirstOrder();
+    $customerAcquisition = $customerFirstOrder ? 'NEW' : 'RETURNING';
+
+    $currency = $order->getGlobalCurrencyCode();
+    $p1 = 'magento2Module_1.3.1';
+
+    $bds = [];
+
+    $items = $order->getAllItems();
+    foreach ($items as $item) {
+        $productType = $item->getProductType();
+
+        if ($productType !== 'configurable') {
+            $itemSku = $item->getSku();
+            $itemProductId = urlencode($item->getProductId());
+            $itemProductName = urlencode($item->getName());
+            $category = $item->getProduct()->getCategory();
+            $primaryCategoryId = $item->getProduct()->getProductPrimaryCategory() ?? null;
+            $primaryCategory = null;
+            if (!empty($primaryCategoryId)) {
+                $primaryCategory = $awinViewModel->getPrimaryCategoryById($primaryCategoryId);
+            }
+            $itemCategory = $primaryCategory ?? ($category ? urlencode($category) : "");
+            $itemQuantity = $item->getQtyOrdered();
+            $itemPrice = $item->getProduct()->getFinalPrice($itemQuantity) / 1.2;
+            $bds[] = "AW:P|{$advertiserId}|{$orderId}|{$itemProductId}|{$itemProductName}|{$itemPrice}|{$itemQuantity}|{$itemSku}|DEFAULT|{$itemCategory}\n";
+        }
+    }
+
+    $fallback_url = "https://www.awin1.com/sread.img?tt=ns&tv=2&merchant={$advertiserId}&amount={$totalAmount}&ch={$channel}&cr={$currency}&parts=DEFAULT:{$totalAmount}&ref={$orderId}&vc={$voucher}&p1={$p1}&testmode=0";
+
+    foreach ($bds as $key => $value) {
+        $fallback_url .= "&bd[{$key}]={$value}";
+    }
+    ?>
+    <?php
+    echo $secureRenderer->renderTag(
+        'img',
+        [
+            'src' => $fallback_url,
+            'border' => '0',
+            'height' => '0',
+            'style' => 'display: none;',
+            'width' => '0'
+        ],
+        '',
+        false
+    );
+    ?>
+    <form style="display: none;" name="aw_basket_form">
+    <textarea wrap="physical" id="aw_basket"><?php
+        foreach ($bds as $bd) {
+            echo $bd . "\n";
+        }
+        ?></textarea>
+    </form>
+    <?php
+    $awinScript = "
+var AWIN = {};
+AWIN.Tracking = {};
+AWIN.Tracking.Sale = {};
+AWIN.Tracking.Sale.amount = '$totalAmount';
+AWIN.Tracking.Sale.channel = '$channel';
+AWIN.Tracking.Sale.currency = '$currency';
+AWIN.Tracking.Sale.orderRef = '$orderId';
+AWIN.Tracking.Sale.parts = 'DEFAULT:$totalAmount';
+AWIN.Tracking.Sale.voucher = '$voucher';
+AWIN.Tracking.Sale.custom = ['$p1'];
+AWIN.Tracking.Sale.test = '0';
+AWIN.Tracking.Sale.customerAcquisition = '$customerAcquisition';
+";
+    echo $secureRenderer->renderTag('script', ['type' => 'text/javascript'], $awinScript, false);
+    ?>
+<?php } ?>

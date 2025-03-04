@@ -1,0 +1,383 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Hyva\Theme\ViewModel\ProductCompare;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\ProductPage;
+use Hyva\Theme\ViewModel\Wishlist;
+use Magento\Catalog\Block\Product\AbstractProduct;
+use Magento\Catalog\Helper\Output as CatalogOutputHelper;
+use Magento\Framework\Escaper;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var AbstractProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+/** @var ProductListItem $productListItemViewModel */
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+
+/** @var CatalogOutputHelper $catalogOutputHelper */
+$catalogOutputHelper = $this->helper(CatalogOutputHelper::class);
+
+/** @var ProductCompare $compareViewModel */
+$compareViewModel = $viewModels->require(ProductCompare::class);
+/** @var Wishlist $wishlistViewModel */
+$wishlistViewModel = $viewModels->require(Wishlist::class);
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+/** @var HeroiconsSolid $heroiconsSolid */
+$heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
+
+/** @var Magento\Catalog\Model\Product $product */
+$product = $block->getData('product');
+$imageDisplayArea = $block->getData('image_display_area');
+$templateType = $block->getData('template_type');
+$viewMode = $block->getData('view_mode');
+$showDescription = $block->getData('show_description');
+$showAddToWishlist = $wishlistViewModel->isEnabled();
+$showAddToCompare = $compareViewModel->showInProductList();
+$viewIsGrid = $viewMode === 'grid';
+
+if (!$product) {
+    return '';
+}
+$productId = $product->getId();
+$uniqueId = '_' . uniqid();
+
+$hideDetails       = $block->getData('hide_details') ?: false;
+$hideRatingSummary = $block->getData('hide_rating_summary') ?: false;
+
+$_awardwinning = $product->getResource()->getAttribute('nc1000001264');
+$_awardwinning = $_awardwinning->getFrontend()->getValue($product);
+
+$_cashback = $product->getResource()->getAttribute('nc1000001252');
+$_cashback = $_cashback->getFrontend()->getValue($product);
+
+$_freeoffer = $product->getResource()->getAttribute('nc1000001258');
+$_freeoffer = $_freeoffer->getFrontend()->getValue($product);
+
+$_pricematch = $product->getResource()->getAttribute('nc1000001246');
+$_pricematch = $_pricematch->getFrontend()->getValue($product);
+
+$_vouchercode = $product->getResource()->getAttribute('nc1000000348');
+$_vouchercode = $_vouchercode->getFrontend()->getValue($product);
+
+$_WHITE5YG  = $product->getResource()->getAttribute('nc1000000458');
+$_WHITE5YG  = $_WHITE5YG->getFrontend()->getValue($product);
+
+/* Yes */
+$_BROWN5YG = $product->getResource()->getAttribute('nc1000000462');
+$_BROWN5YG = $_BROWN5YG->getFrontend()->getValue($product);
+
+$manfgteeparts = $product->getResource()->getAttribute('manfgteeparts');
+$manfgteeparts = $manfgteeparts->getFrontend()->getValue($product);
+$manfgteeparts = $manfgteeparts/12;
+
+$manfgteelabour = $product->getResource()->getAttribute('manfgteelabour');
+$manfgteelabour = $manfgteelabour->getFrontend()->getValue($product);
+$manfgteelabour = $manfgteelabour/12;
+
+/** Promo Blocks **/
+$_promo1 = $product->getResource()->getAttribute('nc1000000352');
+$_promo1 = $_promo1->getFrontend()->getValue($product);
+$_promo2 = $product->getResource()->getAttribute('nc1000000466');
+$_promo2 = $_promo2->getFrontend()->getValue($product);
+$_promo3 = $product->getResource()->getAttribute('nc1000000470');
+$_promo3 = $_promo3->getFrontend()->getValue($product);
+$_promo4 = $product->getResource()->getAttribute('nc1000001270');
+$_promo4 = $_promo4->getFrontend()->getValue($product);
+$_promo5 = $product->getResource()->getAttribute('nc1000001276');
+$_promo5 = $_promo5->getFrontend()->getValue($product);
+if($_promo1 == 'x' || $_promo1 == 'X'):
+    $_promo1 = '';
+endif;
+if($_promo2 == 'x' || $_promo2 == 'X'):
+    $_promo2 = '';
+endif;
+if($_promo3 == 'x' || $_promo3 == 'X'):
+    $_promo3 = '';
+endif;
+if($_promo4 == 'x' || $_promo4 == 'X'):
+    $_promo4 = '';
+endif;
+if($_promo5 == 'x' || $_promo5 == 'X'):
+    $_promo5 = '';
+endif;
+?>
+
+<?php if ($product->isSaleable()): ?>
+<form method="post"
+    action="<?= $escaper->escapeUrl($productViewModel->getAddToCartUrl($product, ['useUencPlaceholder' => true])) ?>"
+    class="item product product-item product_addtocart_form card card-interactive flex flex-col w-full relative <?= $viewIsGrid ? '' : 'md:flex-row' ?>"
+    <?php if ($product->getOptions()): ?>
+    enctype="multipart/form-data"
+    <?php endif; ?>
+>
+    <?= /** @noEscape */ $block->getBlockHtml('formkey') ?>
+    <input type="hidden" name="product" value="<?= (int)$productId ?>"/>
+<?php else: ?>
+<div class="item product product-item card card-interactive flex flex-col w-full <?= $viewIsGrid ? '' : 'md:flex-row' ?>">
+<?php endif; ?>
+    <?php if($viewIsGrid): ?>
+            <?php $productImage = $productViewModel->getImage($product, $imageDisplayArea); ?>
+            <?php // Product Image ?>
+            <span class="product-image-container-<?= $escaper->escapeUrl($productId) ?>" >
+                <a href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
+                   class="product photo product-item-photo block mx-auto mb-3 <?= $viewIsGrid ? '' : 'md:w-2/6 md:mb-0 md:mr-5' ?>"
+                   tabindex="-1">
+                    <img class="hover:shadow-sm mx-auto object-contain"
+                         loading="lazy"
+                         x-data=""
+                         @update-gallery-<?= (int)$productId ?>.window="$el.src = $event.detail"
+                         alt="<?= $escaper->escapeHtmlAttr($productImage->getLabel()) ?>"
+                         title="<?= $escaper->escapeHtmlAttr($productImage->getLabel()) ?>"
+                         src="<?= $escaper->escapeUrl($productImage->getImageUrl()) ?>"
+                         width="<?= $escaper->escapeHtmlAttr($productImage->getWidth()) ?>"
+                         height="<?= $escaper->escapeHtmlAttr($productImage->getHeight()) ?>"
+                    />
+                </a>
+            </span>
+            <div class="product-info flex flex-col flex-grow">
+                <?php
+                    $attribute = $product->getResource()->getAttribute('manufacturer');
+                    echo '<span class="font-sans text-sm leading-6 font-medium text-gray-900">'.$attribute->getFrontend()->getValue($product).'</span>';
+                ?>
+                <?php $productNameStripped = $block->stripTags($product->getName(), null, true); ?>
+                <div class="mb-1 items-center justify-center text-sans-serif text-lg leading-7 font-bold text-gray-900 <?= $viewIsGrid ? '' : 'md:text-left' ?>">
+                    <a class="product-item-link"
+                       href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>">
+                        <?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $product->getName(), 'name') ?>
+                    </a>
+                </div>
+                <script>
+                    function initPriceBox_<?= /** @noEscape */ $uniqueId ?>()
+                    {
+                        return {
+                            updatePrice(priceData) {
+                                const regularPriceLabel = this.$el.querySelector('.normal-price .price-label');
+                                const regularPriceElement = this.$el.querySelector('.normal-price .price-wrapper .price');
+
+                                if (priceData.finalPrice.amount < priceData.oldPrice.amount) {
+                                    regularPriceLabel.classList.add('hidden');
+                                } else {
+                                    regularPriceLabel.classList.remove('hidden');
+                                }
+                                regularPriceElement.innerText = hyva.formatPrice(priceData.finalPrice.amount).replace(/\.00$/,'');
+
+                                const regularExclPriceElement = this.$el.querySelector('.normal-incl-vat .price-wrapper .price');
+                                if (regularExclPriceElement) {
+                                    regularPriceLabel.classList.remove('hidden');
+                                    regularExclPriceElement.innerText = hyva.formatPrice(priceData.exVatFinalPrice.amount).replace(/\.00$/,'');
+                                }
+
+                                const oldExclPriceElement = this.$el.querySelector('.old-price .price-wrapper .price');
+                                this.$el.querySelector('.old-price').classList.add('hidden');
+                                if (oldExclPriceElement && priceData.finalPrice.amount < priceData.oldPrice.amount) {
+                                    this.$el.querySelector('.old-price').classList.remove('hidden');
+                                    oldExclPriceElement.innerText = hyva.formatPrice(priceData.oldPrice.amount).replace(/\.00$/,'');
+                                }
+
+                                const saveUptoExclPriceElement = this.$el.querySelector('.save-upto-excl-price .save-price');
+                                this.$el.querySelector('.save-upto-excl-price').classList.add('hidden');
+                                if (saveUptoExclPriceElement && priceData.finalPrice.amount < priceData.oldPrice.amount) {
+                                    this.$el.querySelector('.save-upto-excl-price').classList.remove('hidden');
+                                    saveUptoExclPriceElement.innerText = hyva.formatPrice(priceData.savePrice.amount).replace(/\.00$/,'');
+                                }
+                            }
+                        }
+                    }
+                </script>
+                <div class="pt-1 text-gray-900" x-data="initPriceBox_<?= /** @noEscape */ $uniqueId ?>()" @update-prices-<?= (int)$productId ?>.window="updatePrice($event.detail);">
+                    <?= /* @noEscape */ $productListItemViewModel->getProductPriceHtml($product) ?>
+                </div>
+                <?php if ($product->isAvailable() && !$hideDetails): ?>
+                    <?= $block->getProductDetailsHtml($product) ?>
+                <?php endif; ?>
+                <?php
+                    $deal1content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo1 . '')->toHtml();
+                    $deal2content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo2 . '')->toHtml();
+                    $deal3content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo3 . '')->toHtml();
+                    if($deal1content != ''):
+                        if (str_contains($deal1content, 'pdp-deal-link')):
+                            $deal1content = $deal1content;
+                        else:
+                            $deal1content = '<span class="pdp-deal-link">'.$deal1content.'</span>';
+                        endif;
+                        echo '<div class="deal-1 pdp-deal-strip cursor-pointer mt-2.5">'.$deal1content.'</div>';
+                    elseif($deal2content != ''):
+                        if (str_contains($deal2content, 'pdp-deal-link')):
+                            $deal2content = $deal2content;
+                        else:
+                            $deal2content = '<span class="pdp-deal-link">'.$deal2content.'</span>';
+                        endif;
+                        echo '<div class="deal-2 pdp-deal-strip cursor-pointer mt-2.5">'.$deal2content.'</div>';
+                    elseif($deal3content != ''):
+                        if (str_contains($deal3content, 'pdp-deal-link')):
+                            $deal3content = $deal3content;
+                        else:
+                            $deal3content = '<span class="pdp-deal-link">'.$deal3content.'</span>';
+                        endif;
+                        echo '<div class="deal-3 pdp-deal-strip cursor-pointer mt-2.5">'.$deal3content.'</div>';
+                    endif;
+                ?>
+                <div class="mt-auto flex flex-wrap justify-center items-center<?= $product->getTypeId() !== 'configurable' ? ' pt-3' : '';?>">
+                    <?php if ($product->isSaleable()): ?>
+                        <a class="w-full btn btn-primary justify-center text-sm <?= $viewIsGrid ? 'mr-auto' : 'mr-auto md:mr-0' ?>" href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>" aria-label="<?= $escaper->escapeHtmlAttr(__('View Product')) ?>">
+                            <span class="inline">
+                                <?= $escaper->escapeHtml(__('View Product')) ?>
+                            </span>
+                        </a>
+                    <?php endif; ?>
+                    <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
+                        <?= $addToBlock->setProduct($product)->getChildHtml() ?>
+                    <?php endif; ?>
+                    <?php if ($showAddToCompare): ?>
+                        <button x-data="initCompareOnProductList()"
+                                @click.prevent="addToCompare(<?= (int)$productId ?>)"
+                                aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>"
+                                type="button"
+                                class="h-9 p-0 border-0 inline-flex flex-shrink-0 items-center justify-center text-gray-500 hover:text-yellow-500">
+                           <svg width="19" height="18" viewBox="0 0 19 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                    <path d="M5.5 13H3.5C2.39543 13 1.5 12.1046 1.5 11V3C1.5 1.89543 2.39543 1 3.5 1H11.5C12.6046 1 13.5 1.89543 13.5 3V5M7.5 17H15.5C16.6046 17 17.5 16.1046 17.5 15V7C17.5 5.89543 16.6046 5 15.5 5H7.5C6.39543 5 5.5 5.89543 5.5 7V15C5.5 16.1046 6.39543 17 7.5 17Z" stroke="#5D6070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <?= $escaper->escapeHtmlAttr(__('Compare')) ?>
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php else: ?>
+             <?php $productImage = $productViewModel->getImage($product, $imageDisplayArea); ?>
+            <?php // Product Image ?>
+            <span class="product-image-container-<?= $escaper->escapeUrl($productId) ?> flex flex-col md:w-3/12 md:pr-6" >
+                <a href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
+                   class="product photo product-item-photo block mb-3 <?= $viewIsGrid ? '' : 'md:mb-0' ?>"
+                   tabindex="-1">
+                    <img class="object-contain mx-auto"
+                         loading="lazy"
+                         x-data=""
+                         @update-gallery-<?= (int)$productId ?>.window="$el.src = $event.detail"
+                         alt="<?= $escaper->escapeHtmlAttr($productImage->getLabel()) ?>"
+                         title="<?= $escaper->escapeHtmlAttr($productImage->getLabel()) ?>"
+                         src="<?= $escaper->escapeUrl($productImage->getImageUrl()) ?>"
+                         width="<?= $escaper->escapeHtmlAttr($productImage->getWidth()) ?>"
+                         height="<?= $escaper->escapeHtmlAttr($productImage->getHeight()) ?>"
+                    />
+                </a>
+            </span>
+            <div class="product-info flex flex-col md:w-6/12 md:ml-auto md:pl-6 md:pr-5">
+                <?php
+                    $attribute = $product->getResource()->getAttribute('manufacturer');
+                    echo '<span class="font-sans text-sm leading-6 font-medium text-gray-900">'.$attribute->getFrontend()->getValue($product).'</span>';
+                ?>
+                <?php $productNameStripped = $block->stripTags($product->getName(), null, true); ?>
+                <div class="mb-1 items-center justify-center text-sans-serif text-lg leading-7 font-bold text-gray-900 <?= $viewIsGrid ? '' : 'md:text-left' ?>">
+                    <a class="product-item-link"
+                       href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>">
+                        <?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $product->getName(), 'name') ?>
+                    </a>
+                </div>
+                <div class="prose text-sm leading-[22px] text-gray-800">
+                    <?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $product->getShortDescription() , 'short_description') ?>
+                </div>
+                <?php
+                    $deal1content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo1 . '')->toHtml();
+                    $deal2content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo2 . '')->toHtml();
+                    $deal3content = $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('deal-' . $_promo3 . '')->toHtml();
+                    if($deal1content != ''):
+                        if (str_contains($deal1content, 'pdp-deal-link')):
+                            $deal1content = $deal1content;
+                        else:
+                            $deal1content = '<span class="pdp-deal-link">'.$deal1content.'</span>';
+                        endif;
+                        echo '<div class="deal-1 pdp-deal-strip cursor-pointer mt-2.5">'.$deal1content.'</div>';
+                    elseif($deal2content != ''):
+                        if (str_contains($deal2content, 'pdp-deal-link')):
+                            $deal2content = $deal2content;
+                        else:
+                            $deal2content = '<span class="pdp-deal-link">'.$deal2content.'</span>';
+                        endif;
+                        echo '<div class="deal-2 pdp-deal-strip cursor-pointer mt-2.5">'.$deal2content.'</div>';
+                    elseif($deal3content != ''):
+                        if (str_contains($deal3content, 'pdp-deal-link')):
+                            $deal3content = $deal3content;
+                        else:
+                            $deal3content = '<span class="pdp-deal-link">'.$deal3content.'</span>';
+                        endif;
+                        echo '<div class="deal-3 pdp-deal-strip cursor-pointer mt-2.5">'.$deal3content.'</div>';
+                    endif;
+                ?>
+            </div>
+            <div class="flex flex-col md:border-l md:border-gray-200 md:w-3/12 md:ml-auto">
+                <div class="w-full flex flex-col md:pl-6">
+                    <script>
+                        function initPriceBox_<?= /** @noEscape */ $uniqueId ?>()
+                        {
+                            return {
+                                updatePrice(priceData) {
+                                    const regularPriceLabel = this.$el.querySelector('.normal-price .price-label');
+                                    const regularPriceElement = this.$el.querySelector('.normal-price .price-wrapper .price');
+                                    if (priceData.finalPrice.amount < priceData.oldPrice.amount) {
+                                        regularPriceLabel.classList.add('hidden');
+                                    } else {
+                                        regularPriceLabel.classList.remove('hidden');
+                                    }
+                                    regularPriceElement.innerText = hyva.formatPrice(priceData.finalPrice.amount);
+                                }
+                            }
+                        }
+                    </script>
+                    <div class="pt-1 text-gray-900" x-data="initPriceBox_<?= /** @noEscape */ $uniqueId ?>()" @update-prices-<?= (int)$productId ?>.window="updatePrice($event.detail);">
+                        <?= /* @noEscape */ $productListItemViewModel->getProductPriceHtml($product) ?>
+                    </div>
+                    <div class="pt-3">
+                        <?php if ($product->isSaleable()): ?>
+                            <a class="w-full btn btn-primary justify-center text-sm <?= $viewIsGrid ? 'mr-auto' : 'mr-auto md:mr-0' ?>" href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>" aria-label="<?= $escaper->escapeHtmlAttr(__('View Product')) ?>">
+                                <span class="inline <?= $viewIsGrid ? 'md:ml-0 md:hidden lg:inline' : '' ?>">
+                                    <?= $escaper->escapeHtml(__('View Product')) ?>
+                                </span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
+                            <?= $addToBlock->setProduct($product)->getChildHtml() ?>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($showAddToCompare): ?>
+                        <button x-data="initCompareOnProductList()"
+                                @click.prevent="addToCompare(<?= (int)$productId ?>)"
+                                aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>"
+                                type="button"
+                                class="h-9 p-0 border-0 inline-flex flex-shrink-0 items-center justify-center text-gray-500 hover:text-yellow-500">
+                            <svg width="19" height="18" viewBox="0 0 19 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                <path d="M5.5 13H3.5C2.39543 13 1.5 12.1046 1.5 11V3C1.5 1.89543 2.39543 1 3.5 1H11.5C12.6046 1 13.5 1.89543 13.5 3V5M7.5 17H15.5C16.6046 17 17.5 16.1046 17.5 15V7C17.5 5.89543 16.6046 5 15.5 5H7.5C6.39543 5 5.5 5.89543 5.5 7V15C5.5 16.1046 6.39543 17 7.5 17Z" stroke="#5D6070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <?= $escaper->escapeHtmlAttr(__('Compare')) ?>
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif;?>
+
+
+    <?php if ($product->isSaleable()): ?>
+</form>
+<?php else: ?>
+</div>
+<?php endif; ?>

@@ -1,0 +1,351 @@
+<?php
+use Magento\Framework\App\ObjectManager;
+
+$autifyDigitalHelper = $this->helper('AutifyDigital\V12Finance\Helper\Data');
+
+if($autifyDigitalHelper->checkModuleEnable() !== '1'){
+	return false;
+}
+
+$checkoutConfigArray = $autifyDigitalHelper->getCheckoutConfig();
+
+$checkProductLevelFinanceConfig = $autifyDigitalHelper->getProductFinanceEnableConfig();
+
+$quote = $autifyDigitalHelper->getQuote();
+$quoteItems = $quote->getAllVisibleItems();
+$couponCode = $quote->getCouponCode();
+
+$v12FinanceEnableProductArray =[];
+$productDisableCategoryIdsArray = [];
+$displayFinanceCategory= [];
+
+$productDisableCategory = $autifyDigitalHelper->getConfig('autifydigital/v12finance/finance_category_option');
+$productDisableCategoryIds = $autifyDigitalHelper->getConfig('autifydigital/v12finance/finance_category_list');
+if($productDisableCategory && $productDisableCategoryIds) {
+    $productDisableCategoryIdsArray = explode(",", $productDisableCategoryIds);
+}
+
+$displayFinanceCategory= [];
+foreach ($quoteItems as $item) {
+    $productId = $item->getProduct()->getId();
+    $product = ObjectManager::getInstance()->get(\Magento\Catalog\Api\ProductRepositoryInterface::class)->getById($productId);
+    $productLevelFinance = $product->getData('v12_finance_enable');
+    if($productLevelFinance === '0') {
+        $v12FinanceEnableProductArray[] = 0;
+    }
+    if($productDisableCategory) {
+        foreach($product->getCategoryIds() as $productCategoryId) {
+            if(in_array($productCategoryId, $productDisableCategoryIdsArray)) {
+                $displayFinanceCategory[] = 1;
+            }
+        }
+    }
+}
+
+if($productDisableCategory) {
+    if(in_array(1, $displayFinanceCategory)) {
+        return false;
+    }
+}
+
+if($checkProductLevelFinanceConfig === '1') {
+    if(in_array(0, $v12FinanceEnableProductArray)) {
+        return false;
+    }
+}
+
+$financeEnable = $quote->getData('v12_finance_enable');
+
+if($financeEnable === "0") {
+    return false;
+}
+
+
+$enableSaleCategory = $checkoutConfigArray['sale_category_enable'];
+$saleCategoryId = $checkoutConfigArray['sale_category_id'];
+$skuFinanceEnable = $checkoutConfigArray['sku_enable_finance'];
+$skuFinanceList = $checkoutConfigArray['sku_list'];
+
+$explodedSkuList = [];
+
+if(!empty($skuFinanceList)) {
+    $explodedSkuList = explode(',', $skuFinanceList);
+}
+$priceBasedFinance = $checkoutConfigArray['price_based_finance'];
+$isFinanceSkuExist = false;
+$minPercentage = $checkoutConfigArray['min_percentage_value'];
+$maxPercentage = $checkoutConfigArray['max_percentage_value'];
+$minFinanceDeposit = $checkoutConfigArray['min_deposit'];
+$maxFinanceDeposit = $checkoutConfigArray['max_deposit'];
+
+$productCategoryExist = false;
+
+$financeSkuArray = $salePriceProductArray = array();
+
+foreach ($quoteItems as $item) {
+    $product = $item->getProduct();
+    $productCategoryIds = $product->getCategoryIds();
+    if(in_array($saleCategoryId, $productCategoryIds)){
+        $productCategoryExist = true;
+        break;
+    }
+    if(in_array($item->getSku(), $explodedSkuList)){
+        $financeSkuArray[] = 1;
+    }
+    $salePriceProductArray[] = $autifyDigitalHelper->checkSalePriceProduct($product);
+}
+
+$orderTotal = $quote->getGrandTotal();
+
+$currencyCode = $autifyDigitalHelper->getCurrentCurrencyCode();
+
+if(in_array(1, $salePriceProductArray) && $checkoutConfigArray['sale_price_enable'] === '1') {
+    $getAllServices = $autifyDigitalHelper->getSaleFinanceOptions();
+    $defaultFinanceOption = $checkoutConfigArray['default_sale_finance_options'];
+} else if(!empty($couponCode) && $checkoutConfigArray['checkout_couponcode_enable'] === '1') {
+    $getAllServices = $autifyDigitalHelper->getSaleFinanceOptions();
+    $defaultFinanceOption = $checkoutConfigArray['default_sale_finance_options'];
+} else if( $enableSaleCategory === '1' && $productCategoryExist === true ){
+    $getAllServices = $autifyDigitalHelper->getSaleFinanceOptions();
+    $defaultFinanceOption = $checkoutConfigArray['default_sale_finance_options'];
+} else if ( $priceBasedFinance === '1' && $autifyDigitalHelper->getPriceBasedFinanceOptions($orderTotal) ) {
+    $getAllServices = $autifyDigitalHelper->getPriceBasedFinanceOptions($orderTotal);
+    $defaultFinanceOption = $checkoutConfigArray['default_price_finance_options'];
+} else if ( $skuFinanceEnable === '1' && in_array(1, $financeSkuArray)) {
+    $getAllServices = $autifyDigitalHelper->getSkuBasedFinanceOptions();
+    $defaultFinanceOption = $checkoutConfigArray['default_sku_finance_options'];
+} else {
+    $getAllServices = $autifyDigitalHelper->getNormalFinanceOptions();
+    $defaultFinanceOption = $checkoutConfigArray['default_finance_option'];
+}
+
+?>
+
+<div class="cart-v12-calc">
+	<ul class="finance-summary finance-calculator-summary v12finance-summary" id="finance-calculator-summary">
+        <li class="deposit-payment">
+            <label><?= __('Deposit Payment') ?></label>
+            <span class="value"></span>
+        </li>
+        <li class="finance-payment">
+            <label><?= __('Finance Amount') ?></label>
+            <span class="value"></span>
+        </li>
+        <li class="repayment-term">
+            <label><?= __('Repayment Term') ?></label>
+            <span class="value"></span>
+        </li>
+        <li class="interest-charged">
+            <label><?= __('Representative APR') ?></label>
+            <span class="value"></span>
+        </li>
+        <li class="monthly-amount">
+            <label><?= __('Instalment Amount') ?></label>
+            <span class="value"></span>
+        </li>
+        <li class="annual-rate-of-interest">
+            <label><?= __('Annual Rate Of Interest') ?></label>
+            <span class="value"></span>
+        </li>
+        <li class="total-amount-payable">
+            <label><?= __('Total Amount Payable') ?></label>
+            <span class="value"></span>
+        </li>
+        <li class="total-amount-payable-now">
+            <label><?= __('Total Amount Payable Now') ?></label>
+            <span class="value"></span>
+        </li>
+    </ul>
+</div>
+<script>
+
+    var grandTotal = '<?= $orderTotal ?>';
+    var currencyCode = '<?= $currencyCode; ?>';
+    var minimumFinancePercentage = '<?= $minPercentage; ?>';
+    var maximumFinancePercentage = '<?= $maxPercentage; ?>';
+    var minFinanceDeposit = '<?= $minFinanceDeposit; ?>';
+    var maxFinanceDeposit = '<?= $maxFinanceDeposit; ?>';
+    var defaultFinanceOption = '<?= $defaultFinanceOption ?>';
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+        reinitializeCalculator();
+    });
+
+    reinitializeCalculator();
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+
+    window.addEventListener("reload-customer-section-data", reinitializeCalculatorUpdate());
+
+    function reinitializeCalculatorUpdate(event) {
+
+        reinitializeCalculator();
+    }
+
+    function reinitializeCalculator() {
+
+        var totals = window.checkoutConfig.totalsData;
+        var grandTotal = (totals ? totals : window.checkoutConfig.totalsData)['grand_total'];
+
+        if((totals ? totals : window.checkoutConfig.totalsData)['base_grand_total'] < (totals ? totals : window.checkoutConfig.totalsData)['grand_total']) {
+            var grandTotal = (totals ? totals : window.checkoutConfig.totalsData)['grand_total'];
+        } else {
+            var grandTotal = (totals ? totals : window.checkoutConfig.totalsData)['base_grand_total'];
+        }
+
+        var minFinanceAmountTotal = parseFloat((minimumFinancePercentage*grandTotal)/100);
+        var maxFinanceAmountTotal = parseFloat((maximumFinancePercentage*grandTotal)/100);
+
+        var minFinanceAmount = Math.round(roundFinanceNum(minFinanceAmountTotal, 1));
+        var maxFinanceAmount = Math.round(roundFinanceNum(maxFinanceAmountTotal, -0.2));
+
+        var financeCookie = getCookie('finance');
+
+        if(typeof financeCookie === 'undefined') {
+            var financeJsonDecoded = "";
+        } else {
+            var financeJsonDecoded = JSON.parse(financeCookie);
+        }
+
+        var depositCookie = selectedDeposit = financeOptionCookie = '';
+
+        if(financeJsonDecoded){
+            var depositCookie = parseFloat(financeJsonDecoded['deposit']);
+            var financeOptionCookie = financeJsonDecoded['finance_option'];
+        }
+
+        if(depositCookie){
+            if(minFinanceAmount > depositCookie) {
+                selectedDeposit = minFinanceAmount;
+            }else if(maxFinanceAmount < depositCookie){
+                selectedDeposit = minFinanceAmount;
+            }else{
+                selectedDeposit = depositCookie;
+            }
+        }else{
+            selectedDeposit = minFinanceAmount;
+        }
+
+        if(financeOptionCookie != '') {
+            defaultFinanceOption = financeOptionCookie;
+        }
+
+        if(defaultFinanceOption == null) {
+            //HIDE OPTIONS
+            if(document.querySelector(".cart-v12finance-summary") !== null) {
+            	document.querySelector(".cart-v12finance-summary").style.display = 'none';
+            }
+	        document.querySelector(".cart-v12-calc").style.display = 'none';
+            return;
+        }
+
+        var totalsValue = grandTotal;
+
+        if(selectedDeposit > maxFinanceAmount) {
+            selectedDeposit = minFinanceAmount;
+        }
+
+        if(selectedDeposit < minFinanceAmount) {
+            selectedDeposit = minFinanceAmount;
+        }
+
+        defaultFinanceOptionArray = defaultFinanceOption.split("|");
+
+        if(defaultFinanceOptionArray) {
+            setTimeout(function(){ 
+            	var monthlyContract = defaultFinanceOptionArray[4];
+    	        var interest = defaultFinanceOptionArray[3];
+    	        var financeName = defaultFinanceOptionArray[2];
+    	        var calculationFactor = defaultFinanceOptionArray[5];
+    	        var minLoanFinanceAtV12 = defaultFinanceOptionArray[6];
+    	        var maxLoanFinanceAtV12 = defaultFinanceOptionArray[7];
+
+    	        var excludeDeposit = parseFloat(totalsValue)-parseFloat(selectedDeposit);
+    	        if(interest > 0) {
+    	            var monthlyAmount = excludeDeposit * calculationFactor;
+    	        } else {
+    	            var monthlyAmount = excludeDeposit/monthlyContract;
+    	        }
+    	        var monthlyAmount = Number(monthlyAmount).toFixed(4);
+    	        var interestAmount = (monthlyAmount*monthlyContract)-excludeDeposit;
+    	        var annualinterestrate = ((interestAmount/excludeDeposit)/(monthlyContract/12)*100);
+
+    	        if(interest > 0) {
+    	            var totalPayment = ((monthlyAmount*monthlyContract)+Number(selectedDeposit));
+    	            var annualinterestrate = ((interestAmount/excludeDeposit)/(monthlyContract/12)*100);
+    	            var financeAmountCheck = (monthlyAmount*monthlyContract);
+    	        }else{
+    	            var totalPayment = excludeDeposit+Number(selectedDeposit);
+    	            var financeAmountCheck = excludeDeposit;
+    	            var annualinterestrate = 0.00;
+    	        }
+    	        var totalDeposit = Math.round(selectedDeposit);
+
+    	        var totalPaymentDepositCheck = excludeDeposit;
+
+                document.querySelector('.v12finance-summary .deposit-payment .value').innerHTML = currencyCode + Number(totalDeposit).toFixed(2);
+    	        document.querySelector('.v12finance-summary .finance-payment .value').innerHTML = currencyCode + Number(excludeDeposit).toFixed(2);
+    	        document.querySelector('.v12finance-summary .monthly-amount .value').innerHTML = currencyCode + Number(monthlyAmount).toFixed(2);
+    	        document.querySelector('.v12finance-summary .repayment-term .value').innerHTML = monthlyContract + ' months';
+    	        document.querySelector('.v12finance-summary .interest-charged .value').innerHTML = Number(interest).toFixed(2) + '%';
+    	        document.querySelector('.v12finance-summary .annual-rate-of-interest .value').innerHTML = Math.abs(annualinterestrate).toFixed(2) + '%';
+    			document.querySelector('.v12finance-summary .total-amount-payable .value').innerHTML = currencyCode + Number(totalPayment).toFixed(2);
+    			document.querySelector('.v12finance-summary .total-amount-payable-now .value').innerHTML = currencyCode + Number(totalDeposit).toFixed(2);
+
+    			if(document.querySelector(".cart-v12finance-summary .cart-v12finance-month") !== null) {
+    				document.querySelector(".cart-v12finance-summary .cart-v12finance-month").innerHTML = currencyCode + Number(monthlyAmount).toFixed(2);
+    			}
+
+    	        if(financeAmountCheck < minLoanFinanceAtV12 || financeAmountCheck > maxLoanFinanceAtV12) {
+    	            //HIDE IT
+                    
+    	            if(document.querySelector(".cart-v12finance-summary") !== null) {
+    	            	document.querySelector(".cart-v12finance-summary").style.display = 'none';
+    	            }
+    	            document.querySelector(".cart-v12-calc").style.display = 'none';
+    	        } else {
+                    
+    	            if(totalPaymentDepositCheck >= minFinanceDeposit && totalPaymentDepositCheck <= maxFinanceDeposit) {
+    	                //SHOW it
+                        if(document.querySelector(".cart-v12finance-summary") !== null) {
+    		            	document.querySelector(".cart-v12finance-summary").style.display = 'block';
+    		            }
+    	                document.querySelector(".cart-v12-calc").style.display = 'block';
+    	            }else{
+    	                //HIDE IT
+    	                if(document.querySelector(".cart-v12finance-summary") !== null) {
+    		            	document.querySelector(".cart-v12finance-summary").style.display = 'none';
+    		            }
+    	                document.querySelector(".cart-v12-calc").style.display = 'none';
+    	            }
+    	        }
+            }, 1000);
+
+        } else {
+        	//HIDE IT
+        	if(document.querySelector(".cart-v12finance-summary") !== null) {
+            	document.querySelector(".cart-v12finance-summary").style.display = 'none';
+            }
+	        document.querySelector(".cart-v12-calc").style.display = 'none';
+        }
+
+    }
+
+    function roundFinanceNum(val, multiplesOf) {
+        var s = 1 / multiplesOf;
+        var res = Math.ceil(val*s)/s;
+        res = res < val ? res + multiplesOf: res;
+        var afterZero = multiplesOf.toString().split(".")[1];
+        return parseFloat(res.toFixed(afterZero ? afterZero.length : 0));
+    }
+
+</script>

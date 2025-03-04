@@ -1,0 +1,25 @@
+<!--
+/**
+ * Copyright © MageWorx. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<input class="admin__control-text delivery-date-calendar-input"
+       type="text"
+       autocomplete="off"
+       data-bind="
+    hasFocus: focused,
+    valueUpdate: valueUpdate,
+    attr: {
+        value: shiftedValue,
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': noticeId,
+        disabled: disabled,
+        autocomplete: autocomplete
+    },
+    datepicker: {
+        storage: shiftedValue,
+        options: options
+    }"/>
+<span class="delivery-date-additional-charges-container" data-bind="html: additionalChargeMessage, visible: additionalChargeMessage"></span>
